@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==== #26. mapper 기본설정 ==== -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<!-- ==== #27. 루트 엘리먼트 & 네임스페이스 설정(프로젝트 전체내에서 유일해야 한다.) ==== -->
+<mapper namespace="dasom">
+
+	<!-- 로그인하기 위해 멤버테이블에서 유저정보 select -->
+	<select id="getLogin" parameterType="HashMap" resultType="com.spring.finalins.model.MemberVO">
+		select userid, pwd, name, nickname, email, tel1, tel2, tel3, leave_status, job, birthday, org_filename, ins_personal_alarm, server_filename
+		  from ins_member
+		 where userid = #{userid} and pwd = #{pwd} and leave_status = 0
+	</select>
+	
+	
+	<!-- 로그인 한 유저의 팀idx, 팀명 select -->
+	<resultMap type="HashMap" id="getTeamInfo">
+		<result property="team_idx" 	      column="team_idx" 	   javaType="String" />
+		<result property="team_name" 	      column="team_name"    javaType="String" />
+		<result property="team_visibility_status" 	      column="team_visibility_status"    javaType="String" />
+	</resultMap>
+	<select id="getTeamList" parameterType="String" resultMap="getTeamInfo">
+		select A.team_idx, A.team_name, team_visibility_status
+		  from ins_team A join ins_team_member B
+  			on A.team_idx = B.fk_team_idx
+		 where B.team_userid = #{userid}
+	</select>
+		
+		
+	<!-- 회원가입하기 위해 멤버테이블에 insert -->
+	<insert id="signupEnd" parameterType="com.spring.finalins.model.MemberVO">
+		insert into ins_member(userid, pwd, name, nickname, email, leave_status, job, birthday, org_filename, ins_personal_alarm, tel1, tel2, tel3)
+		values(#{userid}, #{pwd}, #{name}, #{nickname}, #{email}, default, #{job}, to_date(#{birthday}, 'yyyy-mm-dd'), default, default, #{tel1}, #{tel2}, #{tel3})
+	</insert>
+	
+	
+	<!-- 회원가입 시 아이디 중복체크(멤버테이블 select) -->
+	<select id="idcheck" parameterType="String" resultType="Integer">
+		select count(*)
+		  from ins_member
+		 where userid = #{useridCheck}
+	</select>
+
+	
+	<!-- 팀의 visibility_status컬럼값을 select -->
+	<resultMap type="HashMap" id="teamInfo">
+		<result property="admin_status"       column="admin_status" javaType="String" />
+		<result property="visibility_status"  column="visibility_status" javaType="String" />
+	</resultMap>
+	<select id="getTeamVS" parameterType="HashMap" resultMap="teamInfo">
+		select A.team_visibility_status as visibility_status, B.team_member_admin_status as admin_status
+		  from ins_team A join ins_team_member B
+		    on A.team_idx = B.fk_team_idx
+		 where team_idx = #{teamIDX} and team_userid = #{userid}
+	</select>
+	
+	
+	<!-- 프로젝트 테이블에 새로운 프로젝트 insert -->
+	<insert id="insertProject" parameterType="HashMap">
+		insert into ins_project(PROJECT_IDX, FK_TEAM_IDX, PROJECT_NAME, PROJECT_VISIBILITY_ST, PROJECT_DELETE_STATUS, FK_PROJECT_IMAGE_IDX)
+		values(seq_project.nextval, #{team_idx}, #{project_name}, #{pjst}, default, #{image_idx})
+	</insert>
+	
+	
+	<!-- 생성된 프로젝트idx select -->
+	<select id="getProjectIDX" parameterType="HashMap" resultType="String">
+		select max(project_idx) as project_idx
+		  from (
+				select project_idx, fk_team_idx, project_name
+				  from ins_project
+				 where project_name = #{project_name} and fk_team_idx = #{team_idx}
+				 order by project_idx desc)
+	</select>
+	
+
+	<!-- 생성된 프로젝트idx에 프로젝트 멤버 insert -->
+	<insert id="insertProjectMember" parameterType="HashMap">
+		insert into ins_project_member(project_member_idx, fk_project_idx, project_member_userid, project_member_status, project_member_admin_status, project_favorite_status)
+		values(seq_project_member.nextval, #{projectIDX}, #{userid}, default, 1, default)
+	</insert>
+	
+	
+	<!-- 로그인 한 유저의 프로젝트 이름, 프로젝트idx, 팀idx select -->
+	<resultMap type="HashMap" id="getProjectInfo">
+		<result property="project_idx"   column="project_idx"  javaType="String" />
+		<result property="project_name"  column="project_name" javaType="String" />
+		<result property="team_idx"      column="team_idx"     javaType="String" />
+	</resultMap>
+	<select id="getProjectList" parameterType="String" resultMap="getProjectInfo">
+		select fk_project_idx as project_idx, project_name, fk_team_idx as team_idx
+		  from ins_project_member A join ins_project B       
+		    on A.fk_project_idx = B.project_idx
+		 where project_member_userid = #{userid}
+		 order by project_name asc
+	</select>
+	
+	
+	<!-- 유저가 접속한 프로젝트/프로젝트멤버의 정보를 select -->
+	<resultMap type="HashMap" id="projectInfo">
+		<result property="project_idx"   	  column="project_idx"  	  javaType="String" />
+		<result property="project_name"   	  column="project_name"  	  javaType="String" />
+		<result property="project_visibility" column="project_visibility" javaType="String" />
+		<result property="project_favorite"   column="project_favorite"   javaType="String" />
+		<result property="project_member_idx" column="project_member_idx" javaType="String" />
+		<result property="member_id"   		  column="member_id"  		  javaType="String" />
+		<result property="project_admin"   	  column="project_admin"  	  javaType="String" />
+		<result property="project_image_name" column="project_image_name" javaType="String" />
+	</resultMap>
+	<select id="getProjectInfo" parameterType="HashMap" resultMap="projectInfo">
+		select project_idx, 
+			   project_name, 
+			   project_visibility_st as project_visibility, 
+			   project_favorite_status as project_favorite, 
+			   project_member_idx, 
+       		   project_member_userid as member_id, 
+       		   project_member_admin_status as project_admin,
+       		   project_image_name
+		  from ins_project A,
+		  	   ins_project_member B,
+		  	   ins_project_image C
+		 where project_idx = #{project_idx} 
+		   and project_member_status = 0 
+		   and project_member_userid = #{userid}
+		   and A.project_idx = B.fk_project_idx
+		   and A.fk_project_image_idx = C.project_image_idx
+	</select>
+	
+	
+	<!-- 유저가 접속한 프로젝트의 배경이미지명을 select -->
+	<select id="getBackgroundIMG" parameterType="String" resultType="String">
+		select project_image_name
+		  from ins_project_image 
+		 where project_image_idx = (select fk_project_image_idx from ins_project where project_idx = #{project_idx})
+	</select>
+
+	<!-- 프로젝트의 즐겨찾기 상태를 update -->
+	<update id="updateFavoriteStatus" parameterType="HashMap">
+		<if test='favorite_status==1'>
+			update ins_project_member set project_favorite_status = 0 
+		</if>
+		<if test='favorite_status==0'>
+			update ins_project_member set project_favorite_status = 1 
+		</if>
+		 	where fk_project_idx = #{project_idx} and project_member_userid = #{userid}
+	</update>
+	
+	
+	<!-- 프로젝트의 리스트 목록을 select -->
+	<select id="getListInfo" parameterType="String" resultType="com.spring.finalins.model.ListVO">
+		select list_idx, fk_project_idx, list_name, list_delete_status
+		  from ins_list 
+		 where fk_project_idx = #{project_idx}
+		 order by list_idx asc
+		<!--  select list_idx, fk_project_idx, list_name, list_delete_status, list_userid,
+		        card_idx, fk_list_idx, card_userid, card_title,
+		        card_commentcount, card_date, card_delete_status
+		   from ins_list A, ins_card B
+		  where fk_project_idx = #{project_idx} 
+		    and A.list_idx = B.fk_list_idx -->
+	</select>
+	
+	
+	<!-- 프로젝트에 포함된 리스트의 카드목록 select-->
+	<select id="getCardInfo" parameterType="String" resultType="com.spring.finalins.model.CardVO">
+		select card_idx, fk_list_idx, card_userid, card_title,
+		       card_commentcount, card_date, card_delete_status
+		  from ins_list A, ins_card B
+	     where fk_list_idx = #{list_idx}
+		   and A.list_idx = B.fk_list_idx
+		 order by card_idx asc
+	</select>
+	
+	
+	<select id="emailCheck" parameterType="HashMap" resultType="Integer">
+		select count(*)
+		  from ins_member
+		 where userid = #{userid} and email = #{email}
+	</select>
+	
+	
+	<!-- 회원가입 폼에서 이메일 중복체크를 위한 select -->
+	<select id="signupEmailcheck" parameterType="String" resultType="Integer">
+		select count(email)
+		  from ins_member
+		 where email = #{emailCheck}
+	</select>
+	
+	
+	<!-- 아이디찾기에서 이메일로 아이디를 select -->
+	<select id="getuserID" parameterType="String" resultType="String">
+		select userid 
+		  from ins_member 
+		 where email = #{emailCheck}
+	</select>
+	
+	
+	<!-- 프로젝트 배경이미지 테이블의 데이터를 select -->
+	<resultMap type="HashMap" id="backgroundIMG">
+		<result property="project_image_idx"  column="project_image_idx"  javaType="String" />
+		<result property="project_image_name" column="project_image_name" javaType="String" />
+	</resultMap>
+	<select id="getProjectImg" resultMap="backgroundIMG">
+		select project_image_idx, project_image_name 
+		  from ins_project_image
+	</select>
+	
+	
+	<!-- 리스트 테이블에 insert -->
+	<insert id="addList" parameterType="HashMap">
+		insert into ins_list(list_idx, fk_project_idx, list_name, list_delete_status, list_userid)
+		values(seq_list.nextval, #{project_idx}, #{list_name}, default, #{userid})
+	</insert>
+	
+	
+	<!-- 카드 테이블에 insert -->
+	<insert id="addCard" parameterType="HashMap">
+		insert into ins_card(card_idx, fk_list_idx, card_userid, card_title, card_commentcount, card_date, card_delete_status)
+		values(seq_card.nextval, #{list_idx}, #{userid}, #{card_title}, default, default, default)
+	</insert>
+</mapper>
+ 
+ 

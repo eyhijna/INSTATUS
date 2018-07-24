@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======= #18. tiles 레이아웃 설정하기 ======= -->
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+    <!-- ==== tiles 를 사용하는 레이아웃 설정 시작1 ==== -->
+	<definition name="layout-tiles" template="/WEB-INF/tiles/layout/layout-tiles.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/tile/header.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/tile/footer.jsp" />
+	</definition>
+	
+	<definition name="*.tiles" extends="layout-tiles">
+		<put-attribute name="content" value="/WEB-INF/views/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.tiles" extends="layout-tiles">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="*/*/*.tiles" extends="layout-tiles">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<!-- ==== tiles 를 사용하는 레이아웃 설정1 끝 ==== -->
+	
+    <!-- ==== tiles 를 사용하는 레이아웃 설정 시작2 ==== -->
+    <!-- 메뉴를 새롭게 하기위해 레이아웃을 사용한다. /WEB-INF/tiles/tile/sideinfo.jsp가 없다 -->
+	<definition name="layout-tiles2" template="/WEB-INF/tiles/layout/layout-tiles2.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/tile/header.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	
+	<definition name="*.tiles2" extends="layout-tiles2">
+		<put-attribute name="content" value="/WEB-INF/views2/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.tiles2" extends="layout-tiles2">
+		<put-attribute name="content" value="/WEB-INF/views2/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="*/*/*.tiles2" extends="layout-tiles2">
+		<put-attribute name="content" value="/WEB-INF/views2/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<!-- ==== tiles 를 사용하는 레이아웃 설정2 끝 ==== -->
+	
+		
+    <!-- ==== tiles 를 사용하는 레이아웃 설정 시작3 ==== -->
+    <!-- 메뉴를 새롭게 하기위해 레이아웃을 사용한다. /WEB-INF/tiles/tile/sideinfo.jsp가 없다 -->
+	<definition name="layout-tiles3" template="/WEB-INF/tiles/layout/layout-tiles3.jsp"> 
+	<!-- 	<put-attribute name="cardheader" value="/WEB-INF/tiles/tile/cardheader.jsp" /> -->
+		<put-attribute name="cardcontent" value="" />
+		<put-attribute name="cardsideinfo" value="/WEB-INF/tiles/tile/cardsideinfo.jsp" />
+	</definition>
+	
+	<definition name="*.tiles3" extends="layout-tiles3">
+		<put-attribute name="content" value="/WEB-INF/views3/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.tiles3" extends="layout-tiles3">
+		<put-attribute name="content" value="/WEB-INF/views3/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="*/*/*.tiles3" extends="layout-tiles3">
+		<put-attribute name="content" value="/WEB-INF/views3/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<!-- ==== tiles 를 사용하는 레이아웃 설정2 끝 ==== -->
+	
+	
+
+	
+	
+	
+	<!-- ==== tiles 를 사용하지 않는  레이아웃 설정 시작 ==== -->
+	<definition name="layout-notiles" template="/WEB-INF/tiles/layout/layout-notiles.jsp"> 
+		<put-attribute name="content" value="" />
+	</definition>
+	
+	<definition name="*.notiles" extends="layout-notiles">
+		<put-attribute name="content" value="/WEB-INF/viewsnotiles/{1}.jsp"/>
+	</definition>
+	<!-- ==== tiles 를 사용하지 않는 레이아웃 설정 끝 ==== -->
+	
+		<!-- ==== tiles 를 사용하지 않는 XML을 사용한 AJAX를 위한 레이아웃 설정 시작 ==== -->
+	<definition name="layout-notilesxml" template="/WEB-INF/tiles/layout/layout-notilesxml.jsp"> 
+		<put-attribute name="content" value="" />
+	</definition>
+	
+	<definition name="*.notilesxml" extends="layout-notilesxml">
+		<put-attribute name="content" value="/WEB-INF/viewsnotilesxml/{1}.jsp"/>
+	</definition>
+	<!-- ==== tiles 를 사용하지 않는 XML을 사용한 AJAX를 위한 레이아웃 설정 끝 ==== -->
+	
+</tiles-definitions>       
+
+
+
+
+
+
+
+

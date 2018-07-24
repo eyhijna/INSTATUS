@@ -1,2 +1,1 @@
-# INSTATUS
-ins final project
+# INSFinal

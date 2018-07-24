@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==== #26. mapper 기본설정 ==== -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<!-- ==== #27. 루트 엘리먼트 & 네임스페이스 설정(프로젝트 전체내에서 유일해야 한다.) ==== -->
+<mapper namespace="jihye">
+
+  <!-- 개인정보 수정을 위한 로그인한 유저의 정보를 불러오기 -->
+  <select id="getMyProfile" parameterType="String"   resultType="com.spring.finalins.model.MemberVO">
+     select userid, pwd, name, nickname, email, tel1, tel2, tel3, leave_status, job, birthday, org_filename, ins_personal_alarm, server_filename
+           ,file_size
+     from ins_member
+     where userid = #{userid}
+  </select>
+  
+  
+  <!-- 회원정보수정 업데이트 하기 -->
+  <update id="updateMyProfile" parameterType="com.spring.finalins.model.MemberVO">
+     update ins_member set pwd=#{pwd}, nickname=#{nickname}, tel1=#{tel1},tel2=#{tel2}, tel3=#{tel3},job=#{job}
+     where userid = #{userid}
+   </update>
+   
+  
+   <!-- 회원탈퇴(leave_status 업데이트 하기) -->
+   <update id="deleteMyAccount" parameterType="String">
+     update ins_member set leave_status = 1
+     where userid = #{userid}
+   </update>
+   
+   
+   <!-- 내가 속한 팀목록 보여주기 -->
+    <select id="getTeamList" parameterType="String" resultType="com.spring.finalins.model.TeamVO">
+	    select team_name
+		from ins_team A join ins_team_member B
+		on A.team_idx = B.fk_team_idx
+		where team_userid = #{userid} and team_member_admin_status in (0,1,2)
+   </select>
+   
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->  
+
+    <!-- 내가 활동한 전체 기록수  -->
+    <select id="getRecordTotalCount" parameterType="HashMap" resultType="Integer">
+        select count(*)
+        from
+        (
+        select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status, project_record_idx
+		from
+		(
+		select rownum as RNO
+		      ,project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status,  project_record_idx
+		from
+		(
+		    select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status,  project_record_idx
+				from ins_project_record A join ins_project B
+				on A.fk_project_idx = B.project_idx
+				join ins_list C
+				on A.fk_list_idx = C.list_idx
+				join ins_card D
+				on A.fk_card_idx = D.card_idx
+				where record_userid = #{userid}
+		 ) V
+		)T
+		order by project_record_idx desc
+        )  
+    </select> 
+
+
+ 
+   
+    <!-- 내가 활동한 기록 보여주기 -->
+    <resultMap type="HashMap" id="getMyRecordListMap">
+      <result property="PROJECT_NAME"            column="project_Name"           javaType="String" />
+      <result property="LIST_NAME"               column="list_name"              javaType="String" />
+      <result property="CARD_TITLE"              column="card_title"             javaType="String" />
+      <result property="RECORD_USERID"           column="record_userid"          javaType="String" />
+      <result property="PROJECT_RECORD_TIME"     column="project_record_time"    javaType="String" />
+      <result property="RECORD_DML_STATUS"       column="record_dml_status"      javaType="String" /> 
+      <result property="PROJECT_RECORD_IDX"       column="project_record_idx"      javaType="String" /> 
+    </resultMap>   
+     <select id="getMyRecordList" parameterType="HashMap" resultMap="getMyRecordListMap">
+	    select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status, project_record_idx
+		from
+		(
+		select rownum as RNO
+		      ,project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status, project_record_idx
+		from
+		(
+		    select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status,project_record_idx
+				from ins_project_record A join ins_project B
+				on A.fk_project_idx = B.project_idx
+				join ins_list C
+				on A.fk_list_idx = C.list_idx
+				join ins_card D
+				on A.fk_card_idx = D.card_idx
+				where record_userid = #{userid}
+		 ) V
+		)T
+		where T.rno between #{startRno} and #{endRno}
+		order by project_record_idx desc
+   </select>  
+<!--     <select id="getMyRecordList" parameterType="String" resultMap="getMyRecordListMap">	   
+		    select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status, fk_card_idx
+			from ins_project_record A join ins_project B
+			on A.fk_project_idx = B.project_idx
+			join ins_list C
+			on A.fk_list_idx = C.list_idx
+			join ins_card D
+			on A.fk_card_idx = D.card_idx
+			where record_userid = #{userid}
+		    order by project_record_time desc
+   </select> -->  
+   
+   
+   
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->   
+   
+   <!-- 프로필 이미지 변경하기 -->
+    <update id="updateProfileImg" parameterType="HashMap">
+      update ins_member set org_filename = #{org_filename} ,server_filename = #{server_filename} ,file_size = #{file_size}
+       where userid = #{userid}
+   </update> 
+   
+   
+   <!-- ////////////////////////////////////////////////////////////// -->
+    <!-- 나를 초대한 팀목록 불러오기 -->
+    <resultMap type="HashMap" id="getInviteTeamNameMap">
+      <result property="TEAM_NAME"                 column="team_name"                  javaType="String" />
+      <result property="TEAM_USERID"               column="team_userid"                javaType="String" />
+      <result property="TEAM_MEMBER_ADMIN_STATUS"  column="team_member_admin_status"   javaType="String" />
+      <result property="FK_TEAM_IDX"  column="fk_team_idx"   javaType="String" />
+    </resultMap>  
+   <select id="getInviteTeamName" parameterType="String" resultMap="getInviteTeamNameMap">
+      select team_name, team_userid, team_member_admin_status, fk_team_idx
+	  from ins_team_member A join ins_team B
+	  on A.fk_team_idx = B.team_idx
+	 where team_userid = #{userid} and team_member_admin_status = 3    
+   </select>
+   
+   <!-- 팀초대 승인하기 -->
+   <update id="approveTeam" parameterType="HashMap" >
+     update ins_team_member set team_member_admin_status = 0
+     where team_userid = #{userid} and team_member_admin_status = 3 and fk_team_idx = #{fk_team_idx}   
+   </update>
+   
+   <!-- 팀초대 거절하기 -->
+   <delete id="denyTeam" parameterType="HashMap" >
+      delete from ins_team_member
+      where team_userid = #{userid} and team_member_admin_status = 3 and fk_team_idx = #{fk_team_idx} 
+   </delete>
+
+   
+   <!-- ////////////////////////////////////////////////////////////// -->
+   
+   
+   
+    <!-- 직업별 인원수(통계) -->
+   <resultMap type="HashMap" id="getChartJSON_jobMap">
+      <result property="JOB"    column="job"      javaType="String" />
+      <result property="CNT"       column="cnt"         javaType="String" />
+      <result property="PERCENT"    column="percent"    javaType="String" /> 
+   </resultMap>
+   <select id="getChartJSON_job" resultMap="getChartJSON_jobMap">
+    select  job , count(*) AS cnt, round( count(*)/(select count(*) from ins_member)*100, 1) as percent  
+   from ins_member
+   group by job
+   order by job desc
+   </select>
+   
+   
+   <!-- 나이별 인원수(통계) -->
+    <resultMap type="HashMap" id="agelineMap">
+     <result property="AGELINE"    column="ageline"    javaType="String" />
+     <result property="CNT"       column="cnt"         javaType="String" />
+   </resultMap>
+
+   <select id="adminChartJSON_ageline"  resultMap="agelineMap">
+	    select ageline, count(*) as cnt           
+		 from
+		 (
+		 select decode(trunc(EXTRACT(YEAR FROM SYSDATE) - extract(year from birthday), -1), 0 , '10대미만',to_char(trunc(EXTRACT(YEAR FROM SYSDATE) - extract(year from birthday),-1)|| '대' )) as ageline 
+		 from ins_member
+		 )
+		 group by ageline
+		 order by ageline    
+   </select>
+   
+   
+  <!-- //////////////////////////////////////////////////////////// -->
+ 
+ <!-- 이중차트 -->
+ <resultMap type="HashMap" id="rankShowJSONMap">
+     <result property="RANK"        column="rank"        javaType="String"/>
+     <result property="JOB"         column="job"         javaType="String"/>
+     <result property="CNT"         column="cnt"         javaType="String"/>
+     <result property="PERCENT"     column="percent"     javaType="String"/>
+ </resultMap>
+ <select id="rankShowJSON" resultMap="rankShowJSONMap">
+    select rank() over(order by cnt desc) as rank, job, cnt, percent
+   from
+   (
+   select  job, count(*) AS cnt, round( count(*)/(select count(*) from ins_member)*100, 1) as percent  
+   from ins_member 
+   group by job
+   order by job desc
+   )
+ </select>
+  
+ 
+ 
+ 
+ <resultMap type="HashMap" id="jobAgelineRankShowJSONMap">
+     <result property="AGELINE"     column="ageline"    javaType="String"/>
+     <result property="PERCENT"     column="percent"            javaType="String"/>
+ </resultMap>
+ 
+ <select id="jobAgelineRankShowJSON" parameterType="String"  resultMap="jobAgelineRankShowJSONMap">
+        select AGELINE, round( cnt/(select count(*) from ins_member where job='IT')*100, 1) as percent  
+		from 
+		(
+		select AGELINE, count(*) as cnt
+		from
+		(
+		select decode(trunc(EXTRACT(YEAR FROM SYSDATE) - extract(year from birthday), -1), 0 , '10대미만',to_char(trunc(EXTRACT(YEAR FROM SYSDATE) - extract(year from birthday),-1)|| '대' )) as ageline     
+		from ins_member
+		where job='IT'
+		)
+		group by ageline 
+		)
+		group by ageline ,cnt
+		order by ageline 
+ </select> 
+   
+   
+<!--    ins_personal_alarm값 변경하기
+  <update id="updateIns_personal_alarm" parameterType="String" >
+    update ins_member set ins_personal_alarm = 1
+    where userid = #{userid}
+  </update> -->
+   
+
+</mapper>

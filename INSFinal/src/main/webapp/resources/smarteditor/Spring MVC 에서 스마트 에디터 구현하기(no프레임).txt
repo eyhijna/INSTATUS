@@ -1,0 +1,583 @@
+﻿>>>> Spring MVC 에서 스마트 에디터 구현하기 <<<<
+
+==> 1. 
+       스마트 에디터를 다운받아 /webapp/resources/ 아래에 smarteditor 폴더를 생성후
+       그 아래에 다운받은 스마트 에디터 소스를 붙여두기를 한다.
+ 
+  
+==> 2.
+    /Board/src/main/webapp/resources/smarteditor/SmartEditor2_noframe.html 파일에서 아래 코드를 layout-tiles2.jsp에 삽입한다.
+
+<link href="css/smart_editor2.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="./js/lib/jindo2.all.js" charset="utf-8"></script>
+<script type="text/javascript" src="./js/lib/jindo_component.js" charset="utf-8"></script>
+<script type="text/javascript" src="./js/SE2M_Configuration.js" charset="utf-8"></script>	<!-- 설정 파일 -->
+<script type="text/javascript" src="./js/SE2BasicCreator.js" charset="utf-8"></script>
+<script type="text/javascript" src="./js/smarteditor2.min.js" charset="utf-8"></script>
+<!-- 사진첨부샘플  --> 
+<script type="text/javascript" src="./sample/js/plugin/hp_SE2M_AttachQuickPhoto.js" charset="utf-8"></script>
+
+jquery-2.0.0.js 와 bootstrap.js 는 반드시 아래로 위치해야 한다.
+
+
+==> 3. 
+    /Board/src/main/webapp/resources/smarteditor/js/SE2M_Configuration.js 의 아래 경로 변경
+
+nhn.husky.SE2M_Configuration.SE2B_CSSLoader = {
+	sCSSBaseURI : "./resources/smarteditor/css"   <----- 여기
+};
+
+/**
+ * 편집영역 설정
+ */
+nhn.husky.SE2M_Configuration.SE_EditingAreaManager = {
+	sCSSBaseURI : "./resources/smarteditor/css",	<---- 여기
+	sBlankPageURL : "./resources/smarteditor/smart_editor2_inputarea.html", <---- 여기
+	sBlankPageURL_EmulateIE7 : "./resources/smarteditor/smart_editor2_inputarea_ie8.html", <---- 여기
+	aAddtionalEmulateIE7 : [] // IE8 default 사용, IE9 ~ 선택적 사용
+};
+
+
+==> 4. 
+    /Board/src/main/webapp/resources/smarteditor/js/smarteditor2.min.js 에서
+
+a.href=b+"/smart_editor2_in.css"; 이것을 a.href="../smarteditor/css/smart_editor2_in.css"; 로 변경
+
+
+==> 5. 
+    /Board/src/main/webapp/resources/smarteditor/sample/js/plugin/hp_SE2M_AttachQuickPhoto.js 에서 아래 코드 변경
+
+ makePopupURL : function(){
+		var sPopupUrl = "./resources/smarteditor/sample/photo_uploader/photo_uploader.html"; <---- 여기
+		
+		return sPopupUrl;
+	}, 
+
+
+==> 6.
+    /Board/src/main/webapp/WEB-INF/views2/board/add.jsp 의 
+    <textarea name="content" id="content" rows="10" cols="100" style="width:95%; height:412px;"></textarea>아래에 
+    /Board/src/main/webapp/resources/smarteditor/SmartEditor2_noframe.html 파일에서 아래 코드를 삽입한다.
+
+<span id="rev">Version: 2.8.2.12056 </span> 부터
+~~~~~~~~~
+	function setDefaultFont() {
+		var sDefaultFont = '궁서';
+		var nFontSize = 24;
+		oEditor.setDefaultFont(sDefaultFont, nFontSize);
+	}
+}
+</script> 
+까지 삽입함.
+
+ ****  textarea 태그에서 required="required" 속성을 사용하면  스마트 에디터는 오류가 발생하므로 사용하면 안된다. ****
+  <tr>
+    <th>내용</th>
+    <td><textarea name="content" id="content" rows="10" cols="100" style="width:95%; height:412px;"></textarea>
+  </tr>
+
+
+==> 7. 
+    /Board/src/main/webapp/WEB-INF/views2/board/add.jsp 에서
+
+   <script type="text/javascript">
+	
+	$(document).ready(function(){
+			    	    
+	    // 쓰기버튼
+	    $("#btnWrite").click(function(){
+	    	  
+	        <%-- 스마트 에디터 구현 시작(no frame) --%>  
+	        oEditor.exec("UPDATE_CONTENTS_FIELD");
+	        jindo.$("content");
+	        <%-- 스마트 에디터 구현 끝(no frame) --%> 
+	        ///////////////////////////////////////////////////////////////
+	        // 글제목 유효성 검사
+	        var subjectval = document.getElementById("subject").value.trim();
+	        
+	        if(subjectval == "") {
+	        	alert("글제목을 입력하세요");
+	        	return;
+	        }
+	        
+	        
+	        //스마트에디터 사용시 무의미하게 생기는 p태그 제거
+            var content = document.getElementById("content");
+	        
+	        // === 확인용 ===
+	        // alert(content.value); // content에 내용을 아무것도 입력치 않고 쓰기할 경우 알아보는것.
+	        // "<p>&nbsp;</p>" 이라고 나온다.
+	        
+	        //스마트에디터 사용시 무의미하게 생기는 p태그 제거하기전에 먼저 유효성 검사를 하도록 한다.
+	        // 글내용 유효성 검사 
+	        if(content.value == "" || content.value == "<p>&nbsp;</p>") {
+	        	alert("글내용을 입력하세요");
+	        	return;
+	        }
+	        	        
+			content.value = content.value.replace(/<p><br><\/p>/gi, "<br>"); //<p><br></p> -> <br>로 변환
+			content.value = content.value.replace(/<\/p><p>/gi, "<br>"); //</p><p> -> <br>로 변환
+			content.value = content.value.replace(/(<\/p><br>|<p><br>)/gi, "<br><br>"); //</p><br>, <p><br> -> <br><br>로 변환
+			content.value = content.value.replace(/(<p>|<\/p>)/gi, ""); //<p> 또는 </p> 모두 제거시
+	        ///////////////////////////////////////////////////////////////
+	        
+	        // 글암호 유효성 검사
+	        var pwval = document.getElementById("pw").value.trim();
+	        
+	        if(pwval == "") {
+	        	alert("글암호를 입력하세요");
+	        	return;
+	        }
+	        
+	        //폼 submit
+	        var frm = document.writeFrm;
+			frm.action = "<%= request.getContextPath() %>/addEnd.action";
+			frm.method = "POST";
+			frm.submit();
+	    });
+		
+	}); // end of ready()-------------------------------------------
+		
+</script>
+
+
+==> 8. 
+     /Board/src/main/webapp/WEB-INF/views2/board/edit.jsp 에서
+     <textarea id="content" rows="10" cols="100" style="width:95%; height:412px;">${boardvo.content}</textarea>아래에 
+     /Board/src/main/webapp/resources/smarteditor/SmartEditor2_noframe.html 파일에서 아래 코드를 삽입한다.
+
+<span id="rev">Version: 2.8.2.12056 </span> 부터
+~~~~~~~~~
+	function setDefaultFont() {
+		var sDefaultFont = '궁서';
+		var nFontSize = 24;
+		oEditor.setDefaultFont(sDefaultFont, nFontSize);
+	}
+}
+</script> 
+까지 삽입함.
+그런 다음에 var oEditor = createSEditor2(jindo.$("ir1")) 에 가서
+"ir1" 를 <textarea>  의 id값인 content
+
+ ****  textarea 태그에서 required="required" 속성을 사용하면  스마트 에디터는 오류가 발생하므로 사용하면 안된다. ****
+  <textarea id="content" rows="10" cols="100" style="width:95%; height:412px;">${boardvo.content}</textarea>
+
+
+==> 9. 
+    /Board/src/main/webapp/WEB-INF/views2/board/edit.jsp 에서
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		
+	  	// 수정완료버튼
+        $("#btnUpdate").click(function(){
+           
+           <%-- 스마트 에디터 구현 시작(no frame) --%>  
+	        oEditor.exec("UPDATE_CONTENTS_FIELD");
+	        jindo.$("content");
+	        <%-- 스마트 에디터 구현 끝(no frame) --%> 
+	        ///////////////////////////////////////////////////////////////
+	        
+	        // 글제목 유효성 검사
+	        var subjectval = document.getElementById("subject").value.trim();
+	        
+	        if(subjectval == "") {
+	        	alert("글제목을 입력하세요!!");
+	        	return;
+	        }
+	        
+	        
+	        //스마트에디터 사용시 무의미하게 생기는 p태그 제거
+            var content = document.getElementById("content");
+	        
+	        // === 확인용 ===
+	        // alert(content.value); // content에 내용을 아무것도 입력치 않고 쓰기할 경우 알아보는것.
+	        // "<p>&nbsp;</p>" 이라고 나온다.
+	        
+	        //스마트에디터 사용시 무의미하게 생기는 p태그 제거하기전에 먼저 유효성 검사를 하도록 한다.
+	        // 글내용 유효성 검사 
+	        if(content.value == "" || content.value == "<p>&nbsp;</p>") {
+	        	alert("글내용을 입력하세요!!");
+	        	return;
+	        }
+	        
+	        
+			content.value = content.value.replace(/<p><br><\/p>/gi, "<br>"); //<p><br></p> -> <br>로 변환
+			content.value = content.value.replace(/<\/p><p>/gi, "<br>"); //</p><p> -> <br>로 변환
+			content.value = content.value.replace(/(<\/p><br>|<p><br>)/gi, "<br><br>"); //</p><br>, <p><br> -> <br><br>로 변환
+			content.value = content.value.replace(/(<p>|<\/p>)/gi, ""); //<p> 또는 </p> 모두 제거시
+	        
+	        
+	        // 글암호 유효성 검사
+	        var pwval = document.getElementById("pw").value.trim();
+	        
+	        if(pwval == "") {
+	        	alert("글암호를 입력하세요!!");
+	        	return;
+	        }
+            ///////////////////////////////////////////////////////////////
+                      
+           // 폼 submit
+           var editFrm = document.editFrm;
+   		   editFrm.subject.value = subjectval;
+   		   editFrm.content.value = content.value;
+   	       editFrm.pw.value = pwval;
+	   	   	       
+	   	   editFrm.action = "/board/editEnd.action";
+	   	   editFrm.method = "POST";
+	   	   editFrm.submit();
+        });
+       
+	}); // end of ready()-------------------------------------------    
+	
+</script>
+
+
+
+==> 10. 사진첨부
+    /Board/src/main/webapp/resources/smarteditor/sample/photo_uploader/photo_uploader.html 에 가면
+    form 태그가 존재합니다.
+
+  <form id="editor_upimage" name="editor_upimage" action="FileUploader.php" method="post" enctype="multipart/form-data" onSubmit="return false;">
+        <div id="pop_content2">
+	    <input type="file" class="upload" id="uploadInputBox" name="Filedata">
+            <p class="dsc" id="info"><strong>10MB</strong>이하의 이미지 파일만 등록할 수 있습니다.<br>(JPG, GIF, PNG, BMP)</p>
+        </div>
+  </form>
+
+  위의 action="FileUploader.php" 의미가 없으므로 아래와 같이 삭제해주시던가 "FileUploader.php" 값을 지워주도록 합니다.
+
+  <form id="editor_upimage" name="editor_upimage" method="post" enctype="multipart/form-data" onSubmit="return false;">
+        <div id="pop_content2">
+	    <input type="file" class="upload" id="uploadInputBox" name="Filedata">
+            <p class="dsc" id="info"><strong>10MB</strong>이하의 이미지 파일만 등록할 수 있습니다.<br>(JPG, GIF, PNG, BMP)</p>
+        </div>
+  </form>
+
+
+==> 11. 
+    /Board/src/main/webapp/resources/smarteditor/sample/photo_uploader/attach_photo.js 에 가서
+    
+   ==> 479번째 줄의 callFileUploader () 함수(단일사진첨부함수)를 보면 
+
+     sUrl  : location.href.replace(/\/[^\/]*$/, '') + '/file_uploader.php',  //샘플 URL입니다.
+     sCallback : location.href.replace(/\/[^\/]*$/, '') + '/callback.html',  //업로드 이후에 iframe이 redirect될 콜백페이지의 주소
+
+    위코드를 아래처럼 재정의 해주도록 합니다.
+
+     sUrl  : '/board/image/photoUpload.action',	  // 파일업로드시 동작되는 컨트롤러 URL
+     sCallback : location.href.replace(/\/[^\/]*$/, '') + '/callback.html',	//업로드 이후  redirect 페이지 URL
+
+   ==> 이어서 뒤에서 해야할 다중사진첨부를 위해 333번째 줄의 html5Upload() 함수(다중사진첨부함수)를 보시면 
+
+     sUploadURL= 'file_uploader_html5.php';  //upload URL 
+
+    위코드를 아래처럼 변경해주도록 합니다
+
+     sUploadURL= '/board/image/multiplePhotoUpload.action';     //다중파일업로드시 동작되는 컨트롤러 URL
+
+
+   클라이언트 설정변경을 위와같이 모두 해주셨다면 이어서 서버페이지 코드작성을 합니다.
+
+  
+==> 12. 
+         첨부파일을 받기위한 파일관련 VO 정의
+
+   public class PhotoVO {
+
+      private MultipartFile Filedata;     
+           //photo_uploader.html페이지의 form태그내에 존재하는 file 태그의 name명과 일치시켜줌
+
+      private String callback;
+           //callback URL
+    
+      private String callback_func;
+           //콜백함수??
+ 
+      public MultipartFile getFiledata() {
+          return Filedata;
+      }
+  
+      public void setFiledata(MultipartFile filedata) {
+          Filedata = filedata;
+      }
+ 
+      public String getCallback() {
+          return callback;
+      }
+ 
+      public void setCallback(String callback) {
+          this.callback = callback;
+      }
+ 
+      public String getCallback_func() {
+          return callback_func;
+      }
+ 
+      public void setCallback_func(String callback_func) {
+          this.callback_func = callback_func;
+      }
+  }
+
+
+
+==> 13. 
+       기존의 com.spring.common.FileManager 클래스에서 
+   - 이미지의 크기를 구하기 위한 getImageWidth(), getImageHeight() 메소드 추가생성함.
+     jai_codec.jar, jai_core.jar 이 필요함.
+
+   **  메이븐을 사용하는 경우
+    :  jai_codec.jar, jai_core.jar 파일 Maven dependency
+
+   -- pom.xml에서 25번째 줄에서 했다.
+    <repository>
+        <id>geotools</id>
+        <url>http://download.osgeo.org/webdav/geotools/</url>
+    </repository>
+
+  -- pom.xml에서 328번째 줄에서 했다.
+    <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_core</artifactId>
+        <version>1.1.3</version>
+    </dependency>
+
+    <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_codec</artifactId>
+        <version>1.1.3</version>
+    </dependency>
+
+
+
+==> 14. 
+       기존의 com.spring.common.FileManager 클래스에서 
+   - 이미지의 크기를 구하기 위한 getImageWidth(), getImageHeight() 메소드를 아래와 같이 추가생성함.
+
+	// 이미지 폭
+	public int getImageWidth(String pathname) {
+	   int width=-1;
+		
+	   File file = new File(pathname);
+	     if (! file.exists())
+		return width;
+		
+	   ParameterBlock pb=new ParameterBlock(); 
+           pb.add(pathname); 
+           RenderedOp rOp=JAI.create("fileload",pb); 
+
+           BufferedImage bi=rOp.getAsBufferedImage(); 
+
+           width = bi.getWidth(); 		
+		
+	   return width;
+	}
+		
+	// 이미지 높이
+	public int getImageHeight(String pathname) {
+	   int height=-1;
+		
+	   File file = new File(pathname);
+	     if (! file.exists())
+		return height;
+		
+	   ParameterBlock pb=new ParameterBlock(); 
+           pb.add(pathname); 
+           RenderedOp rOp=JAI.create("fileload",pb); 
+
+           BufferedImage bi=rOp.getAsBufferedImage(); 
+
+           height = bi.getHeight();		
+		
+	   return height;
+	}
+
+ 
+
+==> 15. 
+     /Board/src/main/webapp/resources/smarteditor/sample/photo_uploader/attach_photo.js 파일의 38번째줄을 보시면 
+     checkDragAndDropAPI() 함수내에 존재하는
+     
+     bSupportDragAndDropAPI = true; 는 이미지파일 다중업로드(1번에 여러개의 이미지파일 업로드가능). HTML5 를 지원하는 브라우저(IE10 이상, 크롬, 파이어폭스)
+     bSupportDragAndDropAPI = false; 는 이미지파일 단일업로드(1번에 1개의 이미지파일만 업로드가능). HTML5 를 지원하지 않는 브라우저(IE9 이하) 이다.
+        
+     HTML5 를 지원하지 않는 브라우저(IE9 이하)를 위해서 작성한다라면     
+     bSupportDragAndDropAPI = false; 으로 변경해주고서 아래와 같이 한다
+     
+     HTML5 를 지원하지 않는 브라우저(IE9 이하)를 위해서는 단일사진첨부 컨트롤러를 작성하려면 아래와 같이 한다.
+    
+     /Board/src/main/java/com/spring/board/BoardController.java 에서
+
+    // ==== #스마트에디터1. 단일사진 파일업로드 ====
+	@RequestMapping(value="/image/photoUpload.action", method={RequestMethod.POST})
+	public String photoUpload(PhotoVO photovo, HttpServletRequest req) {
+	    
+		String callback = photovo.getCallback();
+	    String callback_func = photovo.getCallback_func();
+	    String file_result = "";
+	    
+		if(!photovo.getFiledata().isEmpty()) {
+			// 파일이 존재한다라면
+			
+			/*
+			   1. 사용자가 보낸 파일을 WAS(톰캣)의 특정 폴더에 저장해주어야 한다.
+			   >>>> 파일이 업로드 되어질 특정 경로(폴더)지정해주기
+			        우리는 WAS 의 webapp/resources/photo_upload 라는 폴더로 지정해준다.
+			 */
+			
+			// WAS 의 webapp 의 절대경로를 알아와야 한다. 
+			HttpSession session = req.getSession();
+			String root = session.getServletContext().getRealPath("/"); 
+			String path = root + "resources"+File.separator+"photo_upload";
+			// path 가 첨부파일들을 저장할 WAS(톰캣)의 폴더가 된다. 
+			
+		//	System.out.println(">>>> 확인용 path ==> " + path); 
+			// >>>> 확인용 path ==> C:\SpringWorkspaceTeach\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\Board\resources\photo_upload
+			
+			// 2. 파일첨부를 위한 변수의 설정 및 값을 초기화한 후 파일올리기
+			String newFilename = "";
+			// WAS(톰캣) 디스크에 저장할 파일명 
+			
+			byte[] bytes = null;
+			// 첨부파일을 WAS(톰캣) 디스크에 저장할때 사용되는 용도 
+						
+			try {
+				bytes = photovo.getFiledata().getBytes(); 
+				// getBytes()는 첨부된 파일을 바이트단위로 파일을 다 읽어오는 것이다. 
+				/* 2-1. 첨부된 파일을 읽어오는 것
+					    첨부한 파일이 강아지.png 이라면
+					    이파일을 WAS(톰캣) 디스크에 저장시키기 위해
+					    byte[] 타입으로 변경해서 받아들인다.
+				*/
+				// 2-2. 이제 파일올리기를 한다.
+				String original_name = photovo.getFiledata().getOriginalFilename();
+				//  photovo.getFiledata().getOriginalFilename() 은 첨부된 파일의 실제 파일명(문자열)을 얻어오는 것이다. 
+				newFilename = fileManager.doFileUpload(bytes, original_name, path);
+				
+		//      System.out.println(">>>> 확인용 newFileName ==> " + newFileName); 
+				
+				int width = fileManager.getImageWidth(path+File.separator+newFilename);
+		//		System.out.println("확인용 >>>>>>>> width : " + width);
+				
+				if(width > 600)
+					width = 600;
+		//		System.out.println("확인용 >>>>>>>> width : " + width);
+				
+				String CP = req.getContextPath();  // board
+				file_result += "&bNewLine=true&sFileName="+newFilename+"&sWidth="+width+"&sFileURL="+CP+"/resources/photo_upload/"+newFilename; 
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} else {
+			// 파일이 존재하지 않는다라면
+			file_result += "&errstr=error";
+		}
+	    
+		return "redirect:" + callback + "?callback_func="+callback_func+file_result;
+		
+	}// end of String photoUpload(PhotoVO photovo, HttpServletRequest req)-------------------    
+
+
+==> 16. 
+     /Board/src/main/webapp/resources/smarteditor/sample/photo_uploader/attach_photo.js 파일의 38번째줄을 보시면 
+     checkDragAndDropAPI() 함수내에 존재하는
+     
+     bSupportDragAndDropAPI = true; 는 이미지파일 다중업로드(1번에 여러개의 이미지파일 업로드가능). HTML5 를 지원하는 브라우저(IE10 이상, 크롬, 파이어폭스)
+     bSupportDragAndDropAPI = false; 는 이미지파일 단일업로드(1번에 1개의 이미지파일만 업로드가능). HTML5 를 지원하지 않는 브라우저(IE9 이하) 이다.
+         
+     HTML5 를 지원하지 않는 브라우저(IE10 이상)를 위해서 작성한다라면     
+     bSupportDragAndDropAPI = true; 으로 변경해주고서 아래와 같이 한다
+     
+     HTML5 를 지원하는 브라우저(IE10 이상, 크롬, 파이어폭스)를 위해서는 다중사진첨부 컨트롤러를 작성하려면 아래와 같이 한다.
+    
+     /Board/src/main/java/com/spring/board/BoardController.java 에서     
+
+ // ==== #스마트에디터2. 드래그앤드롭을 사용한 다중사진 파일업로드 ====
+	@RequestMapping(value="/image/multiplePhotoUpload.action", method={RequestMethod.POST})
+	public void multiplePhotoUpload(HttpServletRequest req, HttpServletResponse res) {
+	    
+		/*
+		   1. 사용자가 보낸 파일을 WAS(톰캣)의 특정 폴더에 저장해주어야 한다.
+		   >>>> 파일이 업로드 되어질 특정 경로(폴더)지정해주기
+		        우리는 WAS 의 webapp/resources/photo_upload 라는 폴더로 지정해준다.
+		 */
+		
+		// WAS 의 webapp 의 절대경로를 알아와야 한다. 
+		HttpSession session = req.getSession();
+		String root = session.getServletContext().getRealPath("/"); 
+		String path = root + "resources"+File.separator+"photo_upload";
+		// path 가 첨부파일들을 저장할 WAS(톰캣)의 폴더가 된다. 
+		
+	//	System.out.println(">>>> 확인용 path ==> " + path); 
+		// >>>> 확인용 path ==> C:\SpringWorkspaceTeach\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\Board\resources\photo_upload   
+		
+		File dir = new File(path);
+		if(!dir.exists())
+			dir.mkdirs();
+		
+		String strURL = "";
+		
+		try {
+			if(!"OPTIONS".equals(req.getMethod().toUpperCase())) {
+	    		String filename = req.getHeader("file-name"); //파일명을 받는다 - 일반 원본파일명
+	    		
+	    //		System.out.println(">>>> 확인용 filename ==> " + filename); 
+	    		// >>>> 확인용 filename ==> berkelekle%ED%8A%B8%EB%9E%9C%EB%94%9405.jpg
+	    		
+	    		InputStream is = req.getInputStream();
+	    	/*
+	          	요청 헤더의 content-type이 application/json 이거나 multipart/form-data 형식일 때,
+	          	혹은 이름 없이 값만 전달될 때 이 값은 요청 헤더가 아닌 바디를 통해 전달된다. 
+	          	이러한 형태의 값을 'payload body'라고 하는데 요청 바디에 직접 쓰여진다 하여 'request body post data'라고도 한다.
+
+               	서블릿에서 payload body는 Request.getParameter()가 아니라 
+            	Request.getInputStream() 혹은 Request.getReader()를 통해 body를 직접 읽는 방식으로 가져온다. 	
+	    	 */
+	    		String newFilename = fileManager.doFileUpload(is, filename, path);
+	    	
+				int width = fileManager.getImageWidth(path+File.separator+newFilename);
+			
+				if(width > 600)
+					width = 600;
+				
+		//		System.out.println(">>>> 확인용 width ==> " + width);
+				// >>>> 확인용 width ==> 600
+				// >>>> 확인용 width ==> 121
+	    	
+				String CP = req.getContextPath(); // board
+			
+				strURL += "&bNewLine=true&sFileName="; 
+            	strURL += newFilename;
+            	strURL += "&sWidth="+width;
+            	strURL += "&sFileURL="+CP+"/resources/photo_upload/"+newFilename;
+	    	}
+		
+	    	/// 웹브라우저상에 사진 이미지를 쓰기 ///
+			PrintWriter out = res.getWriter();
+			out.print(strURL);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}// end of void multiplePhotoUpload(HttpServletRequest req, HttpServletResponse res)---------------- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

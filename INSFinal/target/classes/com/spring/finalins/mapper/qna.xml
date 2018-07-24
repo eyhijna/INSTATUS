@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==== #26. mapper 기본설정 ==== -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<!-- ==== #27. 루트 엘리먼트 & 네임스페이스 설정(프로젝트 전체내에서 유일해야 한다.) ==== -->
+<mapper namespace="qna">
+ 
+   <!-- ====== #125. ins_QnA 테이블의 groupno 의 max값 알아오기  ======  -->
+   <!-- 참고) 맨처음에 insert하기 전에 원글이 뷰단에서 넘겨서 groupno를 얻어 올때,  groupno는 null이기 때문에 nvl을 써준다. -->
+   <select id="getGroupMaxno" resultType="Integer">
+       select nvl(max(qna_groupno) , 0)   
+       from ins_QnA
+   </select>
+   
+   <!-- ====== #126. Qna 문의하기(파일첨부가 없는 글쓰기, 답변형 게시판)  -->
+    <insert id="write" parameterType="com.spring.finalins.qna.model.QnaVO">
+      <if test='qna_fk_idx.equals("")'>
+       insert into ins_QnA(qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno)
+        values(seq_qna.nextval, #{fk_userid}, #{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default, default, default, #{qna_groupno}) 
+      </if>   
+     <if test='!qna_fk_idx.equals("")'>
+        insert into ins_QnA(qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno)
+        values(seq_qna.nextval, #{fk_userid},#{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default,  #{qna_fk_idx},#{qna_depthno}+1, #{qna_groupno}) 
+      </if> 
+   </insert>
+   
+   
+   
+      <!-- ======  파일첨부가 있는 글쓰기(답변형 게시판) -->
+    <insert id="write_withFile" parameterType="com.spring.finalins.qna.model.QnaVO" >
+       <if test='qna_fk_idx.equals("")'>
+         insert into ins_QnA(qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno, qna_filename, qna_orgfilename, qna_byte)
+         values(seq_qna.nextval, #{fk_userid}, #{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default, default, default, #{qna_groupno}, #{qna_filename}, #{qna_orgfilename}, #{qna_byte})
+        </if>
+         <if test='!qna_fk_idx.equals("")'>
+         insert into ins_QnA(qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno, qna_filename, qna_orgfilename, qna_byte)
+         values(seq_qna.nextval, #{fk_userid}, #{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default, default, #{qna_depthno}+1, #{qna_groupno}, #{qna_filename}, #{qna_orgfilename}, #{qna_byte})
+        </if>
+   </insert>
+
+     
+   <!-- ======  글 1개 보여주기 -->
+   <select id="getView" parameterType="String" resultType="com.spring.finalins.qna.model.QnaVO" >
+       select qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno, qna_filename, qna_orgfilename, qna_byte
+      from ins_QnA
+      where qna_idx = #{qna_idx}  
+   </select>
+   
+   
+   <!--  ====== 글 1개 수정하기 ====== -->
+	<update id="editQna" parameterType="com.spring.finalins.qna.model.QnaVO">
+	    update ins_QnA set qna_title = #{qna_title}, 
+	                        qna_content = #{qna_content}, 
+	                        fk_qna_category_idx = #{fk_qna_category_idx}
+	    where qna_idx = #{qna_idx} 
+	</update>
+	
+	
+	<select id="qnaupdate" parameterType="String" resultType="com.spring.finalins.qna.model.QnaVO">
+	    select qna_idx,qna_groupno, qna_fk_idx
+		from
+		(
+		select qna_idx,qna_groupno, qna_fk_idx
+		from ins_QnA
+		group by qna_groupno,qna_idx, qna_fk_idx
+		having qna_groupno = #{qna_groupno})
+		where qna_fk_idx = 0
+	</select>
+	
+
+	<update id="depthnoUpdate" parameterType="String">
+	   update ins_QnA set qna_depthno = 1
+       where qna_idx = #{qna_idx}
+	</update>
+	
+	
+	
+	
+	
+	
+	
+	<!--  ====== 글 1개 삭제하기 ====== -->
+	<delete id="del" parameterType="String">
+	   delete from ins_QnA 
+	    where qna_idx = #{qna_idx}  and qna_depthno = 0 
+	</delete>
+	
+	
+	<!-- ///////////////////////////////////////////////////////////////////////// -->
+	 <!-- ===== #116. 검색어가 없는 총게시물 갯수   ===== -->
+	<!--  <select id="getTotalCount" resultType="Integer">
+	      select count(*)
+	      from ins_QnA
+	     
+	 </select> -->
+	 
+	 <select id="getTotalCount"  parameterType="HashMap" resultType="Integer">
+	    select count(*)
+		from 
+		(
+		select qna_idx, fk_userid 
+		     , case when length(qna_title) > 20 then substr(qna_title, 1, 18)||'..'
+		       else qna_title end as qna_title
+		     , qna_content 
+		     , to_char(qna_date, 'yyyy-mm-dd hh24:mi:ss') as qna_date
+             , qna_groupno, qna_fk_idx, qna_depthno
+             , qna_fileName, qna_orgFilename, qna_byte
+             , fk_qna_category_idx
+		from ins_QnA
+	     <if test="!userid.equals('admin')">
+	      where fk_userid = #{userid} or fk_userid = 'admin'
+	    </if>
+	    ) V
+	     start with qna_fk_idx = 0
+         connect by prior qna_idx = qna_fk_idx
+		order siblings by qna_groupno desc, qna_idx asc	 
+	 </select>
+	 
+	 
+	 	<select id="getTotalCount2"  parameterType="HashMap" resultType="Integer">
+	    select count(*)
+		from 
+		(
+		select qna_idx, fk_userid 
+		     , case when length(qna_title) > 20 then substr(qna_title, 1, 18)||'..'
+		       else qna_title end as qna_title
+		     , qna_content 
+		     , to_char(qna_date, 'yyyy-mm-dd hh24:mi:ss') as qna_date
+             , qna_groupno, qna_fk_idx, qna_depthno
+             , qna_fileName, qna_orgFilename, qna_byte
+             , fk_qna_category_idx
+		from ins_QnA
+	     <if test="!userid.equals('admin')">	       
+	      where fk_userid = #{userid} or fk_userid = 'admin'	
+	       </if>           	      	   
+	    ) V
+	    <if test="colname != null">
+	          where fk_qna_category_idx = #{colname} 
+	        </if>  
+	     start with qna_fk_idx = 0
+         connect by prior qna_idx = qna_fk_idx
+		order siblings by qna_groupno desc, qna_idx asc	 
+	 </select>
+	 
+	 
+	 
+	 
+	 
+	 <!-- /////////////////////////////////////////// -->
+	 
+	<resultMap type="HashMap" id="qnaListMap">
+	    <result property="rno" 	                column="rno" 	                javaType="String" />
+		<result property="qna_idx" 	            column="qna_idx" 	            javaType="String" />
+	 	<result property="fk_userid" 	        column="fk_userid" 		        javaType="String" />
+	 	<result property="fk_qna_category_idx" 	column="fk_qna_category_idx" 	javaType="String" />
+	 	<result property="qna_title" 	        column="qna_title" 	            javaType="String" />
+	 	<result property="qna_content" 	        column="qna_content" 	        javaType="String" />
+	 	<result property="qna_date" 	        column="qna_date" 	            javaType="String" />
+	 	<result property="qna_fk_idx" 	        column="qna_fk_idx" 	        javaType="String" />
+	 	<result property="qna_depthno" 	        column="qna_depthno" 	        javaType="String" />
+	 	<result property="qna_filename" 	    column="qna_filename" 	        javaType="String" />
+	 	<result property="qna_orgfilename" 	    column=" qna_orgfilename" 	    javaType="String" />
+	 	<result property="qna_byte" 	        column="qna_byte" 	            javaType="String" />
+   </resultMap>	
+	 
+	 <!-- ////////////////////////////////////////////////////////////////////////////////// -->
+	<!-- ===== #142. 파일첨부가 있는 답변형 게시판 글목록 보여주기 페이징 처리(검색어가 없는 전체글목록 보여주기, 댓글의 갯수를 보여주는 것 포함)  
+	                              먼저 위의  #127. 글목록 보여주기(검색어가 있는 것 & 댓글의 갯수를 보여주는 것 포함) 를 주석처리 한 후 아래와 같이 한다.
+	              **   select문에 fileName, orgFilename, fileSize 컬럼을 추가한다.   **           ===== -->
+	      
+	<select id="qnaList"  parameterType="HashMap" resultMap="qnaListMap">
+	   select  rno, qna_idx, fk_userid, qna_title, qna_date
+              , qna_groupno, qna_fk_idx, qna_depthno
+              , qna_fileName, qna_orgFilename, qna_byte
+              , fk_qna_category_idx
+		from 
+		(
+		select rownum as RNO
+		     , V.qna_idx, V.fk_userid, V.qna_title, V.qna_content,  V.qna_date
+             , V.qna_groupno, V.qna_fk_idx, V.qna_depthno
+             , V.qna_fileName, V.qna_orgFilename, V.qna_byte
+             , V.fk_qna_category_idx
+		from 
+		(
+		select qna_idx, fk_userid 
+		     , case when length(qna_title) > 20 then substr(qna_title, 1, 18)||'..'
+		       else qna_title end as qna_title
+		     , qna_content 
+		     , to_char(qna_date, 'yyyy-mm-dd hh24:mi:ss') as qna_date
+             , qna_groupno, qna_fk_idx, qna_depthno
+             , qna_fileName, qna_orgFilename, qna_byte
+             , fk_qna_category_idx
+		from ins_QnA 
+		<if test="!userid.equals('admin')">
+	        where fk_userid = #{userid} or fk_userid = 'admin'
+	    </if>
+	    
+	     start with qna_fk_idx = 0
+         connect by prior qna_idx = qna_fk_idx
+		order siblings by qna_groupno desc, qna_idx asc 
+	    ) V
+	     <if test="colname != null">
+	       where fk_qna_category_idx = #{colname} 
+	     </if>  
+	     start with qna_fk_idx = 0
+         connect by prior qna_idx = qna_fk_idx
+		order siblings by qna_depthno,qna_groupno desc, qna_idx asc
+	  ) T  
+       where T.RNO <![CDATA[>=]]> #{startRno} and T.RNO <![CDATA[<=]]> #{endRno} 
+     
+	</select>
+	
+	
+
+	 
+	 
+	
+	
+	
+	
+   
+   
+   
+   
+
+	
+</mapper>
