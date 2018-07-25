@@ -30,7 +30,7 @@
 		width: 500px;
 	}
 	
-	input[type=text] {
+	input[id="search_input"] {
 		width: 130px;
 		box-sizing: border-box;
 		border: 2px solid #ccc;
@@ -45,7 +45,7 @@
 		transition: width 0.4s ease-in-out;
 	}
 	
-	input[type=text]:focus {
+	input[id="search_input"]:focus {
 		width: 100%;
 		border-color: rgba(255, 82, 82, 0.8);
 	}
@@ -1477,7 +1477,7 @@
 						</a>
 							<ul class="dropdown-menu extended logout">
 								<div class="log-arrow-up"></div>
-								<li class="eborder-top"><a href="#"><i
+								<li class="eborder-top"><a href="mypage.action"><i
 										class="icon_profile"></i> My Profile</a></li>
 								<li><a href="<%= request.getContextPath() %>/logout.action"><i class="icon_key_alt"></i>
 										Log Out</a></li>
