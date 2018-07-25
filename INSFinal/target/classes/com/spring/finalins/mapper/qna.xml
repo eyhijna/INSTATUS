@@ -35,7 +35,7 @@
         </if>
          <if test='!qna_fk_idx.equals("")'>
          insert into ins_QnA(qna_idx, fk_userid, fk_qna_category_idx, qna_title, qna_content, qna_date, qna_fk_idx, qna_depthno, qna_groupno, qna_filename, qna_orgfilename, qna_byte)
-         values(seq_qna.nextval, #{fk_userid}, #{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default, default, #{qna_depthno}+1, #{qna_groupno}, #{qna_filename}, #{qna_orgfilename}, #{qna_byte})
+         values(seq_qna.nextval, #{fk_userid}, #{fk_qna_category_idx}, #{qna_title}, #{qna_content}, default,  #{qna_fk_idx}, #{qna_depthno}+1, #{qna_groupno}, #{qna_filename}, #{qna_orgfilename}, #{qna_byte})
         </if>
    </insert>
 

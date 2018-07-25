@@ -125,7 +125,7 @@ public class MyUtil {
 			while( !(loop > blockSize || pageNo > totalPage) ) {
 				
 				if(pageNo == currentShowPageNo) {
-					pageBar += "&nbsp;<span style=\"color: #fed189; font-size: 13pt; font-weight: bold; text-decoration: underline;\">"+pageNo+"</span>&nbsp;"+"/ 총 "+totalPage+"페이지 &nbsp;";
+					pageBar += "&nbsp;<span style=\"color: rgb(255, 82, 82); font-size: 13pt; font-weight: bold; text-decoration: underline;\">"+pageNo+"</span>&nbsp;"+"<span style='font-weight:bold'>/ 총 </span>"+totalPage+"<span style='font-weight:bold'>페이지</span> &nbsp;";
 				}
 				else {
 					pageBar += "&nbsp;<a href=\""+url+"?currentShowPageNo="+pageNo+"&sizePerPage="+sizePerPage+"&colname="+colname+"&search="+search+"&period="+period+"\">"+pageNo+"</a>&nbsp;";

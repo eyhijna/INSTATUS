@@ -21,7 +21,8 @@ body {
 
     color: #797979;
 
-    background: #eeeeee;
+   /*  background: #eeeeee;  지혜  마이페이지와 관리자페이지 등의 기본 바탕을 흰색으로 정했기 때문에 white로 바꿉니다.*/
+    background: white;
 
     font-family: 'Lato', sans-serif;
 

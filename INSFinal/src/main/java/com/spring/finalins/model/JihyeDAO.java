@@ -144,11 +144,10 @@ public class JihyeDAO implements InterJihyeDAO{
 	}
 
 	// ins_personal_alarm값 변경하기
-//	@Override
-//	public int updateIns_personal_alarm(String userid) {
-//		int n = sqlsession.update("jihye.updateIns_personal_alarm", userid);
-//		return n;
-//	}
+	@Override
+	public int updateIns_personal_alarm(HashMap<String,String> map) {
+		int n = sqlsession.update("jihye.updateIns_personal_alarm", map);
+		return n;	}
 
 
 	

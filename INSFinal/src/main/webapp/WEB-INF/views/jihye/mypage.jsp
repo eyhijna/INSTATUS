@@ -25,10 +25,12 @@
 .next {
     background-color: #4CAF50;
     color: white;
+        width: 100px;
 }
 
 .round {
     border-radius: 50%;
+
 }
 
 
@@ -38,9 +40,10 @@
   display: inline-block;
   width: 50px;
   height: 30px;
+
 }
 
-.switch input {display:none;}
+.switch input {display:none; }
 
 .slider {
   position: absolute;
@@ -67,7 +70,7 @@
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+ background-color:rgb(255, 82, 82);   /* #2196F3; */
 }
 
 input:focus + .slider {
@@ -78,30 +81,74 @@ input:checked + .slider:before {
   -webkit-transform: translateX(26px);
   -ms-transform: translateX(26px);
   transform: translateX(26px);
+   
 }
 
 /* Rounded sliders */
 .slider.round {
   border-radius: 25px;
+   
 }
 
 .slider.round:before {
   border-radius: 50%;
 }
 
+#switchJihye{
+  width: 50px;
+  padding-bottom: 0px;
+  padding-left: 800px;
+
+
+}
 </style>
 
 
 <script type="text/javascript">
 
-/*  function swichMyRecord(){
+$(document).ready(function(){
+	
+  var switchVal = null
+  $(".JJ").click(function() {
+      
+      if (this.checked == false){
+        alert("체크해제");
+        switchVal = 1;
+        
+        console.log(switchVal);
+        
+        var frm = document.switchFrm;
+        
+        frm.switchVal.value = switchVal;
+        frm.method="post";
+        frm.action="switchMyRecord.action"
+        frm.submit();
+        
+      }else{
+        alert("체크");
+        switchVal = 0;
+        console.log(switchVal);
+        
+        var frm = document.switchFrm;
+        
+        frm.switchVal.value = switchVal;
+        frm.method="post";
+        frm.action="switchMyRecord.action"
+        frm.submit();
+        
+        
+     //   swichMyRecord(switchVal);
+        
+      }
+   });// end of $(".checklist").click()
+  
+ }); 
+
+function swichMyRecord(switchVal){
 	         	        
-	    	 var frm = document.switchFrm;
-	    	frm.action="swichMyRecord.action";
-	    	frm.method="POST";
-	    	frm.submit(); 
+	  
 	    	
-	    	form_data = {"switchVal" : $("#switchVal").val()};
+	    	form_data = {"switchVal" : switchVal};
 	    	
 	    	$.ajax({
 	    		url: "swichMyRecordJSON.action",
@@ -109,7 +156,9 @@ input:checked + .slider:before {
 	    		data : form_data,
 	    		dataType: "JSON",
 	    		success: function(json){
-	    			var html ="";
+	    			
+	    			alert("성공");
+	    			/* var html ="";
 	    			
 	    			 $.each(json, function(entryIndex, entry){
 	    			html += "<form name='switchFrm'>";  
@@ -118,13 +167,13 @@ input:checked + .slider:before {
 					     +  "<input type='checkbox' id='switchVal' name='switchVal' value='1' onclick='swichMyRecord();' checked>"	
 			             }
 			             else{
-			  /*            +  "<input type='checkbox' id='switchVal' name='switchVal' value='0' onclick='swichMyRecord();' checked>"	 
+			             +  "<input type='checkbox' id='switchVal' name='switchVal' value='0' onclick='swichMyRecord();' checked>"	 
 			             }
 					     +  "<span class='slider round'></span>"									  
 					     +  "</label>"
 					     +  "</form>"	
 	    			 });     
-				$("#switchTest").append(html);	     
+				$("#switchTest").append(html);	  */    
 	    	  },// end of success: function(json)---------------------------------------------------
 				error: function(request, status, error){
 					alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
@@ -135,13 +184,13 @@ input:checked + .slider:before {
 
 
 
-}  */
+}   
 
  
 </script>
  
- <div class="super_container"> 
-   <div class="cart_container" style="padding-top: 20px;">  
+<!--  <div class="super_container"> 
+   <div class="cart_container" style="padding-top: 20px;">   -->
        <div class="container" > 
          <div class="row" >
             <div class="col" > 
@@ -171,25 +220,43 @@ input:checked + .slider:before {
 							       
 							       <!-- ///////////////////////////////////////////////////////// -->
 									
-						<!-- 		  <div>																		
+						 		<!--   <div>																		
 									<label class="switch">
 									  <input type="checkbox" checked>
 									  <span class="slider round"></span>
 									</label>
-						           </div>    --> 
+						           </div>     -->
 						          <!-- activity 기록 목록 -->	
-						           <div id="switchTest">
-							          </div>					        					          
+						   					        					          
 							      <div>
 							        <table class="table table-hover">
 							          <thead>						         
 							            <tr>
-							              <th>Activity
-									    </th>
+							              <th  colspan= 1;>Activity
+									     </th>
+									    
+									    <c:if test="${ins_personal_alarm == 0}">
+									      <th colspan= 4; id="switchJihye">
+									      <label class="switch" >									    
+											  <input type="checkbox" data-toggle="toggle" data-size="small" class="JJ" id="JJ" checked>																	 
+											  <span class="slider round"></span>
+									      </label>
+									      </th>
+									    </c:if> 
+									      <c:if test="${ins_personal_alarm == 1}">
+									      <th colspan= 4; id="switchJihye">
+									      <label class="switch" >									    
+											  <input type="checkbox" data-toggle="toggle" data-size="small" class="JJ" id="JJ" >																	 
+											  <span class="slider round"></span>
+									      </label>
+									      </th>
+									    </c:if>  		
+														      		
 							            </tr>
+							            
 							          </thead>
 							          <c:if test="${myRecordList.size() <1 }">						         					        
-							              <td style="text-align: center;">${sessionScope.loginuser.name}님의 개인 활동 기록이 없습니다.</td>
+							              <td style="text-align: center;" colspan="5">${sessionScope.loginuser.name}님의 개인 활동 기록이 없습니다.</td>
 							            </c:if>  
 							        <c:if test="${myRecordList.size() > 0}"> 
 							           
@@ -220,10 +287,7 @@ input:checked + .slider:before {
 								   <div align="center" style="width: 70%; margin-top: 20px;  margin-left: 100px;  margin-right: auto;">
 								       ${pagebar}
 								   </div>
-							         
-							       <!--  <div class="btnclass" style="margin-top: 20px; margin-bottom: 20px; text-align:center;">				       
-						           <button type="button"  class="btn btn-primary btn-sm" id="btnMore" value="" >더보기....</button>
-							       </div> --> 
+						
 							               
 					        </div>
 					  </div>
@@ -231,14 +295,12 @@ input:checked + .slider:before {
              </div>
          </div>
       </div>
-   </div> 
+<!--    </div> 
 </div>
+ -->
 
-<!-- 
-<script src="resources/jihye/bootstrap4/popper.js"></script> 
-<script src="resources/jihye/bootstrap4/bootstrap.min.js"></script>
-<script src="resources/jihye/plugins/easing/easing.js"></script>
-<script src="resources/jihye/plugins/parallax-js-master/parallax.min.js"></script>
-<script src="resources/jihye/checkout_custom.js"></script> -->
-
+<form name = "switchFrm">
+<input type="hidden" id="switchVal"  name="switchVal">
+<input type="hidden" value="${ins_personal_alarm}" >
+</form>
 

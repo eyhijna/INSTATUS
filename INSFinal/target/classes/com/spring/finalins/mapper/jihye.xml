@@ -232,11 +232,11 @@
  </select> 
    
    
-<!--    ins_personal_alarm값 변경하기
-  <update id="updateIns_personal_alarm" parameterType="String" >
-    update ins_member set ins_personal_alarm = 1
+<!--    ins_personal_alarm값 변경하기 -->
+  <update id="updateIns_personal_alarm" parameterType="HashMap" >
+    update ins_member set ins_personal_alarm = #{switchVal}
     where userid = #{userid}
-  </update> -->
+  </update> 
    
 
 </mapper>

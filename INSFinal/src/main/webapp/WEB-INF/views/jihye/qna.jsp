@@ -13,30 +13,14 @@
                   cursor: pointer;}
 
 
-
-
-.btn-dark{color:white; background-color:#343a40; border-color:#343a40}
-.btn-dark:hover{color:#fff;background-color:#23272b;border-color:#1d2124}  
-.btn-dark.focus,.btn-dark:focus{box-shadow:0 0 0 .2rem rgba(52,58,64,.5)} 
-
-/* a {
-    text-decoration: none;
-    display: inline-block;
-    padding: 8px 16px;
-}
-
-a:hover {
-    background-color: #ddd;
-    color: black;
-} */
-
 .previous {
-    background-color: rgb(255, 82, 82);   /*  #f1f1f1; */
+    background-color: rgb(255, 82, 82);  
     color: white;
+    width: 20px;
 }
 
 .next {
-    background-color:rgb(255, 82, 82);  /* #f1f1f1; */
+    background-color:rgb(255, 82, 82);  
 
   color: white;
 } 
@@ -44,7 +28,10 @@ a:hover {
     border-radius: 50%;
 }
 
-
+.btnQna {
+    background-color: rgb(255, 82, 82); 
+    color: white;
+}
 
 </style> 
   
@@ -124,16 +111,16 @@ function chooseCategory(){
                 <div  style="margin-bottom:15px;">
                          <form name="chooseCategoryFrm">
 			                <div align="left"class="categorybtn">
-			                <button class="btn btn-sm btn-default"  onclick="<%= request.getContextPath() %>/qna.action" >전체보기</button>
-			                <button class="btn btn-sm btn-default " name="colname"  value="1" onclick="chooseCategory();">기술문의</button>
-			                <button class="btn btn-sm btn-default" name="colname" value="2" onclick="chooseCategory();">기타</button>
+				                <button class="btn btnQna"  onclick="<%= request.getContextPath() %>/qna.action" >전체보기</button>
+				                <button class="btn btnQna" name="colname"  value="1" onclick="chooseCategory();">기술문의</button>
+				                <button class="btn btnQna" name="colname" value="2" onclick="chooseCategory();">기타</button>
 			                </div> 
 		               </form> 
-	                   <div align="right" >
-		                    <c:if test="${(sessionScope.loginuser).userid != 'admin' }">
-		                     <button  id="goWrite"type="button" class="btn btn-default" onClick="goWrite();">Q&A 글쓰기</button>	                
-		                    </c:if>
-	                   </div>
+		                   <div align="right">
+			                    <c:if test="${(sessionScope.loginuser).userid != 'admin'}">
+			                     <button  id="goWrite"type="button" class="btn btnQna" onClick="goWrite();">Q&A 글쓰기</button>	                
+			                    </c:if>
+		                   </div>
                  </div>
                 
                 

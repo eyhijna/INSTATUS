@@ -178,11 +178,11 @@ public class JihyeService implements InterJihyeService{
 
 	
 	// ins_personal_alarm값 변경하기
-	/*@Override
-	public int updateIns_personal_alarm(String userid) {
-		int n = dao.updateIns_personal_alarm(userid);
+	@Override
+	public int updateIns_personal_alarm(HashMap<String,String> map) {
+		int n = dao.updateIns_personal_alarm(map);
 		return n;
-	}*/
+	}
 
 
 

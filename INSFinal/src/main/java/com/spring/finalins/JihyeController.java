@@ -174,12 +174,15 @@ public class JihyeController {
 			return "jihye/adminChart.tiles";
 		}
 		
+		String ins_personal_alarm = loginuser.getIns_personal_alarm();
+		req.setAttribute("ins_personal_alarm", ins_personal_alarm);
+		
 		return "jihye/mypage.tiles";
 	}
 	
 	
 	// 내가 활동한 기록 더보기 버튼 만들기
-/*	@RequestMapping(value="myRecordListJSON.action", method = {RequestMethod.POST})
+	@RequestMapping(value="myRecordListJSON.action", method = {RequestMethod.POST})
 	public String requireLogin_myRecordListJSON(HttpServletRequest req, HttpServletResponse res) {
 		
 		String start = req.getParameter("start");
@@ -240,7 +243,7 @@ public class JihyeController {
 		
 		
 		return "jihye/myRecordListJSON";
-	}*/
+	}
 	
 	
 	
@@ -799,35 +802,91 @@ public class JihyeController {
          
          
         // 프로젝트 페이지에서 내가 활동한 기록을 보여주기 /안보여주기 를 위해 switch값을 넘긴다.    	
-//     	@RequestMapping(value="/swichMyRecordJSON.action", method={RequestMethod.POST})
-//     	public String requireLogin_swichMyRecord(HttpServletRequest req, HttpServletResponse res) {
-//     		 
-//     		HttpSession session = req.getSession();
-//			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-//			
-//			String userid = null;
-//
-//			if (loginuser != null) {
-//				userid = loginuser.getUserid();
-//			}
-//     		 
-//     		 String switchVal = req.getParameter("switchVal");
-//     		
-//     		int n =0;
-//     		 if(switchVal.equalsIgnoreCase("1")) {    			 
-//     			 n = service.updateIns_personal_alarm(userid);    			 
-//     		 }
-//     		 
-//     		 if(n==1) {
-//     			MemberVO str_jsonarray =service.getMyProfile(userid);
-//         		
-//         		req.setAttribute("str_jsonArr", str_jsonarray);
-//         		
-//     		 }
-//     		 
-//     		 return "jihye/swichMyRecordJSON";
-//     		 
-//     	}
+     	/*@RequestMapping(value="/swichMyRecordJSON.action", method={RequestMethod.POST})
+     	public String requireLogin_swichMyRecord(HttpServletRequest req, HttpServletResponse res) {
+     		 
+     		HttpSession session = req.getSession();
+			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
+			
+			String userid = null;
+
+			if (loginuser != null) {
+				userid = loginuser.getUserid();
+			}
+     		 
+     		 String switchVal = req.getParameter("switchVal");
+     		 
+     		 System.out.println(switchVal);
+     		
+    		int n =0;
+    		 if(switchVal.equalsIgnoreCase("1")) {    			 
+     			 n = service.updateIns_personal_alarm(userid);    			 
+     		 }
+     		 
+     		 if(n==1) {
+     			String str_jsonarray =service.getMyProfile(userid);
+         		
+         		req.setAttribute("str_jsonArr", str_jsonarray);
+         		
+     		 }
+     		 
+     		 return "jihye/swichMyRecordJSON";
+     		 
+     	}*/
+     	
+     	@RequestMapping(value="/switchMyRecord.action", method={RequestMethod.POST})
+     	public String requireLogin_switch(HttpServletRequest req, HttpServletResponse res) {
+     		
+     		HttpSession session = req.getSession();
+			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
+			
+			String userid = null;
+
+			if (loginuser != null) {
+				userid = loginuser.getUserid();
+			}
+     		 
+     		 String switchVal = req.getParameter("switchVal");
+     		 
+     		 System.out.println(switchVal);
+     		
+     		HashMap<String,String> map = new HashMap<String,String>();
+     		map.put("userid", userid);
+     		map.put("switchVal", switchVal);
+     		 
+    		int n =0;
+    	   			 
+     			 n = service.updateIns_personal_alarm(map);    			 
+     		
+    		
+		 
+    		 MemberVO mvo = service.getMyProfile(userid);
+    		 
+    		 String ins_personal_alarm = mvo.getIns_personal_alarm();
+    		 
+    		 loginuser.setIns_personal_alarm(ins_personal_alarm);
+    		 
+    		 ins_personal_alarm = loginuser.getIns_personal_alarm();
+    		 req.setAttribute("ins_personal_alarm", ins_personal_alarm);
+    		
+    		 
+    		 String msg = null;
+    		 String loc = null;
+    	  if(ins_personal_alarm.equalsIgnoreCase("0")) {	 
+    		 
+    	      msg = "개인 알람을 활성화시킵니다.";
+    		  loc = "mypage.action";
+    	  }else {
+    		 msg = "개인 알람을 비활성화시킵니다.";
+      		loc = "mypage.action";
+    		  
+    	  }
+    		req.setAttribute("msg", msg);
+    		req.setAttribute("loc", loc);
+    		 
+     		return "msg.notiles";
+     		
+     	}
          
 	
 

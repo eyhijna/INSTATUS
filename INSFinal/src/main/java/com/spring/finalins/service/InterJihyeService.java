@@ -35,7 +35,7 @@ public interface InterJihyeService {
 	String rankShowJSON(); 
 	String jobAgelineRankShowJSON(String job); //
 
-//	int updateIns_personal_alarm(String userid); // ins_personal_alarm값 변경하기
+	int updateIns_personal_alarm(HashMap<String,String> map); // ins_personal_alarm값 변경하기
 
 	
 

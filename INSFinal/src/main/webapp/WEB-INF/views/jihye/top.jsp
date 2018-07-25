@@ -41,29 +41,6 @@
 
 <style >
 
-/*    ul {
-  list-style: none;
-  margin-left: 0;
- }
- ul > li {
-  display: inline-block;
- }
- ul > li > a {
-  color: #fff;
-  text-decoration: none;
-  display: block;
-  padding: 5px 10px;
-  background-color: rgb(255, 82, 82);
- }
- ul > li:hover > a,
- ul > li:focus > a,
- ul > li:active > a,
- ul > li.active >a {
-  color: yellow;
-  background-color: #000;
- }  */
- 
-
 .grid-container {
   display: grid;
   /* grid-gap: 10px; */
@@ -113,6 +90,14 @@
   padding-right:10%;
 }
 
+.topNav {
+  color: white;
+   font-weight : bold;
+  font-size: 17px;
+  background-color: rgb(255, 82, 82);
+}
+
+
 .activity {
     border-bottom: 0px solid #e2e4e6;
     margin-left: 40px;
@@ -132,15 +117,20 @@
     display: block;
     }
         
-.modal-dialog{
+/* .modal-dialog{
   display: inline-block;
   text-align: left;
   vertical-align : middle;
-}
+} */
 
 .topBack {
-   background-image: url('<%= request.getContextPath() %>/resources/jihye/www.jpg');
+<%--    width: 100%;
+   background-image: url('<%= request.getContextPath() %>/resources/jihye/top2.jpg'); --%>
+  background-color:  white;   
+ 
+
 }
+
 
 </style>
 
@@ -168,11 +158,11 @@ function test(){
 
 </script>
 
-<div class="topBack" > 
+<div class="topBack" >
 <!--    <div class="cart_container" style="padding-top: 0px;padding-bottom: 0px;" > -->
       <div class="container" >
-         <div class="row" >
-            <div class="col" >
+     <!--     <div class="row" >
+            <div class="col" > -->
 
 				<div class="grid-container" style="border: 0px solid black; margin_bottom: 100px;">
 				       <div class="grid-item item1"> <!--grid-item  -->
@@ -201,17 +191,17 @@ function test(){
 					      -->
 					  
 					    <input type="hidden" value="${sessionScope.loginuser.userid}" />   
-						   <span style="color:#333 ">  이  름 :</span> ${sessionScope.loginuser.name}</br></br>
-						     <span style="color:#333 "> 이메일 :</span>  ${sessionScope.loginuser.email}</br></br>
-						    <span style="color:#333 ">  닉네임 : </span> ${sessionScope.loginuser.nickname}</br></br>         
+						   <span style="color:rgb(255, 82, 82); font-weight: bold;">  이  름 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.name}</span></br></br>
+						     <span style="color:rgb(255, 82, 82); font-weight: bold;"> 이메일 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">   ${sessionScope.loginuser.email} </span></br></br>
+						    <span style="color:rgb(255, 82, 82); font-weight: bold;">  닉네임 : </span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.nickname} </span></br></br>         
 					  </div> 
 				</div>  
 		 </div>
-	  </div>
-    </div>
+	<!--   </div>
+    </div> -->
 <!--   </div> -->
-</div>    		 		
-
+    		 		
+ </div> 
  
  
 
@@ -247,22 +237,22 @@ function test(){
     
   
  <%-- 상단에 탭메뉴이다. 탭을 클릭하면 링크타고 페이지 이동한다. --%> 
-<div class="navtab" align="center">        
+<div class="navtab" align="center" style="background-color: white;">        
     <ul class="nav nav-tabs abc">
         <c:if test="${sessionScope.loginuser.userid.equals('admin') }">  
-            <li><a id="ccc"data-toggle="tab5" href="<%= request.getContextPath() %>/managementMember.action">Management</a></li> 
+            <li><a class="topNav"data-toggle="tab5" href="<%= request.getContextPath() %>/managementMember.action">Management</a></li> 
        </c:if>
        <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">  
-	       <li><a id="ccc" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
-	       <li><a id="ccc"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
+	       <li><a class="topNav" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
+	       <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
        </c:if> 
        
-	       <li><a id="ccc"  data-toggle="tab2" href="<%= request.getContextPath() %>/qna.action">Q&A</a></li>
+	       <li><a class="topNav"  data-toggle="tab2" href="<%= request.getContextPath() %>/qna.action">Q&A</a></li>
 	     <c:if test="${sessionScope.loginuser.userid.equals('admin') }">     
-	       <li><a id="ccc" data-toggle="tab3" href="<%= request.getContextPath() %>/adminChart.action">Chart</a></li> 
+	       <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/adminChart.action">Chart</a></li> 
 	     </c:if> 
 	      <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">     
-	     <li><a id="ccc" data-toggle="tab3" href="<%= request.getContextPath() %>/mySetting.action">Setting</a></li> 
+	     <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/mySetting.action">Setting</a></li> 
 	     </c:if> 
    </ul>   
 </div>  
@@ -270,7 +260,7 @@ function test(){
 
 
  
- 
+
 
 
 
