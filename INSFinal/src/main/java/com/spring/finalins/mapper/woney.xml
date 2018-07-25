@@ -1,13 +1,372 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ==== #26. mapper 기본설정 ==== -->
-
-<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
 <!-- ==== #27. 루트 엘리먼트 & 네임스페이스 설정(프로젝트 전체내에서 유일해야 한다.) ==== -->
 <mapper namespace="woney">
+	<!-- // 카드 정보 받아오기 -->
+	<resultMap type="HashMap" id="cardMap">
+		<result property="CARDIDX" column="card_idx" javaType="String"/>
+		<result property="FKLISTIDX" column="fk_list_idx" javaType="String"/>
+		<result property="CARDUSERID" column="card_userid" javaType="String"/>
+		<result property="CARDTITLE" column="card_title" javaType="String"/>
+		<result property="CARDCOMMENTCOUNT" column="card_commentCount" javaType="String"/>
+		<result property="CARDDATE" column="card_date" javaType="String"/>
+		<result property="CARDDELETESTATUS" column="card_delete_status" javaType="String"/>
+	</resultMap>
+
+	<select id="getCardInfo" parameterType="String" resultMap="cardMap">
+		select card_idx, fk_list_idx, card_userid , card_title, card_commentCount, 
+		to_char(card_date,'yyyy-mm-dd hh24:mi:ss'), card_delete_status
+		from ins_card
+		where card_delete_status = 1 and
+			card_idx=#{cardIdx}
+	</select>
+	
+	<!-- // 카드 상세 정보 받아오기 -->
+	<resultMap type="HashMap" id="cardDetailMap">
+		<result property="DETAILIDX" column="card_detail_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="DESCRIPTION" column="card_description" javaType="String"/>
+		<result property="FILENAME" column="card_filename" javaType="String"/>
+		<result property="ORGFILENAME" column="card_orgfilename" javaType="String"/>
+		<result property="BYTE" column="card_byte" javaType="String"/>
+	</resultMap>
+
+	<select id="getCardDetailInfo" parameterType="String" resultMap="cardDetailMap">
+		select card_detail_idx, fk_card_idx, card_description,
+				card_filename, card_orgfilename, card_byte
+		from ins_card_detail
+		where fk_card_idx=#{cardIdx}
+	</select>
+	
+	<!-- // 카드 코멘트 정보 받아오기 -->
+	<resultMap type="HashMap" id="cardCommentListMap">
+		<result property="CARDCOMMENTIDX" column="card_comment_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="CARDCOMMENTUSERID" column="card_comment_userid" javaType="String"/>
+		<result property="CARDCOMMENTCONTENT" column="card_comment_content" javaType="String"/>
+		<result property="CARDCOMMENTDATE" column="card_comment_date" javaType="String"/>
+		<result property="CARDNICKNAME" column="user_nickname" javaType="String"/>
+	</resultMap>
+
+	<select id="cardCommentInfo" parameterType="String" resultMap="cardCommentListMap">
+		select card_comment_idx, fk_card_idx ,card_comment_userid , card_comment_content, 
+          to_char(card_comment_date ,'mon dd hh24:mi', 'NLS_DATE_LANGUAGE=ENGLISH') AS card_comment_date, user_nickname
+		from ins_card_comment 
+		where fk_card_idx=#{cardIdx}
+		order by card_comment_idx desc, card_comment_date desc
+	</select>
+	
+	
+	<!-- // 카드 기록 받아오기 -->
+	<resultMap type="HashMap" id="cardRecordListMap">
+		<result property="PROJECTRECORDIDX" column="project_record_idx" javaType="String"/>
+		<result property="FKPROJECTIDX" column="fk_project_idx" javaType="String"/>
+		<result property="RECORDUSERID" column="record_userid" javaType="String"/>
+		<result property="PROJECTRECORDTIME" column="project_record_time" javaType="String"/>
+		<result property="RECORDDMLSTATUS" column="record_dml_status" javaType="String"/>
+		<result property="FKLISTIDX" column="fk_list_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="NICKNAME" column="nickname" javaType="String"/> 
+	</resultMap>
+	
+	<select id="getCardRecordInfo" parameterType="HashMap" resultMap="cardRecordListMap">	
+		select project_record_idx, fk_project_idx, record_userid,
+		      to_char(project_record_time ,'mon dd hh24:mi', 'NLS_DATE_LANGUAGE=ENGLISH') AS project_record_time
+		      , record_dml_status, fk_list_idx, fk_card_idx ,nickname
+		from ins_project_record A join ins_member B
+		on A.record_userid = B.userid
+		where fk_project_idx = #{projectIdx} and 
+		    fk_list_idx=#{listIdx} and
+		    fk_card_idx =#{cardIdx}
+		order by project_record_time desc, project_record_idx
+	</select>
+	
+		<!-- // 카드 DueDate 받아오기 -->
+	<resultMap type="HashMap" id="cardDueDateMap">
+		<result property="CARDDUEDATEIDX" column="card_duedate_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="CARDDUEDATE" column="card_duedate" javaType="String"/>
+		<result property="CARDCHECK" column="card_check" javaType="String"/>
+	</resultMap>
+
+	<select id="cardDueDateInfo" parameterType="String" resultMap="cardDueDateMap">
+		select card_duedate_idx, fk_card_idx, to_char(card_duedate ,'yyyy-mm-dd') AS card_duedate ,card_check
+		from ins_card_duedate
+		where fk_card_idx = #{cardIdx}
+	</select>
+	
+	<!-- // 체크타이틀 받아오기 -->
+	<resultMap type="HashMap" id="cardCheckTitleMap">
+		<result property="CARDCHECKLISTIDX" column="card_checklist_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="CARDCHECKLISTTITLE" column="card_checklist_title" javaType="String"/>
+	</resultMap>
+
+	<select id="cardCheckTitleInfo" parameterType="String" resultMap="cardCheckTitleMap">
+		select card_checklist_idx ,fk_card_idx,card_checklist_title
+		from ins_card_checklist
+		where fk_card_idx =#{cardIdx}
+	</select>
+	
+	<!-- // 체크리스트 받아오기 -->
+	<resultMap type="HashMap" id="cardCheckListMap">
+		<result property="CARDCHECKLISTDETAILIDX" column="card_checklist_detail_idx" javaType="String"/>
+		<result property="FKCARDCHECKLISTIDX" column="fk_card_checklist_idx" javaType="String"/>
+		<result property="CARDCHECKLISTTODO" column="card_checklist_todo" javaType="String"/>
+		<result property="CARDCHECKLISTTODOSTATUS" column="card_checklist_todo_status" javaType="String"/>
+	</resultMap>
+
+	<select id="cardCheckListInfo" parameterType="String" resultMap="cardCheckListMap">
+		select card_checklist_detail_idx ,fk_card_checklist_idx,card_checklist_todo, card_checklist_todo_status
+		from ins_card_checklist_detail
+		where fk_card_checklist_idx = #{cardIdx}
+		order by card_checklist_detail_idx
+	</select>
+	
+	<!-- // 라벨리스트 받아오기 -->
+	<resultMap type="HashMap" id="cardLabelListMap">
+		<result property="CARDLABELIDX" column="card_label_idx" javaType="String"/>
+		<result property="FKCARDIDX" column="fk_card_idx" javaType="String"/>
+		<result property="CARDLABEL" column="card_label" javaType="String"/>
+	</resultMap>
+
+	<select id="cardLabelListInfo" parameterType="String" resultMap="cardLabelListMap">
+		select card_label_idx, fk_card_idx,card_label
+		from ins_card_label
+		where fk_card_idx = #{cardIdx}
+		order by card_label
+	</select>
+	
+	<select id="cardLabelCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_label
+		where fk_card_idx = #{cardIdx}
+	</select>
+
+	<!-- // 프로젝트 멤버 체크 -->
+	<select id="getProjectMember" parameterType="HashMap" resultType="Integer">
+		select count(*)
+		from ins_card A join ins_list B
+		on A.fk_list_idx = B.list_idx
+		join ins_project_member C
+		on B.fk_project_idx= C.fk_project_idx
+		where card_delete_status = 1 and 
+				card_idx=#{cardIdx} and
+				project_member_userid=#{userid}
+	</select>
+	
+	<!-- // 카드 제목 수정 -->
+	<update id="setCardTitleUpdate" parameterType="HashMap">
+		update ins_card set card_title = #{cardUpdateTitle}
+		where card_delete_status = 1 and
+		 		card_idx = #{cardIdx}
+	</update>
+	
+	<!-- // 카드 Description 존재 여부 체크 -->
+	<select id="cardDescriptionCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_detail
+		where fk_card_idx=#{cardIdx}
+	</select>
+	
+	<!-- // 카드 Description 입력 -->
+	<insert id="setcardDescriptionInsert" parameterType="HashMap">
+		insert into ins_card_detail(card_detail_idx, fk_card_idx) values(seq_card_detail.nextval,#{cardIdx})
+	</insert>
+	
+	<!-- // 카드 Description 수정 -->
+	<update id="setcardDescriptionUpdate" parameterType="HashMap">
+		update ins_card_detail set card_description = #{cardDescription}
+		where fk_card_idx=#{cardIdx}
+	</update>
+	
+	<!-- // 파일첨부 -->
+	<update id="add_withFile" parameterType="com.spring.finalins.model.CardDetailVO">
+		update ins_card_detail set card_filename = #{card_filename},card_orgfilename=#{card_orgfilename},card_byte=#{card_byte}
+		where fk_card_idx =#{fk_card_idx}
+	</update>
+	
+	<!-- // 카드 첨부파일 삭제 -->
+	<update id="setcardAttachDelete" parameterType="String">
+		update ins_card_detail set card_filename =null,card_orgfilename=null,card_byte=null
+		where fk_card_idx = #{cardIdx}
+	</update>
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	<!-- // 카드 Comment 입력 -->
+	<insert id="setcardaddComment" parameterType="HashMap">
+		insert into ins_card_comment(card_comment_idx,fk_card_idx,card_comment_userid,card_comment_content,card_comment_date,user_nickname) values(seq_card_comment.nextval,#{cardIdx}, #{userid}, #{content},sysdate,#{nickname})
+	</insert>
+	
+	<!-- // 카드 Comment 입력시 ins_card 테이블에 commentcount수 증가 -->
+	<update id="setcardCommentCountUP" parameterType="String">
+		update ins_card set card_commentcount = card_commentcount+1
+		where card_delete_status = 1 and 
+		      card_idx=#{cardIdx}
+	</update>
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	
+	
+	<!-- // 카드 Comment 수정 -->
+	<update id="setcardCommentEdit" parameterType="HashMap">
+		update ins_card_comment set card_comment_content = #{Editcontent}
+		where card_comment_idx=#{cardcommentidx} and
+		      fk_card_idx=#{cardIdx}
+	</update>
+	
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	<!-- // 카드 Comment 삭제 -->
+	<delete id="setcardCommentDelete" parameterType="HashMap">
+		delete from ins_card_comment
+		where card_comment_idx=#{cardcommentidx} and
+		      fk_card_idx=#{cardIdx}
+	</delete>
+	
+	<!-- // 카드 Comment 삭제시 ins_card 테이블에 commentcount수 감소  -->
+	<update id="setcardCommentCountDown" parameterType="String">
+		update ins_card set card_commentcount = card_commentcount-1
+		where card_delete_status = 1 and 
+		      card_idx=#{cardIdx}
+	</update>	
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+		
+	<!-- // 카드 수정 기록 -->
+	<insert id="setCardRecordInsert" parameterType="HashMap">
+		insert into ins_project_record(project_record_idx , fk_project_idx, record_userid,project_record_time,fk_list_idx,fk_card_idx,record_dml_status)
+		values(seq_project_record.nextval,#{projectIdx},#{userid}, sysdate,#{listIdx},#{cardIdx},#{recordstatus})
+	</insert>
+	
+	<!-- // 트랜잭션 프로젝트 idx 받아오기 -->
+	<select id="getCardRecordIdx" parameterType="HashMap" resultType="String">
+		select max(project_record_idx)
+		from ins_project_record
+		where record_userid = #{userid} and 
+		    fk_card_idx = #{cardIdx}		
+	</select>
+	
+	<!-- // 카드 알람 생성 -->
+	<insert id="setCardAlarmInsert" parameterType="String">
+		insert into ins_personal_alarm(personal_alarm_idx ,fk_project_record_idx ,personal_alarm_read_status)
+		values(seq_personal_alarm.nextval,#{cardRecordIdx},default)
+	</insert>
+	
+	<!-- // 카드 Description null 인지 아닌지 체크 -->
+	<select id="cardRecordDescriptionCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_detail
+		where fk_card_idx= #{cardIdx} and 
+			card_description is null
+	</select>
+	
+	<!-- // 카드 삭제  -->
+	<update id="setCardDelete" parameterType="String">
+		update ins_card set card_delete_status = 0
+		where card_idx = #{cardIdx}
+	</update>
+	
+	<!-- // 카드 DueDate 생성 -->
+	<insert id="setCardDuDateAdd" parameterType="HashMap">
+		insert into ins_card_duedate(card_duedate_idx, fk_card_idx, card_duedate, card_check) values(seq_card_duedate.nextval, #{cardIdx}, #{datepicker},default)
+	</insert>
+	
+	<!-- // 카드  DueDate 수정 -->
+	<update id="setCardDueDateEdit" parameterType="HashMap">
+		update ins_card_duedate set card_duedate = #{datepicker}
+		where fk_card_idx = #{cardIdx} and
+			card_duedate_idx = #{cardduedateIdx}
+	</update>
+	
+	<!-- // 카드  DueDate 삭제 -->
+	<delete id="setCardDueDateDelete" parameterType="HashMap">
+		delete from ins_card_duedate 
+		where fk_card_idx = #{cardIdx} and 
+		card_duedate_idx = #{cardduedateIdx}
+	</delete>
+	
+	<!-- // 카드 DueDate 삭제 체크를 위한 CNT -->
+	<select id="cardDueDateCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_duedate
+		where fk_card_idx = #{cardIdx}
+	</select>
+	
+	<!-- // 카드 DueDate 체크 여부 -->
+	<select id="getCardCheck" parameterType="HashMap" resultType="Integer">
+		select card_check
+		from ins_card_duedate
+		where fk_card_idx = #{cardIdx} and
+		card_duedate_idx = #{cardduedateIdx} 
+	</select>
+	
+	<!-- // 카드 DueDate 체크 업데이트 -->
+	<update id="setCheckChangeAdd" parameterType="HashMap">
+		update ins_card_duedate set card_check = 1
+		where fk_card_idx =  #{cardIdx} and
+		card_duedate_idx = #{cardduedateIdx} 
+	</update>
+	
+	<!-- // 카드 DueDate 체크해제 업데이트 -->
+	<update id="setCheckChangeRemove" parameterType="HashMap">
+		update ins_card_duedate set card_check = 0
+		where fk_card_idx =  #{cardIdx} and
+		card_duedate_idx = #{cardduedateIdx} 
+	</update>
+	
+	<!-- // 카드 체크리스트 존재여부 확인 -->
+	<select id="getCheckListCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_checklist
+		where fk_card_idx = #{cardIdx}
+	</select>	
+	
+	<!-- // 카드 체크리스트 타이틀 생성 -->
+	<insert id="setCheckListTitleAdd" parameterType="HashMap">
+		insert into ins_card_checklist(card_checklist_idx ,fk_card_idx,card_checklist_title)
+		values(seq_card_checklist.nextval,#{cardIdx},#{checkListTitleName})
+	</insert>
+	
+	<!-- // 카드 체크리스트 타이틀 수정 -->
+	<update id="setCheckLisTitletEdit" parameterType="HashMap">
+		update ins_card_checklist set card_checklist_title = #{checkListTitleEditvalue}
+		where fk_card_idx = #{cardIdx} and
+		card_checklist_idx = ${cardchecklistIdx}
+	</update>
+	
+	<!-- // 카드  체크리스트 생성 -->
+	<insert id="setCheckListAdd" parameterType="HashMap">
+		insert into ins_card_checklist_detail(card_checklist_detail_idx ,fk_card_checklist_idx,card_checklist_todo, card_checklist_todo_status)
+		values(seq_checklist_detail.nextval,#{cardchecklistIdx},#{checkListContent},default)
+	</insert>
+	
+	<!-- // 카드  체크리스트 체크 상태 변경 -->
+	<update id="setCheckListChange" parameterType="HashMap">
+		update ins_card_checklist_detail set card_checklist_todo_status = #{checkListStatus}
+		where  card_checklist_detail_idx = #{checkDetailIdx} and
+ 		fk_card_checklist_idx= ${cardchecklistIdx}
+	</update>
+	
+	<!-- // 카드  체크리스트 삭제 -->
+	<delete id="setCheckListDelete" parameterType="HashMap">
+		delete ins_card_checklist_detail 
+		where card_checklist_detail_idx = #{checkDetailIdx} and
+		fk_card_checklist_idx= ${cardchecklistIdx}
+	</delete>
+	
+	<!-- // 카드  체크리스트 타이틀 삭제 -->
+	<delete id="setCheckListTitleDelete" parameterType="HashMap">
+		delete ins_card_checklist
+		where card_checklist_idx = ${cardchecklistIdx} and 
+		fk_card_idx = #{cardIdx}
+	</delete>
+	
+	<!-- // 카드  라벨추가 -->
+	<insert id="setLabelAdd" parameterType="HashMap">
+		insert into ins_card_label(card_label_idx ,fk_card_idx,card_label)
+		values(seq_card_checklist.nextval,#{cardIdx},#{labelid})
+	</insert>
+	
 </mapper>
-
-
-
-
+ 
+ 

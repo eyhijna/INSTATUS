@@ -5,7 +5,7 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"  %>    
 
 <%
-   String ctxpath = request.getContextPath();
+	String ctxpath = request.getContextPath();
 %>
     
 <!DOCTYPE html>
@@ -18,7 +18,7 @@
     <meta name="author" content="">
 
     <title>SB Admin 2 - Bootstrap Admin Theme</title>
-    
+ 	
     <!-- Bootstrap Core CSS -->
     <link href="<%=ctxpath %>/resources/card/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -32,14 +32,14 @@
     <link href="<%=ctxpath %>/resources/card/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     
     <!-- Add icon library -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-   <!-- <datePicker> -->
-   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-   
-   
-   <script type="text/javascript" src="<%=ctxpath %>/resources/js/jquery-2.0.0.js"></script>
-   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+	<!-- <datePicker> -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	
+	
+	<script type="text/javascript" src="<%=ctxpath %>/resources/js/jquery-2.0.0.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="<%=ctxpath %>/resources/card/vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -50,12 +50,12 @@
     <!-- Custom Theme JavaScript -->
     <script src="<%=ctxpath %>/resources/card/dist/js/sb-admin-2.js"></script>
 
-   <!-- Woney Css -->
-   <link rel="stylesheet" type="text/css" href="<%= ctxpath %>/resources/card/css/style.css" />
-   
-   
+	<!-- Woney Css -->
+	<link rel="stylesheet" type="text/css" href="<%= ctxpath %>/resources/card/css/style.css" />
+	
+	
 
-   
+	
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -66,14 +66,14 @@
 </head>
   
 <body>
-   <div id="mycontainer">
-      <div id="mycardsideinfo">
-         <tiles:insertAttribute name="cardsideinfo" />
-      </div>
-   
-      <div id="mycardcontent">
-         <tiles:insertAttribute name="content" />
-      </div>
-   </div>
+	<div id="mycontainer">
+		<div id="mycardsideinfo">
+			<tiles:insertAttribute name="cardsideinfo" />
+		</div>
+	
+		<div id="mycardcontent">
+			<tiles:insertAttribute name="content" />
+		</div>
+	</div>
 </body>
 </html>

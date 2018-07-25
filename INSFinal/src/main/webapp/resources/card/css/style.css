@@ -1,0 +1,241 @@
+@CHARSET "UTF-8";
+
+.collapsible {
+
+    background-color: #f5f5f5;
+    color: #333333;
+    cursor: pointer;
+    padding: 10px 15px;
+    width: 100%;
+    border: 1px solid transparent;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+.content {
+    padding: 0 18px;
+    display: 1px soild gray;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+#inputcss{
+	/* //display: block; */
+   /* // width: 100%; */
+    font-weight:bold;
+   	margin-left: 10px;
+    height: 34px;
+    padding: 6px 150px 10px 6px;
+    font-size: 20px;
+    line-height: 1.42857143;
+    color: #777;
+    background-color: #fff;
+    background-image: none;
+ 	border: none;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.attachBtn {
+    background-color: DodgerBlue;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Darker background on mouse-over */
+.attachBtn:hover {
+    background-color: RoyalBlue;
+    }
+
+.commentCss::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.commentCss {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+ .sideBar{
+ 	position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #337ab7;
+    text-decoration: none;
+    background-color: transparent;
+    box-sizing: border-box;
+    cursor: pointer;
+ }
+ .cal{    padding-top: 60px;
+ 	}
+ 	
+.btnSideBar {
+    color: #337ab7;
+    background-color: #ffffff;
+    border-color: #ebecec;
+}
+.btnSideBar:hover {
+    color: #fff;
+    background-color: #bdd8ef;
+    border-color: #c5d1db;
+ }
+ 
+ .btnSideBar.focus, .btnSideBar:focus {
+    color: #fff;
+    background-color: #bdd8ef;
+    border-color: #c5d1db;
+}
+.dropdown-menu>li>a {
+    padding: 3px 90px;
+}
+ 	
+.btnSideBar{text-align: left;
+   }
+    
+ .imgSelect {
+	cursor: pointer;
+}
+
+.popupLayer {
+	position: absolute;
+	display: none;
+	background-color: #ffffff;
+	border: solid 2px #d0d0d0;
+	width: 350px;
+	height: 150px;
+	padding: 10px;
+}
+.popupLayer div {
+	position: absolute;
+	top: 5px;
+	right: 5px
+}
+
+/* 모달 배경 색 투명도 */
+.modal-backdrop.in{opacity: 0;}
+
+/* 모달 옵션 */
+.modal-dialog{position: absolute;
+ 			width: 250px;
+}
+#labelmodal {  
+margin: 100px auto;
+}
+
+#checklistmodal { 
+margin: 150px auto;
+}
+        
+#datemodal {
+margin: 200px auto;
+}
+    
+#deletemodal { 
+margin: 250px auto;
+}
+/* 모달 옵션 끝 */
+
+/* DueDate 체크 */
+.duedateCheck{
+	border: 2px solid #93ca94;
+    background-color: #a4e0a0;
+}
+
+/* 라벨  시작*/
+.form-group .LabelChecklist[type="checkbox"] {
+    display: none;
+}
+
+.form-group .LabelChecklist[type="checkbox"] + .btn-group > .LabelCheckBtn Span {
+    width: 20px;
+}
+
+.form-group .LabelChecklist[type="checkbox"] + .btn-group > .LabelCheckBtn Span:first-child {
+    display: none;
+}
+.form-group .LabelChecklist[type="checkbox"] + .btn-group > .LabelCheckBtn Span:last-child {
+    display: inline-block;   
+}
+
+.form-group .LabelChecklist[type="checkbox"]:checked + .btn-group > .LabelCheckBtn Span:first-child {
+    display: inline-block;
+}
+.form-group .LabelChecklist[type="checkbox"]:checked + .btn-group > .LabelCheckBtn Span:last-child {
+    display: none;   
+}
+
+/* 라벨  끝*/
+
+/* 체크리스트 시작 */
+.checkboxList label:after
+ {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.checkboxList .cr
+ {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: .25em;
+    width: 1.3em;
+    height: 1.3em;
+    float: left;
+    margin-right: .5em;
+}
+
+
+.checkboxList .cr .cr-icon {
+    position: absolute;
+    font-size: .8em;
+    line-height: 0;
+    top: 50%;
+    left: 20%;
+}
+
+
+.checkboxList label input[type="checkbox"]{
+    display: none;
+}
+
+.checkboxList label input[type="checkbox"] + .cr > .cr-icon {
+    transform: scale(3) rotateZ(-20deg);
+    opacity: 0;
+    transition: all .3s ease-in;
+}
+
+.checkboxList label input[type="checkbox"]:checked + .cr > .cr-icon {
+    transform: scale(1) rotateZ(0deg);
+    opacity: 1;
+}
+
+.checkboxList label input[type="checkbox"]:disabled + .cr {
+    opacity: .5;
+}
+
+/* 체크리스트 끝 */
+
+.labelCss{
+	    border-radius: 3px;
+    box-sizing: border-box;
+    display: block;
+    float: left;
+    font-size: 12px;
+    font-weight: 600;
+    height: 30px;
+    line-height: 30px;
+    margin: 0 4px 4px 0;
+    min-width: 40px;
+    padding: 0 8px;
+    width: auto;
+}

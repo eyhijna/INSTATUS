@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ======= #18. tiles 레이아웃 설정하기 ======= -->
 
@@ -44,7 +44,7 @@
 	<!-- ==== tiles 를 사용하는 레이아웃 설정2 끝 ==== -->
 	
 		
-    <!-- ==== tiles 를 사용하는 레이아웃 설정 시작3 ==== -->
+       <!-- ==== tiles 를 사용하는 레이아웃 설정 시작3 ==== -->
     <!-- 메뉴를 새롭게 하기위해 레이아웃을 사용한다. /WEB-INF/tiles/tile/sideinfo.jsp가 없다 -->
 	<definition name="layout-tiles3" template="/WEB-INF/tiles/layout/layout-tiles3.jsp"> 
 	<!-- 	<put-attribute name="cardheader" value="/WEB-INF/tiles/tile/cardheader.jsp" /> -->

@@ -1,6 +1,7 @@
-package com.spring.finalins.common;
+﻿package com.spring.finalins.common;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -217,5 +218,13 @@ public class MyUtil {
 		
 		return result;
 	} // getComma(long number)
+
+	// ****  현재시각을 나타내기  **** //
+	public static String getNowTime() {
+		Date now = new Date();
+		String today = String.format("%tF %tT", now, now);
+        return today;
+	}
+
 
 }

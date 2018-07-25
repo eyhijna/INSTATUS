@@ -5898,7 +5898,7 @@ button.close {
   overflow-y: auto;
 }
 .modal-dialog {
-/* position: relative;  지혜 로그인창 패스워드 찾기 등 모달창 위치 조절을 위해 주석처리함  */
+  position: relative;
   width: auto;
   margin: 10px;
 }
