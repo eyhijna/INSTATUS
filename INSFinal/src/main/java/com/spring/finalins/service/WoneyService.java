@@ -411,4 +411,11 @@ public class WoneyService implements InterWoneyService{
 		return n;
 	}
 
+	// 카드 라벨 삭제
+	@Override
+	public int setLabelDelete(HashMap<String, String> map) {
+		int n = dao.setLabelDelete(map);
+		return n;
+	}
+
 }

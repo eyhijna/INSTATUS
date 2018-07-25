@@ -367,6 +367,13 @@
 		values(seq_card_checklist.nextval,#{cardIdx},#{labelid})
 	</insert>
 	
+	<!-- // 카드 라벨 삭제 -->
+	<delete id="setLabelDelete" parameterType="HashMap">
+		delete ins_card_label
+		where fk_card_idx = #{cardIdx} and
+		card_label = #{labelid}
+	</delete>
+	
 </mapper>
  
  

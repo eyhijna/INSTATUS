@@ -53,6 +53,10 @@ public class WoneyController {
 	@RequestMapping(value="/carddetail.action", method= {RequestMethod.GET})
 	public String crearddetail(HttpServletRequest request,HttpServletResponse response,HttpSession session) 
 			throws Throwable {
+		String url = MyUtil.getCurrentURL(request);
+		//	System.out.println("현재페이지 확인용:" + url);
+		session.setAttribute("goBackURL", url); //세션에 url정보를 저장시킨다.
+	
 		String cardIDX =  request.getParameter("cardIDX");
 		String listIDX =  request.getParameter("listIDX");
 		String projectIDX =  request.getParameter("projectIDX");
@@ -492,6 +496,24 @@ public class WoneyController {
 		return "gocardRecordInfoJSON.notiles";
 	}// end of cardDelete()------------------
 	
+	// ==== 카드 Due date 불러오기 ====
+	@RequestMapping(value="/goDueDateView.action", method= {RequestMethod.POST})
+	public String goDueDateView(HttpServletRequest request) {
+		String cardIdx = request.getParameter("cardidx");
+		HashMap<String, String> cardDueDateMap = service.cardDueDateInfo(cardIdx);
+		
+		String str_jsonobj ="";
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("CARDCHECK", cardDueDateMap.get("CARDCHECK"));
+		jsonobj.put("CARDDUEDATE", cardDueDateMap.get("CARDDUEDATE"));
+		jsonobj.put("CARDDUEDATEIDX", cardDueDateMap.get("CARDDUEDATEIDX"));
+		
+		str_jsonobj = jsonobj.toString();
+		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		return "gocheckChangeJSON.notiles";
+	}// end of goDueDateAdd()------------------
+	
 	// ==== 카드 Due date 생성 ====
 	@RequestMapping(value="/goDueDateAdd.action", method= {RequestMethod.POST})
 	public String goDueDateAdd(HttpServletRequest request) {
@@ -504,16 +526,16 @@ public class WoneyController {
 
 		int n = service.setCardDuDateAdd(map);
 	
-		HashMap<String, String> cardDueDateMap = service.cardDueDateInfo(cardIdx);
-		
+		int cardLabelCNT = service.cardLabelCNT(cardIdx);
+	
 		String str_jsonobj ="";
 		JSONObject jsonobj = new JSONObject();
-		jsonobj.put("CARDCHECK", cardDueDateMap.get("CARDCHECK"));
-		jsonobj.put("CARDDUEDATE", cardDueDateMap.get("CARDDUEDATE"));
-		jsonobj.put("CARDDUEDATEIDX", cardDueDateMap.get("CARDDUEDATEIDX"));
+		jsonobj.put("cardLabelCNT", cardLabelCNT);
 		
 		str_jsonobj = jsonobj.toString();
 		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+str_jsonobj);
 		
 		return "gocheckChangeJSON.notiles";
 	}// end of goDueDateAdd()------------------
@@ -531,19 +553,8 @@ public class WoneyController {
 		map.put("cardduedateIdx", cardduedateIdx);
 
 		int n = service.setCardDueDateEdit(map);
-	
-		HashMap<String, String> cardDueDateMap = service.cardDueDateInfo(cardIdx);
-		
-		String str_jsonobj ="";
-		JSONObject jsonobj = new JSONObject();
-		jsonobj.put("CARDCHECK", cardDueDateMap.get("CARDCHECK"));
-		jsonobj.put("CARDDUEDATE", cardDueDateMap.get("CARDDUEDATE"));
-		jsonobj.put("CARDDUEDATEIDX", cardDueDateMap.get("CARDDUEDATEIDX"));
-		
-		str_jsonobj = jsonobj.toString();
-		request.setAttribute("str_jsonobj", str_jsonobj);
-		
-		return "gocheckChangeJSON.notiles";
+
+		return "goDueDate.notiles";
 	}// end of goDueDateEdit()------------------
 	
 	// ==== 카드 Due date 삭제 ====
@@ -559,10 +570,12 @@ public class WoneyController {
 		int n = service.setCardDueDateDelete(map);
 
 		int cardDueDateCNT = service.cardDueDateCNT(cardIdx);
+		int cardLabelCNT = service.cardLabelCNT(cardIdx);
 		
 		String str_jsonobj ="";
 		JSONObject jsonobj = new JSONObject();
 		jsonobj.put("CARDDUEDATECNT", cardDueDateCNT);
+		jsonobj.put("cardLabelCNT", cardLabelCNT);
 		
 		str_jsonobj = jsonobj.toString();
 		request.setAttribute("str_jsonobj", str_jsonobj);
@@ -690,9 +703,11 @@ public class WoneyController {
 	// ==== 카드  체크리스트 체크 상태 변경 ====
 	@RequestMapping(value="/goCheckListChange.action", method= {RequestMethod.POST})
 	public String goCheckListChange(HttpServletRequest request) {
+
 		String checkDetailIdx = request.getParameter("checkDetailIdx"); // 디테일 idx
 		String cardchecklistIdx = request.getParameter("cardchecklistIdx"); // 리스트 idx
 		String checkListStatus = request.getParameter("checkListStatus"); 
+		
 		if("0".equals(checkListStatus)) {
 			checkListStatus = "1"; // 스테이터스가 0이면 1으로 바꾸고 
 		}else if("1".equals(checkListStatus)){
@@ -705,8 +720,18 @@ public class WoneyController {
 		map.put("checkListStatus", checkListStatus);
 
 		int n = service.setCheckListChange(map);
-	
-		return "goCheckListNodata.notiles";
+		
+		
+		String str_jsonobj ="";
+		JSONObject jsonobj = new JSONObject();
+		
+		jsonobj.put("checkDetailIdx", checkDetailIdx);
+		jsonobj.put("checkListStatus", checkListStatus);
+		
+		str_jsonobj = jsonobj.toString();
+		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		return "goCheckListJSON.notiles";
 	}// end of goCheckListChange()------------------	
 	
 	// ==== 카드  체크리스트 삭제 ====
@@ -755,21 +780,6 @@ public class WoneyController {
 		return "goCheckListNodata.notiles";
 	}// end of goCheckListTitleAdd()------------------	
 	
-	// ==== 카드  라벨추가 ====
-	@RequestMapping(value="/goLabelAdd.action", method= {RequestMethod.POST})
-	public String goLabelAdd(HttpServletRequest request) {
-		String labelid = request.getParameter("labelid");
-		String cardIdx = request.getParameter("cardidx");
-		
-		HashMap<String, String> map = new HashMap<String, String>(); 
-		map.put("labelid", labelid);
-		map.put("cardIdx", cardIdx);
-
-		int n = service.setLabelAdd(map);
-		
-		return "goLabelDML.notiles";
-	}// end of goLabelAdd()------------------	
-	
 	// 라벨 리스트 불러오기
 	@RequestMapping(value="/labelselect.action", method= {RequestMethod.POST})
 	public String labelselect(HttpServletRequest request) {
@@ -811,6 +821,54 @@ public class WoneyController {
 		request.setAttribute("str_jsonobj", str_jsonobj);
 		//System.out.println("CARDCHECKLISTTITLE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:"+str_jsonobj);
 
-		return "goLabel.notiles";
+		return "goLabelobj.notiles";
 	}// end of labelcnt()------------------	
+	
+	// ==== 카드  라벨추가 ====
+	@RequestMapping(value="/goLabelAdd.action", method= {RequestMethod.POST})
+	public String goLabelAdd(HttpServletRequest request) {
+		String labelid = request.getParameter("labelid");
+		String cardIdx = request.getParameter("cardidx");
+		
+		HashMap<String, String> map = new HashMap<String, String>(); 
+		map.put("labelid", labelid);
+		map.put("cardIdx", cardIdx);
+
+		int n = service.setLabelAdd(map);
+		
+		int cardDueDateCNT = service.cardDueDateCNT(cardIdx);
+
+		String str_jsonobj ="";
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("CARDDUEDATECNT", cardDueDateCNT);
+		
+		str_jsonobj = jsonobj.toString();
+		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		return "goLabelobj.notiles";
+	}// end of goLabelAdd()------------------	
+	
+	// ==== 카드  라벨삭제 ====
+	@RequestMapping(value="/goLabelDelete.action", method= {RequestMethod.POST})
+	public String goLabelDelete(HttpServletRequest request) {
+		String labelid = request.getParameter("labelid");
+		String cardIdx = request.getParameter("cardidx");
+		
+		HashMap<String, String> map = new HashMap<String, String>(); 
+		map.put("labelid", labelid);
+		map.put("cardIdx", cardIdx);
+
+		int n = service.setLabelDelete(map);
+		
+		int cardDueDateCNT = service.cardDueDateCNT(cardIdx);
+
+		String str_jsonobj ="";
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("CARDDUEDATECNT", cardDueDateCNT);
+		
+		str_jsonobj = jsonobj.toString();
+		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		return "goLabelobj.notiles";
+	}// end of goLabelAdd()------------------	
 }

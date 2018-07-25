@@ -65,7 +65,7 @@
 
 </head>
   
-<body>
+<body style="background-color: #ffffff;">
 	<div id="mycontainer">
 		<div id="mycardsideinfo">
 			<tiles:insertAttribute name="cardsideinfo" />

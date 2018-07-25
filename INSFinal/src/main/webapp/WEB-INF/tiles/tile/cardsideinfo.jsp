@@ -4,12 +4,6 @@
 <script type="text/javascript">
  $(document).ready(function(){
 	 
-	 
-	 
-	 /* $(document).on("hide","checkListAdd",function(){ });
-	 $(document).on("hide","checkListTitleEdit",function(){ }); */
-
-	 
 	$("#cardDelete").bind("click",function(){
 		//$('#modal').modal('hide');
 		var cardidx = $("#cardidx").val();
@@ -18,14 +12,13 @@
 	
 	// DueDate 저장 클릭시
 	$(".doneDate").bind("click",function(){
-		alert("DueDate 저장 클릭시");
 		$('#modalDate').modal('hide');
 		$('#modalDate2').modal('hide');
 		var cardidx = $("#cardidx").val();
 		var datepicker1 = $("#datepicker1").val();
 		var datepicker2 = $("#datepicker2").val();
 		var cardduedateIdx = $("#cardduedateIdx").val();
-		alert(cardduedateIdx);
+		
 		if(datepicker1 == "" && datepicker2 ==""){ // DueDate가 값이 없으면
 			alert("날짜를 입력하세요");
 			return;
@@ -33,14 +26,11 @@
 			 if(cardduedateIdx == "" || cardduedateIdx== 0){
 			 goDueDateAdd(cardidx,datepicker1);
 			 }else{
-				 alert("확인용1");
 				goDueDateEdit(cardidx,datepicker1);// DueDate2의 값이 있고 DueDate1의 값을 수정하면
 			 }
 		 }else if(datepicker1 =="" && datepicker2 !=""){// DueDate2의 값이 있으면
-			 alert("확인용2");
 			goDueDateEdit(cardidx,datepicker2 );
 		 }else if(datepicker1 !="" && datepicker2 !=""){
-			 alert("확인용3");
 			goDueDateEdit(cardidx,datepicker1);
 		 }
 
@@ -58,7 +48,7 @@
 	});
 	
 	// DueDate 삭제
-	$("#cardDueDateDelete").bind("click",function(){
+	$(".cardDueDateDelete").bind("click",function(){
 		$('#modalDate').modal('hide');
 		$('#modalDate2').modal('hide');
 		
@@ -91,14 +81,17 @@
 	});
 	
 	// 체크리스트 추가  
-	$(document).on("click","#goCheckListAdd",function(){
+	$(document).on("click","#goCheckListADD",function(){
+		alert("add중");
 		goCheckListAdd();
 	});
 
 	// 라벨 클릭 시 추가
 	$(document).on("click",".LabelChecklist",function(){
-		 var checkBox = $(this).val();
+		
 		var checkBoxid= $(this).attr('id');
+		 var checkBox = document.getElementById(checkBoxid);
+		 
 		if(checkBoxid =="label1" || checkBoxid =="label6" ){
 			checkBoxid = "0";
 		}else if(checkBoxid =="label2" || checkBoxid =="label7" ){
@@ -110,11 +103,11 @@
 		}else if(checkBoxid =="label5" || checkBoxid =="label10" ){
 			checkBoxid = "4";
 		}
-	
-		 if (checkBox.checked == true){
+	 	
+		 if (checkBox.checked == true){ // 라벨 체크
 			 goLabelAdd(checkBoxid);
-		 }else{
-			 goLabelAdd(checkBoxid);
+		 }else{ // 라벨 체크 해제
+			 goLabelDelete(checkBoxid);
 		 }  
 	});
 	
@@ -219,8 +212,8 @@ function goCardDelete(cardidx){
 	 		type:"POST",
 	 		data : form_data,
 	 		success: function() {
-	 			$("#description").val(json.DESCRIPTION);
-	 			cardRecordInfo();
+	 			opener.window.location ="javascript:history.go(0);";
+	 	    	close();
 	 		}, 
 	 		error: function(request, status, error){ 
 	 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -231,6 +224,47 @@ function goCardDelete(cardidx){
 	}
 
 }// end of goCardDelete()
+
+//카드 DueDate 불러오기
+function goDueDateView(cardidx){
+	var form_data = {cardidx :  cardidx
+			}
+
+	$.ajax({		
+ 		url:"goDueDateView.action",
+ 		type:"POST",
+ 		data : form_data,
+ 		dataType: "JSON",
+    	success: function(json) {
+    		$("#dueCheck").empty();
+ 	        var html = "<div class='commentCss dueCheck labelCss' id='dueCheck' style='margin: 10px 10px 10px 10px;'>"			  	  
+ 	        		 +  	"<p><input type='checkbox' id='dateCheck'>"
+ 					 +		"<span data-toggle='modal' href='#modalDate2'>"+json.CARDDUEDATE+"</span></p>"
+ 					 +	"</div>"
+ 					 
+ 	       	$("#dueCheck").html(html);
+		 	if(json.CARDCHECK == 0){ // 체크가 안된 상태
+     			
+				$(".dueCheck").removeClass("duedateCheck");
+				$("#dateCheck").prop("checked", false);
+			}else if(json.CARDCHECK == 1){ // 체크가 된 상태
+			
+				$(".dueCheck").addClass("duedateCheck");
+				$("#dateCheck").prop("checked", true);
+			}
+    		
+ 	        $("#datepicker1").val("");
+ 	        $("#datepicker2").val("");		 	
+		 	$("#cardduedateIdx").val(json.CARDDUEDATEIDX);
+ 	          
+ 		}, 
+ 		error: function(request, status, error){ 
+ 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+ 		}
+ 	
+ 	}); // end of ajax({})
+	
+}// end of goDueDateAdd()
 
 // 카드 DueDate 생성
 function goDueDateAdd(cardidx,datepicker){
@@ -243,35 +277,38 @@ function goDueDateAdd(cardidx,datepicker){
 
 		$.ajax({		
 	 		url:"goDueDateAdd.action",
+	 		
 	 		type:"POST",
 	 		data : form_data,
 	 		dataType: "JSON",
      		success: function(json) {
-     			$("#option").empty();
+     			alert("dudate 생성"+json.cardLabelCNT);
+     			if(json.cardLabelCNT == 0){
+     		 	$("#option").empty();
 	 	        var html = "<div class='panel panel-default' style='margin-top: 2%'>"
-	 	              + "<div class='panel-heading'><i class='fa fa-plus'></i>" 
-	 	              + "Option"
-	 	              + "</div>"
-	 	              + "<div class='panel-body'>"
-	 	              +  "<div class='row'>"
-	 	              +     	"<div class='col-lg-6'>"
-	 	              +            "<form role='form'>"
-	 	              +                "<div class='form-group'>"
-	 				  +					"<div class='commentCss dueCheck' id='dueCheck' style='padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;'>"
-	 				  +					  "<p><input type='checkbox' id='dateCheck'>"
-	 				  +						 "<span data-toggle='modal' href='#modalDate2'>"+json.CARDDUEDATE+"</span></p>"
-	 				  +						"</div>"
-	 	              +                 "</div>"    
-	 	              +             "</form>"
-	 	              +         "</div>"
-	 	              +     "</div>"
-	 	              + "</div>"
-	 	              + "</div>"
+	 	            	  + 	"<div class='panel-heading'><i class='fa fa-plus'></i>" 
+	 	           		  + 	"Option"
+	 	           		  + 	"</div>"
+	 	              	  + 	"<div class='panel-body'>"
+	 	              	  + 		"<div class='row'>" 
+	 	              	  +				"<div id='dueCheck'>"
+	 				  	  +				"</div>"
+	 				  	  +				"<div id='cardLabel'>"
+	 				  	  +				"</div>"
+	 	              	  +     	"</div>"
+	 	              	  + 	"</div>"
+	 	              	  + "</div>"
 	 	           
 	 	          $("#option").html(html);
-	 	              
-	 	          $("#cardduedateIdx").val(json.CARDDUEDATEIDX);
-	 	          
+   			     goDueDateView(cardidx);
+
+	 	        $("#cardduedateIdx").val(json.CARDDUEDATEIDX); 
+     			}else{
+	 	        goDueDateView(cardidx);
+	 	        
+
+	 	        $("#cardduedateIdx").val(json.CARDDUEDATEIDX); 
+     			}
 	 		}, 
 	 		error: function(request, status, error){ 
 	 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -294,9 +331,10 @@ function goDueDateEdit(cardidx,datepicker){
 		 		url:"goDueDateEdit.action",
 		 		type:"POST",
 		 		data : form_data,
-		 		dataType: "JSON",
-	     		success: function(json) {
-	     			$("#option").empty();
+		 		// dataType: "JSON",
+	     		success: function() {
+	     			goDueDateView(cardidx);
+	     	/* 		$("#option").empty();
 		 	        var html = "<div class='panel panel-default' style='margin-top: 2%'>"
 		 	              + "<div class='panel-heading'><i class='fa fa-plus'></i>" 
 		 	              + "Option"
@@ -306,7 +344,7 @@ function goDueDateEdit(cardidx,datepicker){
 		 	              +     	"<div class='col-lg-6'>"
 		 	              +            "<form role='form'>"
 		 	              +                "<div class='form-group'>"
-		 				  +					"<div class='commentCss dueCheck' id='dueCheck' style='padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;'>"
+		 				  +					"<div class='commentCss dueCheck labelCss' id='dueCheck' style='padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;'>"
 		 				  +					  "<p><input type='checkbox' id='dateCheck'>"
 		 				  +						 "<span data-toggle='modal' href='#modalDate2'>"+json.CARDDUEDATE+"</span></p>"
 		 				  +						"</div>"
@@ -317,9 +355,9 @@ function goDueDateEdit(cardidx,datepicker){
 		 	              + "</div>"
 		 	              + "</div>"
 		 	           
-		 	          $("#option").html(html);
+		 	          $("#option").html(html); */
 		 	              
-	     			if(json.CARDCHECK == 0){ // 체크가 안된 상태
+	     		/* 	if(json.CARDCHECK == 0){ // 체크가 안된 상태
 	     			
 						$(".dueCheck").removeClass("duedateCheck");
 						$("#dateCheck").prop("checked", false);
@@ -329,7 +367,7 @@ function goDueDateEdit(cardidx,datepicker){
 						$("#dateCheck").prop("checked", true);
 					}
 	     			
-	     			$("#cardduedateIdx").val(json.CARDDUEDATEIDX);
+	     			$("#cardduedateIdx").val(json.CARDDUEDATEIDX); */
 		 		}, 
 		 		error: function(request, status, error){ 
 		 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -338,7 +376,8 @@ function goDueDateEdit(cardidx,datepicker){
 		 	}); // end of ajax({})
 		}
  }// end of goDueDateEdit()
- 
+
+// 카드 duedate 삭제
 function goDueDateDelete(cardidx,cardduedateIdx){
 	 var CNT = LoginCheck();
 		if(CNT != 0){
@@ -352,8 +391,15 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		 		data : form_data,
 		 	 	dataType: "JSON", 
 	     		success: function(json) {
-	     			$("#option").empty();
-	     			alert("delete : "+ json.CARDDUEDATECNT);
+	     			alert("dudate 삭제"+json.cardLabelCNT);
+	     			if(json.cardLabelCNT==0){
+	     				$("#option").empty();
+	     			}else{
+	     				$("#dueCheck").empty();
+	     			}
+		 	        $("#datepicker1").val("");
+		 	        $("#datepicker2").val("");
+		 	        
 		 	        $("#cardduedateIdx").val(json.CARDDUEDATECNT); 
 		 	       
 		 		}, 
@@ -414,7 +460,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 			                +             	"<div class='form-group'>"
 			                +           		 "<textarea class='form-control' rows='3' id='CheckListContent' placeholder='Add an item...'></textarea>"
 			                +             	"</div>"
-				            +               "<button type='button' class='btn btn-default' style='font-weight: bold;' id='goCheckListAdd'><i class='fa fa-plus'></i>Add</button>"
+				            +               "<button type='button' class='btn btn-default' style='font-weight: bold;' id='goCheckListADD'><i class='fa fa-plus'></i>Add</button>"
 							+				"<button type='button' class='btn btn-default' style='font-weight: bold;' id='checkListCancel' ><i class='fa fa-times-circle'></i>Cancel</button>"      
 			                +        	"</form>"
 							+			"</div>"
@@ -466,46 +512,6 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		}
  }// end of goDueDateDelete()
  
- function goLabelAdd(labelid){
-	 var arr = new Array();
-	 $(".labelstatus").each(function(index){ // arr 저장된 라벨을 배열에 담아준다.
-	
-		arr.push($(this).val());
-		
-	 });
-	 
-	 /* document.write(arr); */
-	 
-	 var CNT = LoginCheck();
-		if(CNT != 0){
-			if (arr.indexOf(labelid) != -1) {  //  저장된 라벨 번호가 추가되는 라벨과 값이 같다면 
-				alert("라벨이 존재합니다.");
-				location.href="javascript:history.go(0);"
-     			return;
-				
-			}else {// 저장된 라벨 번호가 추가되는 라벨과 값지 않으면
-				alert("시작");
-				var form_data = {cardidx :  $("#cardidx").val(),
-								labelid : labelid
-								}
-			
-				$.ajax({		
-			 		url:"goLabelAdd.action",
-			 		type:"POST",
-			 		data : form_data,
-			 	 	//dataType: "JSON", 
-		     		success: function() {
-		     			labelselect();
-			 		}, 
-			 		error: function(request, status, error){ 
-			 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
-			 		}
-			 	
-			 	}); // end of ajax({})
-			}
-		}// end of CNT
- }// end of goLabelAdd(labelid)
- 
  // 라벨 선택
  function labelselect(){
 	var form_data = {cardidx :  $("#cardidx").val()
@@ -517,9 +523,8 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 	 		data : form_data,
 	 	 	dataType: "JSON", 
      		success: function(json) {
-     			
+     			$("#cardLabel").empty();
      			if(json.length > 0){
-	     			$("#cardLabel").empty();
 	     			
 	     			var html ="";
 	     			
@@ -527,28 +532,28 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 						if(entry.CARDLABEL == "0"){
 							html +=	"<div class='labelCss'>";
 							html +=	"	<button type='button' class='btn btn-primary' style='border: 0px; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'></button> &nbsp;";
-							html +=	" 	<input type='text' class='labelstatus' value='0'/>";
+							html +=	" 	<input type='hidden' class='labelstatus' value='0'/>";
 							html +=	"</div>";
 							
 						}else if(entry.CARDLABEL == "1"){
 							html +=	"<div class='labelCss'>";
 							html +=	"	<button type='button' class='btn btn-success' style='border: 0px; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'></button> &nbsp;";
-							html +=	" 	<input type='text' class='labelstatus' value='1'/>";
+							html +=	" 	<input type='hidden' class='labelstatus' value='1'/>";
 							html +=	"</div>";
 						}else if(entry.CARDLABEL == "2"){
 							html +=	"<div class='labelCss'>";
 							html +=	"	<button type='button' class='btn btn-info' style='border: 0px; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'></button> &nbsp;";
-							html +=	" 	<input type='text' class='labelstatus' value='2'/>";
+							html +=	" 	<input type='hidden' class='labelstatus' value='2'/>";
 							html +=	"</div>";
 						}else if(entry.CARDLABEL == "3"){
 							html +=	"<div class='labelCss'>";
 							html +=	"	<button type='button' class='btn btn-warning' style='border: 0px; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'></button> &nbsp;";
-							html +=	" 	<input type='text' class='labelstatus' value='3'/>";
+							html +=	" 	<input type='hidden' class='labelstatus' value='3'/>";
 							html +=	"</div>";
 						}else if(entry.CARDLABEL == "4"){
 							html +=	"<div class='labelCss'>";
 							html +=	"	<button type='button' class='btn btn-danger' style='border: 0px; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'></button> &nbsp;";
-							html +=	" 	<input type='text' class='labelstatus' value='4'/>";
+							html +=	" 	<input type='hidden' class='labelstatus' value='4'/>";
 							html +=	"</div>";
 						}
 					
@@ -556,8 +561,59 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					
 					$("#cardLabel").html(html);
 					
-					//cardLabelCNT();
-     			}
+					cardLabelCNT();
+					
+     			}// end of if
+     			
+
+				 var arr = new Array();
+				 $(".labelstatus").each(function(index){ // arr 저장된 라벨을 배열에 담아준다.
+				
+					arr.push($(this).val());
+					
+				 });
+				
+				 // 라벨리스트에 있는 값이 있으면 체크 없으면 체크해제
+				if (arr.indexOf("0") != -1) { // 같다면
+					$("#label1").prop("checked", true);
+					$("#label6").prop("checked", true);
+				}else{
+					$("#label1").prop("checked", false);
+					$("#label6").prop("checked", false);
+				}
+				
+				if (arr.indexOf("1") != -1) { // 같다면
+					$("#label2").prop("checked", true);
+					$("#label7").prop("checked", true);
+				}else{
+					$("#label2").prop("checked", false);
+					$("#label7").prop("checked", false);
+				}
+				if (arr.indexOf("2") != -1) { // 같다면
+					$("#label3").prop("checked", true);
+					$("#label8").prop("checked", true);
+				}else{
+					$("#label3").prop("checked", false);
+					$("#label8").prop("checked", false);
+				}
+				if (arr.indexOf("3") != -1) { // 같다면
+					$("#label4").prop("checked", true);
+					$("#label9").prop("checked", true);
+				}else{
+					$("#label4").prop("checked", false);
+					$("#label9").prop("checked", false);
+				}
+				if (arr.indexOf("4") != -1) { // 같다면
+					$("#label5").prop("checked", true);
+					$("#label10").prop("checked", true);
+				}else{
+					$("#label5").prop("checked", false);
+					$("#label10").prop("checked", false);
+				}
+				
+				$('#modalLabels1').modal('hide');
+				$('#modalLabels2').modal('hide');
+     			
 	 		}, 
 	 		error: function(request, status, error){ 
 	 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -566,6 +622,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 	 	}); // end of ajax({})
  }
  
+ // 라벨 갯수
  function cardLabelCNT(){
 		var form_data = {cardidx :  $("#cardidx").val()
 		}
@@ -577,15 +634,13 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		dataType: "JSON", 
 		success: function(json) {
 			
-			/* 	var html ="";
-					
-				json.<c:if test="${cardLabelCNT>0 && cardLabelCNT < 5}">
-				 <div class="labelCss" >
-				 <button type="button" class="btn btn-default" style="border: 1px solid gray; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"><i class="fa fa-plus"></i></button> &nbsp;
-				 </div>		
-			 	</c:if>
-				
-				$("#cardLabel").html(html); */
+				var html ="";
+				if(json.cardLabelCNT > 0 && json.cardLabelCNT < 5){
+					html+=  "<div class=labelCss' >";
+					html+=  "<button type='button' class='btn btn-default' style='border: 1px solid gray; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'><i class='fa fa-plus'></i></button> &nbsp;";
+					html+=  "</div>";
+				}
+				$("#cardLabel").append(html);
 			
 			}, 
 			error: function(request, status, error){ 
@@ -594,10 +649,152 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 			
 			}); // end of ajax({})
  }
+ 
+ // 라벨 추가
+ function goLabelAdd(labelid){
+	 var arr = new Array();
+	 $(".labelstatus").each(function(index){ // arr 저장된 라벨을 배열에 담아준다.
+	
+		arr.push($(this).val());
+		
+	 });
+	 
+	 var CNT = LoginCheck();
+		if(CNT != 0){
+				var form_data = {cardidx :  $("#cardidx").val(),
+								labelid : labelid
+								}
+			
+				$.ajax({		
+			 		url:"goLabelAdd.action",
+			 		type:"POST",
+			 		data : form_data,
+			 	 	dataType: "JSON", 
+		     		success: function(json) {
+		     			if(json.CARDDUEDATECNT==0){
+		     				
+		         		 	$("#option").empty();
+		    	 	        var html = "<div class='panel panel-default' style='margin-top: 2%'>"
+		    	 	            	  + 	"<div class='panel-heading'><i class='fa fa-plus'></i>" 
+		    	 	           		  + 	"Option"
+		    	 	           		  + 	"</div>"
+		    	 	              	  + 	"<div class='panel-body'>"
+		    	 	              	  + 		"<div class='row'>" 
+		    	 	              	  +				"<div id='dueCheck'>"
+		    	 				  	  +				"</div>"
+		    	 	              	  +				"<div id='cardLabel'>"
+		    	 				  	  +				"</div>"
+		    	 	              	  +     	"</div>"
+		    	 	              	  + 	"</div>"
+		    	 	              	  + "</div>"
+		    	 	           
+		    	 	          $("#option").html(html);	
+		     			}
+		     			labelselect();
+			 		}, 
+			 		error: function(request, status, error){ 
+			 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+			 		}
+			 	
+			 	}); // end of ajax({})
+			/* } */
+		}// end of CNT
+ }// end of goLabelAdd(labelid)
+ 
+ // 라벨 삭제
+ function goLabelDelete(labelid){
+	 var arr = new Array();
+	 $(".labelstatus").each(function(index){ // arr 저장된 라벨을 배열에 담아준다.
+	
+		arr.push($(this).val());
+		
+	 });
+
+	 var CNT = LoginCheck();
+		if(CNT != 0){
+			
+			var form_data = {cardidx :  $("#cardidx").val(),
+							labelid : labelid
+							}
+		
+			$.ajax({		
+		 		url:"goLabelDelete.action",
+		 		type:"POST",
+		 		data : form_data,
+		 	 	dataType: "JSON", 
+	     		success: function(json) {
+	     			if(json.CARDDUEDATECNT==0){
+	     				
+	     				$("#option").empty();
+	     				
+	     				
+	     				 var arr = new Array();
+						 $(".labelstatus").each(function(index){ // arr 저장된 라벨을 배열에 담아준다.
+						
+							arr.push($(this).val());
+							
+						 });
+						 // 라벨리스트에 있는 값이 있으면 체크 없으면 체크해제
+						if (arr.indexOf("0") != -1) { // 같다면
+							$("#label1").prop("checked", true);
+							$("#label6").prop("checked", true);
+						}else{
+							$("#label1").prop("checked", false);
+							$("#label6").prop("checked", false);
+						}
+						
+						if (arr.indexOf("1") != -1) { // 같다면
+							$("#label2").prop("checked", true);
+							$("#label7").prop("checked", true);
+						}else{
+							$("#label2").prop("checked", false);
+							$("#label7").prop("checked", false);
+						}
+						if (arr.indexOf("2") != -1) { // 같다면
+							$("#label3").prop("checked", true);
+							$("#label8").prop("checked", true);
+						}else{
+							$("#label3").prop("checked", false);
+							$("#label8").prop("checked", false);
+						}
+						if (arr.indexOf("3") != -1) { // 같다면
+							$("#label4").prop("checked", true);
+							$("#label9").prop("checked", true);
+						}else{
+							$("#label4").prop("checked", false);
+							$("#label9").prop("checked", false);
+						}
+						if (arr.indexOf("4") != -1) { // 같다면
+							$("#label5").prop("checked", true);
+							$("#label10").prop("checked", true);
+						}else{
+							$("#label5").prop("checked", false);
+							$("#label10").prop("checked", false);
+						}
+						
+						$('#modalLabels1').modal('hide');
+	     				$('#modalLabels2').modal('hide');
+	     				
+	     			}else{
+	     				labelselect();
+	     			}
+	     			
+		 		}, 
+		 		error: function(request, status, error){ 
+		 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+		 		}
+		 	
+		 	}); // end of ajax({})
+		}// end of CNT
+ }
+ 
+
  </script>
+ 
+<div>
  <div class="navbar-default sidebar" role="navigation">
      <div class="sidebar-nav navbar-collapse">
-         <ul class="nav" id="side-menu">
+         <ul class="nav" id="side-menu" style="background-color: #ffffff;">
 
 			<!-- 라벨 버튼-->
              <button type="button" class="btn btn-outline btnSideBar  btn-lg btn-block" data-toggle="modal" href="#modalLabels1"><i class="fa fa-tag"></i> Labels</button>
@@ -637,7 +834,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]" style="border-right: 0px;"></span>
 					                    <span> </span>
 					                </label>
-					                 <label for="label1" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 32px;" >
+					                 <label for="label1" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 31px;" >
 					                </label>
 					            </div>
 					        </div>
@@ -648,7 +845,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label2" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 32px;" >
+					                <label for="label2" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 31px;" >
 					                </label>
 					            </div>
 					        </div>
@@ -659,7 +856,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label3" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+					                <label for="label3" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 					                </label>
 					            </div>
 					        </div>
@@ -670,7 +867,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label4" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+					                <label for="label4" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 					                </label>
 					            </div>
 					        </div>
@@ -681,7 +878,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label5" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+					                <label for="label5" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 					                </label>
 					            </div>
 					        </div>
@@ -741,9 +938,9 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		        </form>
 		      </div>
 		      <div class="modal-footer">
-		      	<button type="button" class="btn btn-danger" id="cardDueDateDelete">Delete</button>
+		      	<button type="button" class="btn btn-danger cardDueDateDelete">Delete</button>
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		        <button type="button" class="btn btn-default doneDate" id="doneDate">Save</button>
+		        <button type="button" class="btn btn-default doneDate">Save</button>
 		      </div>
 		    </div>
 		  </div>
@@ -773,3 +970,5 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		    </div>
 		  </div>
 		</div> 
+		
+</div>

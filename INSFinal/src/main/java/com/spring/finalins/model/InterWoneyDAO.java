@@ -91,4 +91,6 @@ public interface InterWoneyDAO {
 
 	int setLabelAdd(HashMap<String, String> map); // 카드  라벨추가
 
+	int setLabelDelete(HashMap<String, String> map); // 카드 라벨 삭제
+
 }

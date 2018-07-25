@@ -15,18 +15,18 @@ $(document).ready(function(){
 		titleSelect();
 	} */
 	
-	$("#inputcss").keyup(function(event) {
-
-		if (event.keyCode == 13) {
+	$("#inputcss").keydown(function(event) {
+		titleUpdate();
+	/* 	if (event.keyCode == 13) {
 			titleUpdate();
-		} 
+		}  */
 	}); // end of $("#inputcss").keydown()
 
- 	$('body').click(function(e) {
+ 	/* $('body').click(function(e) {
 		if(!$('#titleInput').has(e.target).length) { 
 			titleUpdate();
 		}  
-	});// end of $('body').click()------------------ 
+	});// end of $('body').click()------------------  */
 	
 	// 코멘트 리스트로 불렀을때 지정된 코멘트를 선택하기 위해 숫자생성
 	var count = 1;
@@ -49,9 +49,13 @@ $(document).ready(function(){
 	// DueDate 클릭시 색을 바꿔주는 함수
 	$("#dateCheck").bind("click", function(){
 		 var checkBox = document.getElementById("dateCheck");
+		  
 		 if (checkBox.checked == true){
+		//	 alert("체크");
 			 checkChange();
+			 
 		 }else{
+			// alert("체크해제");
 			 checkChange();
 		 }
 	});// end of $("#dateCheck").bind()
@@ -81,20 +85,22 @@ $(document).ready(function(){
 	
 	// Ajax안에서 체크리스트 클릭 시 체크, 체크해제
 	$(document).on("click",".checklist",function(){
-		 var checkBox = $(this).val();
-		 var $target = $(event.target); 
-		 var checklistdetailidx =$target.next().next().val();
-		 var checklisttodostatus =$target.next().next().next().val();
-		 
-	/* 	 alert("체크박스 : "+checkBox);
-		 alert("체크리스트 idx : " + cardchecklistdetailidx);
+		var checkBoxid= $(this).attr('id'); // 현재 선택자의 ID 알아오기
+		var checkBox = document.getElementById(checkBoxid);
+				
+		var $target = $(event.target); 
+		var checklistdetailidx =$target.next().next().val();
+		var checklisttodostatus =$target.next().next().next().val();
+		var checklisttodostatusid= $(this).next().next().next().attr('id');
+		
+		// checkBox = checkBox.getAttribute("checked");
+	 	// alert("체크박스 : "+checkBoxid);
+	 	/* alert("체크리스트 idx : " + cardchecklistdetailidx);
 		 alert("체크리스트 스테이터스:"+cardchecklisttodostatus); */
-		 if (checkBox.checked == true){
-			//alert("체크해제");
-			goCheckListChange(checklistdetailidx,checklisttodostatus); // 체크 해제
-		 }else{
-			//alert("체크");
-			goCheckListChange(checklistdetailidx,checklisttodostatus);// 체크
+		 if (checkBox.checked == true){// 체크
+			goCheckListChange(checklistdetailidx,checklisttodostatus,checklisttodostatusid); 
+		 }else if (checkBox.checked == false){// 체크 해제
+			goCheckListChange(checklistdetailidx,checklisttodostatus,checklisttodostatusid);
 		 }
 	}); // end of $(document).on()
 	
@@ -126,38 +132,6 @@ $(document).ready(function(){
 		goCheckListTitleDelete();
 	}); // end of $(document).on()
 	
-	
-	
-	/* // 체크리스트 삭제
-	$(".checkboxList").each(function(index,  item){
-		 var checkBox = $(this).val();
-		 var $target = $(event.target); 
-		 var cardchecklistdetailidx =$target.next().next().val();
-		 var cardchecklisttodostatus =$target.next().next().next().val();
-		 
-		 alert("체크박스 : "+checkBox);
-		 alert("체크리스트 idx : " + cardchecklistdetailidx);
-		 alert("체크리스트 스테이터스:"+cardchecklisttodostatus);
-		 if (checkBox.checked == true){
-			alert("체크해제");
-			goCheckListChange(cardchecklistdetailidx,cardchecklisttodostatus); // 체크 해제
-		 }else{
-			alert("체크");
-			goCheckListChange(cardchecklistdetailidx,cardchecklisttodostatus);// 체크
-		 }
-	}); // end of $(".checklist").click() */
-    
-/* 
-    $("#goCheckLisTitletEdit").bind("click", function(){  	  
-    	alert("호호호");
-    	goCheckLisTitletEdit();
-   	
-    });
-    
-    $("#goCheckListAdd").bind("click", function(){
-    	goCheckListAdd();
-
-    }); */
 	
 /* 	#  ed ==	///////////////////////////////////////////////////
 	comment 입력 수정 삭제 시 불러오는 값 테스트
@@ -674,6 +648,8 @@ function titleUpdate(){
 		 		data : form_data,
 		 		dataType: "JSON",
 		 		success: function(json) {
+		 			alert("하하핳");
+		 			alert("확인용"+json.datecheckCNT);
 					if(json.datecheckCNT == 0){ // 체크가 안된 상태
 						$(".dueCheck").removeClass("duedateCheck");
 					}else if(json.datecheckCNT == 1){ // 체크가 된 상태
@@ -800,7 +776,7 @@ function goCheckListAdd(){
 							
 				 				html += 	"<div class='checkboxList'>";
 								html += 	"<label style='float: left;'>";
-								html += 		"<input type='checkbox'  class='checklist'>";
+								html += 		"<input type='checkbox'  id='checkliststatus"+entryIndex+"' class='checklist'/>";
 								html += 		"<span class='cr'><i class='cr-icon glyphicon glyphicon-ok'></i></span>";		
 								html +=			"<input type='hidden' id='checklistIdx"+entryIndex+"' value='"+entry.CARDCHECKLISTDETAILIDX+"' />";
 								html +=	   		"<input type='hidden' id='checklist"+entryIndex+"' value='"+entry.CARDCHECKLISTTODOSTATUS+"' />";
@@ -812,7 +788,7 @@ function goCheckListAdd(){
 								html += 		"</div>";
 								html += "</div>";
 								html += "<br/>";
-								
+					        
 			 			}); 
 			 			$("#cardCheckBoxList").html(html);
 			 			
@@ -847,7 +823,7 @@ function goCheckListAdd(){
 }// end of goCheckListAdd()
 
 // 체크리스트 체크 해제 , 체크
-function goCheckListChange(checkDetailIdx, checkListStatus){
+function goCheckListChange(checkDetailIdx, checkListStatus,checklisttodostatusid){
 	var cardchecklistIdx = $("#cardchecklistIdx").val();
 	var CNT = LoginCheck();
 	if(CNT != 0){
@@ -860,8 +836,16 @@ function goCheckListChange(checkDetailIdx, checkListStatus){
 	 		url:"goCheckListChange.action",
 	 		type:"POST",
 	 		data : form_data,
-	 		success: function(){
-	 		
+	 		dataType: "JSON",
+	 		success: function(json){
+	 			
+	 			if(json.checkListStatus== 0){// 체크 해제
+	 				alert(json.checkListStatus);
+	 				$("#"+checklisttodostatusid).val("0");
+	 			}else{
+	 				alert(json.checkListStatus);
+	 				$("#"+checklisttodostatusid).val("1");
+	 			}	 		
 			}, 
 			error: function(request, status, error){ 
 	 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -894,7 +878,7 @@ function goCheckListDelete(checkDetailIdx){
 						
 			 				html += 	"<div class='checkboxList'>";
 							html += 	"<label style='float: left;'>";
-							html += 		"<input type='checkbox'  class='checklist'>";
+							html += 		"<input type='checkbox'  id='checkliststatus"+entryIndex+"' class='checklist'/>";
 							html += 		"<span class='cr'><i class='cr-icon glyphicon glyphicon-ok'></i></span>";		
 							html +=			"<input type='hidden' id='checklistIdx"+entryIndex+"' value='"+entry.CARDCHECKLISTDETAILIDX+"' />";
 							html +=	   		"<input type='hidden' id='checklist"+entryIndex+"' value='"+entry.CARDCHECKLISTTODOSTATUS+"' />";
@@ -976,7 +960,7 @@ function goCheckListTitleDelete(){
 	<input type="hidden" id="cardidx" value="${cardMap.CARDIDX}"/>
     <div id="wrapper">
         <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0; background-color:#ffffff ">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -985,6 +969,7 @@ function goCheckListTitleDelete(){
                     <span class="icon-bar"></span>
                 </button>
              
+             <!-- 카드 타이틀 변경 -->
               <span class="navbar-brand title" id="titleInput">
               	<i class="fa fa-columns"></i><input type="text"  id="inputcss" value="${cardMap.CARDTITLE}" /> 
               	<input type="hidden"  id="inputtitle" value="${cardMap.CARDTITLE}"  />
@@ -1013,7 +998,7 @@ function goCheckListTitleDelete(){
      
      	<!-- 옵션 -->
         <div id="option">
-        <c:if test="${cardDueDateMap != null || cardLabelList != null}">
+        <c:if test="${cardDueDateMap != null || not empty cardLabelList}">
       
          <div class="panel panel-default" style="margin-top: 2%">
                <div class="panel-heading">
@@ -1022,77 +1007,73 @@ function goCheckListTitleDelete(){
                </div>
                <div class="panel-body">
                    <div class="row">
-                   <!--     <div class="col-lg-6"> -->
-                           <form role="form">
-                               <div class="form-group">
-                               		<div class="commentCss dueCheck labelCss" id="dueCheck" style="margin: 10px 10px 10px 10px;"> <!-- style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;" -->
-                               		    <c:if test="${cardDueDateMap != null}">
-									        <!-- 	<label style="float: left;" > -->
-										              <input type="checkbox" id="dateCheck">  
-										            <!-- <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span> -->
-										              
-										        <!-- </label> -->
-											 <span data-toggle="modal" href="#modalDate2">${cardDueDateMap.CARDDUEDATE}</span></p>
-										 </c:if>
-								    </div>
-									 
-		                           <%--  <div class="commentCss dueCheck" id="dueCheck" style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;"> 
-									<!-- <button type="button" class="commentCss dueCheck" id="dueCheck"  data-toggle="modal" href="#modal2" style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;"> -->      
-									  <p>
-									  <input type="checkbox" id="dateCheck">  
+                 	 <c:if test="${cardDueDateMap != null}">
+                 		<div id="dueCheck">
+	                   		<div class="commentCss dueCheck labelCss" style="margin: 10px 10px 10px 10px;"> <!-- style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;" -->
+							        <!-- 	<label style="float: left;" > -->
+							              <input type="checkbox" id="dateCheck">  
+							            <!-- <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span> -->
+								              
+								        <!-- </label> -->
 									 <span data-toggle="modal" href="#modalDate2">${cardDueDateMap.CARDDUEDATE}</span></p>
-									</div> <!-- </button> --> --%>
-										<!-- 라벨 -->
-									<div id = "cardLabel">
-										<c:if test="${not empty cardLabelList}">
-											<c:forEach var="list" items="${cardLabelList}">
-												<c:if test="${list.CARDLABEL== '0'}">
-												<div class="labelCss">
-												 <button type="button" class="btn btn-primary " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
-												 <input type="text" class="labelstatus" value="0"/>
-												 </div>
-												 </c:if>
-												 
-												 <c:if test="${list.CARDLABEL== '1'}">
-												 <div class="labelCss">
-												 <button type="button" class="btn btn-success " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
-												 <input type="text" class="labelstatus" value="1"/>
-												 </div>
-												 </c:if>
-												  
-												  <c:if test="${list.CARDLABEL== '2'}">
-												 <div class="labelCss" >
-												 <button type="button" class="btn btn-info " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
-												 <input type="text" class="labelstatus" value="2"/>
-												 </div>
-												 </c:if>
-												 
-												  <c:if test="${list.CARDLABEL== '3'}">
-												 <div class="labelCss" >
-												 <button type="button" class="btn btn-warning" style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
-												 <input type="text" class="labelstatus" value="3"/>
-												 </div>
-												 </c:if>
-											
-												 <c:if test="${list.CARDLABEL== '4'}">
-												 <div class="labelCss" >
-												 <button type="button" class="btn btn-danger" style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
-												 <input type="text" class="labelstatus" value="4"/>
-												 </div>	
-												 </c:if>
-												 
-											</c:forEach>
-												<input type="text" value="${cardLabelCNT}" />
-												<c:if test="${cardLabelCNT>0 && cardLabelCNT < 5}">
-												 <div class="labelCss" >
+							   </div>
+					    </div>
+					</c:if>
+						 
+						 
+                          <%--  <div class="commentCss dueCheck" id="dueCheck" style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;"> 
+						<!-- <button type="button" class="commentCss dueCheck" id="dueCheck"  data-toggle="modal" href="#modal2" style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;"> -->      
+						  <p>
+						  <input type="checkbox" id="dateCheck">  
+						 <span data-toggle="modal" href="#modalDate2">${cardDueDateMap.CARDDUEDATE}</span></p>
+						</div> <!-- </button> --> --%>
+							<!-- 라벨 -->
+						<div id = "cardLabel">
+							<c:if test="${not empty cardLabelList}">
+								<c:forEach var="list" items="${cardLabelList}">
+									<c:if test="${list.CARDLABEL== '0'}">
+									<div class="labelCss">
+									 <button type="button" class="btn btn-primary " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
+									 <input type="hidden" class="labelstatus" value="0"/>
+									 </div>
+									 </c:if>
+									 
+									 <c:if test="${list.CARDLABEL== '1'}">
+									 <div class="labelCss">
+									 <button type="button" class="btn btn-success " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
+									 <input type="hidden" class="labelstatus" value="1"/>
+									 </div>
+									 </c:if>
+									  
+									  <c:if test="${list.CARDLABEL== '2'}">
+									 <div class="labelCss" >
+									 <button type="button" class="btn btn-info " style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
+									 <input type="hidden" class="labelstatus" value="2"/>
+									 </div>
+									 </c:if>
+									 
+									  <c:if test="${list.CARDLABEL== '3'}">
+									 <div class="labelCss" >
+									 <button type="button" class="btn btn-warning" style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
+									 <input type="hidden" class="labelstatus" value="3"/>
+									 </div>
+									 </c:if>
+								
+									 <c:if test="${list.CARDLABEL== '4'}">
+									 <div class="labelCss" >
+									 <button type="button" class="btn btn-danger" style="border: 0px; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"></button> &nbsp;
+									 <input type="hidden" class="labelstatus" value="4"/>
+									 </div>	
+									 </c:if>
+								</c:forEach>
+								
+										<c:if test="${cardLabelCNT>0 && cardLabelCNT < 5}">
+											 <div class="labelCss" >
 												 <button type="button" class="btn btn-default" style="border: 1px solid gray; width: 50px; height: 32px; margin-top: 10px;" data-toggle="modal" href="#modalLabels2"><i class="fa fa-plus"></i></button> &nbsp;
-												 </div>		
-											 	</c:if>
-										</c:if> 
-										</div>
-                               </div>    
-                           </form>
-                     <!--   </div> -->
+											 </div>	
+								 		</c:if>
+							</c:if> 
+							</div>
                    </div>
                    <!-- /.row (nested) -->
                </div>
@@ -1123,7 +1104,7 @@ function goCheckListTitleDelete(){
 			        </form>
 			      </div>
 			      <div class="modal-footer">
-			        <button type="button" class="btn btn-danger" id="cardDueDateDelete">Delete</button>
+			        <button type="button" class="btn btn-danger cardDueDateDelete">Delete</button>
 			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 			        <button type="button" class="btn btn-primary doneDate" id="doneDate">Save</button>
 			      </div>
@@ -1152,7 +1133,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]" style="border-right: 0px;"></span>
 						                    <span> </span>
 						                </label>
-						                 <label for="label6" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 32px;" >
+						                 <label for="label6" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 31px;" >
 						                </label>
 						            </div>
 						        </div>
@@ -1163,7 +1144,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label7" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 32px;" >
+						                <label for="label7" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 31px;" >
 						                </label>
 						            </div>
 						        </div>
@@ -1174,7 +1155,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label8" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+						                <label for="label8" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1185,7 +1166,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label9" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+						                <label for="label9" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1196,7 +1177,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label10" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
+						                <label for="label10" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1320,7 +1301,7 @@ function goCheckListTitleDelete(){
 									 		<c:forEach var="list" items="${cardCheckList}" varStatus="status">
 										        <div class="checkboxList">
 										        	<label style="float: left;" >
-											            <input type="checkbox" class="checklist"/>
+											            <input type="checkbox" id="checkliststatus${status.index}" class="checklist"/>
 											            <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
 											            <input type="hidden" id="checklistIdx${status.index}" value="${list.CARDCHECKLISTDETAILIDX}" />
 											            <input type="hidden" id="checklist${status.index}" value="${list.CARDCHECKLISTTODOSTATUS}" />
@@ -1348,7 +1329,7 @@ function goCheckListTitleDelete(){
 	                             <div class="form-group">
 	                           		 <textarea class="form-control" rows="3" id="CheckListContent" placeholder="Add an item..."></textarea>
 	                             </div>
-		                            <button type="button" class="btn btn-default" style="font-weight: bold;" id="goCheckListAdd"><i class="fa fa-plus"></i>Add</button>
+		                            <button type="button" class="btn btn-default" style="font-weight: bold;" id="goCheckListADD"><i class="fa fa-plus"></i>Add</button>
 									<button type="button" class="btn btn-default" style="font-weight: bold;" id="checkListCancel" ><i class="fa fa-times-circle"></i>Cancel</button>      
 	                        	 </form>
 								</div>

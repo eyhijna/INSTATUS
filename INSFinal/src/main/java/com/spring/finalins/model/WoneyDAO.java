@@ -308,4 +308,11 @@ public class WoneyDAO implements InterWoneyDAO {
 		return n;
 	}
 
+	// 카드 라벨 삭제
+	@Override
+	public int setLabelDelete(HashMap<String, String> map) {
+		int n = sqlsession.delete("woney.setLabelDelete", map);
+		return n;
+	}
+
 }
