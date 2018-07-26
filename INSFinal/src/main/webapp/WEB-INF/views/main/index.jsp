@@ -21,8 +21,8 @@
 	    $(".background-grid-trigger").click(function(event){
 	   // 	console.log($(this).val());
 	    	var image_name = $(this).val();
-	    	$("#project-modal").css("background-image","url(./resources/images/" + image_name + ")");
-	    	
+	   // 	$("#project-modal").css("background-image","url(./resources/images/" + image_name + ")");
+	    	$("#testcontent").css("background-image","url(./resources/images/" + image_name + ")");	
 	  //  	alert("확인: " + $(this).next().val());/* project_image_name */
 			$("#image_idx").val($(this).next().val());
 	    });
@@ -109,7 +109,7 @@
 	    });
 	    
 
-	    $("#btn-changePwd1").hide();
+	//    $("#btn-changePwd1").hide();
 	    //아이디찾기의 경우
 	    $("#findUserID").keyup(function(){
 	    	var Classification = "findID";
@@ -125,15 +125,18 @@
 	    				$("#span-resultID").empty();
     					$("#span-resultID").css("color", "#FF0000");
     					$("#span-resultID").text("가입되지 않은 email입니다.");
-    					$("#btn-changePwd1").hide();
+    					$("#findUserID").css("border-color", "#FF0000");
+    				//	$("#btn-changePwd1").hide();
     				}
     				else if(data.n != 0){ //중복된 이메일이 있는 경우
     					$("#span-resultID").empty();
     					$("#span-resultID").css("color", "#000000");
     					
-    					var html = "<span style='font-size: 11pt; color: #0066ff'>" + data.resultid + "</span>";
-    					$("#span-resultID").html("회원님의 아이디는 " + html + " 입니다.");
-    					$("#btn-changePwd1").show();
+    					var html = "<span style='font-size: 11pt; color: #000000'>" + data.resultid + "</span>";
+    					$("#span-resultID").html("회원님의 아이디는 < " + html + " > 입니다.");
+    					$("#span-resultID").css("color", "#2eb82e");
+    					$("#findUserID").css("border-color", "#2eb82e");
+    				//	$("#btn-changePwd1").show();
     				}
 	    		},
 	    		error: function(request, status, error){ 
@@ -142,11 +145,115 @@
 	    	}); // end of $.ajax
 	    }); // end of $("#findUserID").keyup
 	    
-	    $("#btn-changePwd1").click(function(){
-	    	alert("버튼을 클릭했습니다.");
-	    	$("#id-modal1").hide();
+	    
+	    //비밀번호찾기 모달에 새 비밀번호 입력하는 div 추가
+	    $("#btn-changePwd2").click(function(){
+	    //	alert("버튼을 클릭했습니다.");
+	    //	$("#id-modal1").hide();
+	    	var idtest = $("#checkUserid").val();
+	    	$("#btn-changePwd2").hide();
+	    	var hiddenUserid = "<div class='form-group'>"
+							 + "<input type='hidden' class='form-control' id='hiddenuserid'>"
+							 + "</div>";
+	    	
+	    	var changePwd_div = "<div class='form-group'>"
+	    					  + "<label for='newpw_findpw'>new password :</label>"
+	    					  + "<input type='password' class='form-control' id='newpw_findpw'>"
+	    					  + "<span id='error_newpw_findpw' class='text-danger'></span>"
+	    					  + "</div>";
+	    					  
+    		var changePwd_div2 = "<div class='form-group'>"
+	    					   + "<label for='checkpw_findpw'>check password :</label>"
+	    					   + "<input type='password' class='form-control' id='checkpw_findpw'>"
+	    					   + "<span id='error_checkpw_findpw' class='text-danger'></span>"
+	    					   + "</div>";				  
+	    					  
+	    	$("#findPW_modal").empty();
+	    //	alert(idtest);
+	    	$("#findPW_modal").append(hiddenUserid);     
+	    	$("#hiddenuserid").val(idtest);
+			$("#findPW_modal").append(changePwd_div);
+			$("#findPW_modal").append(changePwd_div2);
+			
+		
+    	  	var addbtn_updatePW = "<button type='button' class='btn btn-default' id='btn_updatePW'>password Change!</button>";
+    	  	$("#findpw_footer").prepend(addbtn_updatePW);
+    	  	
+    	  	$("#newpw_findpw").keyup(function(){
+    	  		pwdCheck();
+    	  		pwdchkCheck();
+    	  	});
+    	  	
+    	  	$("#checkpw_findpw").keyup(function(){
+    	  		pwdchkCheck();
+    	  	});
+    	  	
+    	  	 $("#btn_updatePW").click(function(){ //변경된 비밀번호 입력 후 버튼을 누른 경우
+    	  		if(pwdcheckVal != 0 && $("#checkpw_findpw").val().trim() != "" && $("#newpw_findpw").val().trim() != "" && ($("#checkpw_findpw").val()== $("#newpw_findpw").val())){ 
+    	  			
+    	  			var form_data = {"userid" : $("#hiddenuserid").val() , "password" : $("#newpw_findpw").val()};
+    	  			$.ajax({
+    	  				url: "changePassword.action",
+    	  				type: "POST",
+    					data: form_data,
+    					dataType: "JSON",
+    					success: function(data){
+   							var msg = "<div class='form-group'>"
+   		    					    + "<span style='color: black; font-size: 13pt; font-weight: bold;'>" + data.msg + "</span>"
+   		    					    + "</div>";
+   		    					    
+   							$("#findPW_modal").empty();
+   							$("#findPW_modal").append(msg);
+   							
+   							var modal_footer = "<button type='button' class='btn btn-default' data-dismiss='modal'>close</button>";
+   							$("#findpw_footer").empty();
+   							$("#findpw_footer").html(modal_footer);
+    					},
+    					error: function(request, status, error){ 
+    				         alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+    				    }
+    	  			});
+    	  		}
+    	  		else{
+    	  			alert("비밀번호와 비밀번호확인이 일치하지 않습니다.");
+    	  			$("#newpw_findpw").focus();
+    	  		}
+    	  		
+    	  	}); 
 	    });
-
+//////////////////////////////////////////////////////////////////////////////////////
+	    var pwdcheckVal = 0;
+		function pwdCheck(){ //패스워드 형식체크 함수
+			var passwd = $("#newpw_findpw").val().trim(); // 패스워드 값을 넣는다.
+			var regexp_passwd = new RegExp(/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g);// 패스워드를 검사해주는 정규표현식 객체 생성
+			var bool = regexp_passwd.test(passwd); 
+			
+			if(!bool){ //패스워드가 정규표현식에 맞지 않는 경우
+				$("#newpw_findpw").css("border-color", "#FF0000");
+				$("#error_newpw_findpw").text("* 비밀번호는 영문 대,소문자와 특수문자를 포함한 8~15자 입니다.");
+				pwdcheckVal = 0;
+				$("#checkpw_findpw").attr('readonly', true);
+			}
+	    	else{ //공백이 아니고 정규표현식에도 맞는 경우
+		   		$("#newpw_findpw").css("border-color", "#2eb82e");
+		   		$("#error_newpw_findpw").text("");
+		   		pwdcheckVal = 1;
+		   		$("#checkpw_findpw").attr('readonly', false);
+	    	}
+		} // end of pwdCheck()
+		
+		
+		function pwdchkCheck(){ //패스워드체크 확인 함수
+			if($("#checkpw_findpw").val()!= $("#newpw_findpw").val()){
+	    		$("#checkpw_findpw").css("border-color", "#FF0000");
+	    		$("#error_checkpw_findpw").text("* 비밀번호와 다르게 입력하셨습니다.");
+	    	}
+	    	else{
+	    		$("#checkpw_findpw").css("border-color", "#2eb82e");
+	    		$("#error_checkpw_findpw").text("");
+	    	}
+		} // end of pwdchkCheck()
+//////////////////////////////////////////////////////////////////////////////////////		
 	    
 	    //비밀번호찾기의 경우
 	    $("#div-checkCode").hide();
@@ -276,9 +383,9 @@
 			}
 		}); // end of $("#sendCode").click
 		
-		$("#btn-changePwd").click(function(){
-			$("#findPwd-modal").hide();
-			$("#findID-modal").hide();
+		$("#btn-changePwd2").click(function(){
+		/* 	$("#findPwd-modal").hide();
+			$("#findID-modal").hide(); */
 		});
 		
    }); // end of $(document).ready()---------------------------    
@@ -391,16 +498,16 @@ display: inline-block;  vertical-align: middle;
 .background-grid {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+   /*  justify-content: space-between; */
     list-style: none;
     list-style-type: none;
     list-style-position: initial;
     list-style-image: initial;
-    margin: 0;
+ /*    margin: 0; */
     margin-top: 0px;
-    margin-right: 0px;
+    margin-right: 50px;
     margin-bottom: 0px;
-    margin-left: 0px;
+    margin-left: 8px;
 }
 
 body{overflow: hidden;}
@@ -480,7 +587,8 @@ body{overflow: hidden;}
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu" style="width: 100%;">
 							<c:forEach items="${sessionScope.teamList}" var="map">
-								<li><a href="#">${map.team_name}</a></li>
+								<%-- <li><a href="#">${map.team_name}</a></li> --%>
+								<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${map.team_idx}">${map.team_name}</a></li>
 						    </c:forEach>
 					    </ul>
 					    
@@ -526,13 +634,13 @@ body{overflow: hidden;}
     </div>
 
 
-<!-- 프로젝트 생성 Modal -->
-  <div class="modal fade" id="myModal" role="dialog" style="padding-right: 50%; border: 0px solid yellow; margin-right: 50%;" >
-    <div class="modal-dialog modal-lg" >
-      <div class="modal-content" style="border: 0px solid yellow;">
+<!-- 프로젝트 생성 Modal --> 
+  <div class="modal fade" id="myModal" role="dialog" >
+    <div class="modal-dialog" style="width:380px;">
+      <div class="modal-content" id="testcontent">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Create New Project!!</h4>
+          <h4 class="modal-title" style="font-weight: bold;">Create New Project!!</h4>
         </div>
         
         <!-- 소속된 팀이 있는 경우 -->
@@ -564,11 +672,8 @@ body{overflow: hidden;}
 		  </div> 
 		  <!-- 프로젝트 배경이미지 선택 -->
 		  <div class="form-group" >
-		  	<!-- <label for="backgroundImg" style="margin-top: 10px;">Project BackgroundImg</label>
-			<select name="backgroundImg" id="backgroundImg" class="form-control">
-				<option value="">기본이미지</option>
-			</select>	 -->
-			<ul class="background-grid">
+		  	<label for="background-grid" style="margin-top: 10px;">select Background</label>
+			<ul class="background-grid" id="background-grid">
 				<c:forEach items="${sessionScope.imageList}" var="map" varStatus="status">
 				<li class="background-grid-item">
 					<button class="background-grid-trigger" type="button" style="background-image: url('./resources/images/${map.project_image_name}');" value="${map.project_image_name}"></button>
@@ -617,7 +722,7 @@ body{overflow: hidden;}
           <h4 class="modal-title"><span style="font-size: 13pt; font-weight: bold;">Find Your ID!!</span></h4>
         </div>
         
-        <div class="modal-body">
+        <div class="modal-body" >
           <div class="form-group id-modal1">
           	 <label for="findUserID">Email :</label>
              <input type="text" class="form-control" id="findUserID" placeholder="123@abc.com" maxlength="40">
@@ -629,8 +734,6 @@ body{overflow: hidden;}
        	</div>  
        	
     	  <div class="modal-footer">						  
-    	  	<a href="<%=request.getContextPath()%>/changePwd.action">password Change!</a>
-    	  	<button type="button" class="btn btn-default" id="btn-changePwd1" >password Change!</button>
           	<button type="button" class="btn btn-default" data-dismiss="modal">go Login</button>
           </div> 
       </div>
@@ -638,9 +741,9 @@ body{overflow: hidden;}
   </div>
   
   
-  <!-- 비밀번호찾기 modal --><!-- style="padding-right: 50%; border: 0px solid yellow; margin-right: 50%;"  -->
+  <!-- 비밀번호찾기 modal -->
   <div class="modal fade" id="findPwd-modal" role="dialog">
-    <div class="modal-dialog modal-lg" >
+    <div class="modal-dialog" style="width:400px;">
       <div class="modal-content" style="border: 0px solid yellow;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -648,8 +751,7 @@ body{overflow: hidden;}
         </div>
         
         
-        <div class="modal-body">
-         <!--  <form name = PJcreateFrm> -->
+        <div class="modal-body" id="findPW_modal">
           <div class="form-group">
             <label for="checkUserid">userid :</label>
             <input type="text" class="form-control" id="checkUserid" name="checkUserid" maxlength="20">
@@ -674,7 +776,7 @@ body{overflow: hidden;}
                  
         </div>
           
-    	  <div class="modal-footer">
+    	  <div class="modal-footer" id="findpw_footer">
     	  	<button type="button" class="btn btn-default" id="btn-changePwd2">password Change!</button>
           	<button type="button" class="btn btn-default" data-dismiss="modal" id="btn-reset">cancel</button>
           </div> 

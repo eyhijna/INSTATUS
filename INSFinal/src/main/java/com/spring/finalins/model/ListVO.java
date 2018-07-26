@@ -8,6 +8,7 @@ public class ListVO {
 	private String fk_project_idx;
 	private String list_name;
 	private String list_delete_status;
+	private String list_userid;
 	private List<CardVO> cardlist;
 	/*
 	 	리스트번호
@@ -18,12 +19,13 @@ public class ListVO {
 	
 	public ListVO() {}
 
-	public ListVO(String list_idx, String fk_project_idx, String list_name, String list_delete_status, List<CardVO> cardlist) {
+	public ListVO(String list_idx, String fk_project_idx, String list_name, String list_delete_status, String list_userid, List<CardVO> cardlist) {
 		super();
 		this.list_idx = list_idx;
 		this.fk_project_idx = fk_project_idx;
 		this.list_name = list_name;
 		this.list_delete_status = list_delete_status;
+		this.list_userid = list_userid;
 		this.cardlist = cardlist;
 	}
 
@@ -57,6 +59,15 @@ public class ListVO {
 
 	public void setList_delete_status(String list_delete_status) {
 		this.list_delete_status = list_delete_status;
+	}
+
+	
+	public String getList_userid() {
+		return list_userid;
+	}
+
+	public void setList_userid(String list_userid) {
+		this.list_userid = list_userid;
 	}
 
 	public List<CardVO> getCardlist() {

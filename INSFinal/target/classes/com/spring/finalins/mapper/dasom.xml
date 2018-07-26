@@ -16,15 +16,16 @@
 	
 	<!-- 로그인 한 유저의 팀idx, 팀명 select -->
 	<resultMap type="HashMap" id="getTeamInfo">
-		<result property="team_idx" 	      column="team_idx" 	   javaType="String" />
-		<result property="team_name" 	      column="team_name"    javaType="String" />
-		<result property="team_visibility_status" 	      column="team_visibility_status"    javaType="String" />
+		<result property="team_idx" 	          column="team_idx" 	          javaType="String" />
+		<result property="team_name" 	          column="team_name"              javaType="String" />
+		<result property="team_visibility_status" column="team_visibility_status" javaType="String" />
 	</resultMap>
 	<select id="getTeamList" parameterType="String" resultMap="getTeamInfo">
 		select A.team_idx, A.team_name, team_visibility_status
 		  from ins_team A join ins_team_member B
   			on A.team_idx = B.fk_team_idx
 		 where B.team_userid = #{userid}
+		   and team_delete_status = 1
 	</select>
 		
 		
@@ -45,7 +46,7 @@
 	
 	<!-- 팀의 visibility_status컬럼값을 select -->
 	<resultMap type="HashMap" id="teamInfo">
-		<result property="admin_status"       column="admin_status" javaType="String" />
+		<result property="admin_status"       column="admin_status"      javaType="String" />
 		<result property="visibility_status"  column="visibility_status" javaType="String" />
 	</resultMap>
 	<select id="getTeamVS" parameterType="HashMap" resultMap="teamInfo">
@@ -92,6 +93,7 @@
 		  from ins_project_member A join ins_project B       
 		    on A.fk_project_idx = B.project_idx
 		 where project_member_userid = #{userid}
+		   and project_member_status = 0
 		 order by project_name asc
 	</select>
 	
@@ -126,7 +128,6 @@
 		   and A.fk_project_image_idx = C.project_image_idx
 	</select>
 	
-	
 	<!-- 유저가 접속한 프로젝트의 배경이미지명을 select -->
 	<select id="getBackgroundIMG" parameterType="String" resultType="String">
 		select project_image_name
@@ -152,12 +153,6 @@
 		  from ins_list 
 		 where fk_project_idx = #{project_idx}
 		 order by list_idx asc
-		<!--  select list_idx, fk_project_idx, list_name, list_delete_status, list_userid,
-		        card_idx, fk_list_idx, card_userid, card_title,
-		        card_commentcount, card_date, card_delete_status
-		   from ins_list A, ins_card B
-		  where fk_project_idx = #{project_idx} 
-		    and A.list_idx = B.fk_list_idx -->
 	</select>
 	
 	
@@ -166,7 +161,7 @@
 		select card_idx, fk_list_idx, card_userid, card_title,
 		       card_commentcount, card_date, card_delete_status
 		  from ins_list A, ins_card B
-	     where fk_list_idx = #{list_idx}
+	     where fk_list_idx = #{list_idx} and card_delete_status = 1
 		   and A.list_idx = B.fk_list_idx
 		 order by card_idx asc
 	</select>
@@ -218,6 +213,48 @@
 		insert into ins_card(card_idx, fk_list_idx, card_userid, card_title, card_commentcount, card_date, card_delete_status)
 		values(seq_card.nextval, #{list_idx}, #{userid}, #{card_title}, default, default, default)
 	</insert>
+	
+	
+	<!-- 메인페이지에서 비밀번호 update -->
+	<update id="changePassword" parameterType="HashMap">
+		update ins_member set pwd = #{password}
+		 where userid = #{userid}
+	</update>
+	
+	
+	<!-- 리스트 제목 update -->
+	<update id="updateListTitle" parameterType="HashMap">
+		update ins_list set list_name = #{newtitle}
+		 where list_idx = #{list_idx}
+	</update>
+	
+	
+	<!-- 리스트 생성 ajax처리를 위한 insert된 리스트 정보를 가져오는 select -->
+	<select id="getListOne" parameterType="HashMap" resultType="com.spring.finalins.model.ListVO">
+		select list_idx, fk_project_idx, list_name, list_delete_status, list_userid 
+		  from ins_list 
+		 where list_idx = (select max(list_idx) from ins_list where list_userid = #{userid} and fk_project_idx = #{project_idx})
+	</select>
+	
+	
+	<!-- 프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 select -->
+	<resultMap type="HashMap" id="memberMap">
+		<result property="member_idx"  		column="member_idx"  	  javaType="String" />
+		<result property="userid"  			column="userid"  		  javaType="String" />
+		<result property="nickname"         column="nickname"  		  javaType="String" />
+		<result property="email"            column="email"            javaType="String" />
+		<result property="server_filename"  column="server_filename"  javaType="String" />
+		<result property="admin_status"  	column="admin_status"  	  javaType="String" />
+	</resultMap>
+	<select id="getProjectMemberInfo" parameterType="String" resultMap="memberMap">
+		select project_member_idx as member_idx, userid, nickname, email, server_filename, project_member_admin_status as admin_status
+		  from ins_member A, ins_project_member B
+		 where fk_project_idx = #{project_idx}
+		   and project_member_status = 0
+		   and A.userid = B.project_member_userid
+		 order by 6 desc, 1 asc
+	</select>
+	
 </mapper>
  
  

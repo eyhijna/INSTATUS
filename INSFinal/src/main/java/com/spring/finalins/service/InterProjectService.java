@@ -64,5 +64,17 @@ public interface InterProjectService {
 	//새로운 카드를 생성하는 메소드
 	int addCard(HashMap<String, String> map);
 
+	//메인페이지에서 비밀번호 변경하는 메소드 
+	int changePassword(HashMap<String, String> map);
+
+	//리스트 제목을 변경하는 메소드
+	String updateListTitle(HashMap<String, String> map);
+
+	//리스트 생성 ajax처리를 위한 insert된 리스트 정보를 가져오는 메소드
+	ListVO getListOne(HashMap<String, String> map);
+
+	//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
+	List<HashMap<String, String>> getProjectMemberInfo(String project_idx);
+
 
 }

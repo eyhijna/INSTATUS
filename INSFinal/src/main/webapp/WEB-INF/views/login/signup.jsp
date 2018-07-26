@@ -465,7 +465,7 @@ body{overflow: auto;}
 
               <div style="text-align:center;">
                 <h1><!-- <i class="fa fa-paw"></i>  --><span onclick="javascript:window.location.href='index.do'">Ins groupware! </SPAN> </h1>
-                <p>©2018 All Rights Reserved. Ins groupware is a Bootstrap 4 template. Privacy and Terms</p>
+              <!--   <p>©2018 All Rights Reserved. Ins groupware is a Bootstrap 4 template. Privacy and Terms</p> -->
               </div>
               
             </form>

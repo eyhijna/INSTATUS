@@ -233,8 +233,6 @@ public class ProjectController {
 			List<ListVO> listvo = null;
 			listvo = service.getListInfo(project_idx);
 			
-			
-			
 			for(int i=0; i<listvo.size(); i++) {
 				//프로젝트에 포함된 리스트의 카드목록을 가져오는 메소드
 				List<CardVO> cardlist = service.getCardInfo(listvo.get(i).getList_idx());
@@ -247,9 +245,16 @@ public class ProjectController {
 			//	System.out.println("카드vo확인용: " + listvo.get(i).getCardvo().getCard_title());
 			}
 			
+			//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
+			List<HashMap<String, String>> memberInfo = service.getProjectMemberInfo(project_idx);
+			
 			session.setAttribute("projectInfo", projectInfo);
 			request.setAttribute("project_image_name", project_image_name);
 			request.setAttribute("listvo", listvo);
+			request.setAttribute("memberInfo", memberInfo);
+		}
+		else if(loginuser == null) {
+			return "login/logincheck";
 		}
 		return "project/project.tiles";
 	} // end of showProjectPage(HttpServletRequest request)
@@ -394,11 +399,6 @@ public class ProjectController {
 		String project_idx = request.getParameter("project_idx");
 		String userid = request.getParameter("userid");
 		
-		System.out.println("리스트명 확인: " + list_name);
-		System.out.println("idx 확인: " + project_idx);
-		System.out.println("유저 확인: " + userid);
-		//2018.07.20 리스트생성 메소드 작업중
-		
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("list_name", list_name);
 		map.put("project_idx", project_idx);
@@ -409,9 +409,19 @@ public class ProjectController {
 		JSONObject jsonObj = new JSONObject();
 		jsonObj.put("result", result);
 		
+		if(result == 1) {
+			ListVO listvo = service.getListOne(map);
+			
+			jsonObj.put("list_idx", listvo.getList_idx());
+			jsonObj.put("fk_project_idx", listvo.getFk_project_idx());
+			jsonObj.put("list_name", listvo.getList_name());
+			jsonObj.put("list_delete_status", listvo.getList_delete_status());
+			jsonObj.put("list_userid", listvo.getList_userid());
+		}
+		
 		String str_jsonObj = jsonObj.toString();
 		request.setAttribute("str_jsonObj", str_jsonObj);
-		
+		System.out.println("json데이터 확인: " + str_jsonObj);
 		return "project/addListJSON";
 	} // end of addList(HttpServletRequest request) 
 	
@@ -422,7 +432,9 @@ public class ProjectController {
 		String userid = request.getParameter("userid");
 		String list_idx = request.getParameter("list_idx");
 		String card_title = request.getParameter("card_title");
-		
+		System.out.println("카트인서트 아이디체크: " + userid);
+		System.out.println("카트인서트 리스트idx체크: " + list_idx);
+		System.out.println("카트인서트 카드제목체크: " + card_title);
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("userid", userid);
 		map.put("list_idx", list_idx);
@@ -438,4 +450,59 @@ public class ProjectController {
 		
 		return "project/addListJSON";
 	} // end of addCard(HttpServletRequest request)
+	
+	
+	//메인페이지에서 비밀번호 변경하는 메소드 
+	@RequestMapping(value="changePassword.action", method= {RequestMethod.POST})
+	public String changePassword(HttpServletRequest request) {
+		String userid = request.getParameter("userid");
+		String password = request.getParameter("password");
+		
+//		System.out.println("아이디확인: " + userid + "  비밀번호확인: " + password);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("userid", userid);
+		map.put("password", password);
+		
+		int result = service.changePassword(map);
+		
+		String msg = "";
+		if(result == 1) {
+			msg = "비밀번호가 변경되었습니다!";
+		}
+		else {
+			msg = "비밀번호 변경에 실패했습니다. 다시 시도해주세요.";
+		}
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("result", result);
+		jsonObj.put("msg", msg);
+		
+		String str_jsonObj = jsonObj.toString();
+		request.setAttribute("str_jsonObj", str_jsonObj);
+		return "main/changePasswordJSON";
+	} // end of changePassword(HttpServletRequest request)
+	
+	
+	//리스트 제목을 변경하는 메소드 
+	@RequestMapping(value="updateListTitle.action", method= {RequestMethod.POST})
+	public String updateListTitle(HttpServletRequest request) {
+		String newtitle = request.getParameter("newtitle");
+		String oldtitle = request.getParameter("oldtitle");
+		String list_idx = request.getParameter("list_idx");
+
+		System.out.println("변경할 타이틀 확인: " + newtitle + "  이전타이틀 확인: " + oldtitle);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("newtitle", newtitle);
+		map.put("oldtitle", oldtitle);
+		map.put("list_idx", list_idx);
+		
+		String resultTitle = service.updateListTitle(map);
+		System.out.println("타이틀 업데이트 확인용: " + resultTitle);
+		
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("resultTitle", resultTitle);
+		
+		String str_jsonObj = jsonObj.toString();
+		request.setAttribute("str_jsonObj", str_jsonObj);
+		return "project/titleUpdateJSON";
+	} // end of updateListTitle(HttpServletRequest request)
 }

@@ -185,6 +185,45 @@ public class ProjectService implements InterProjectService{
 	} // end of addCard(HashMap<String, String> map)
 
 
-	
+	//메인페이지에서 비밀번호 변경하는 메소드 
+	@Override
+	public int changePassword(HashMap<String, String> map) {
+		int result = dao.changePassword(map);
+		return result;
+	} // end of changePassword(HashMap<String, String> map)
+
+
+	//리스트 제목을 변경하는 메소드
+	@Override
+	public String updateListTitle(HashMap<String, String> map) {
+		int n = dao.updateListTitle(map);
+		
+		String title = "";
+		if(n == 1) { //타이틀변경이 성공한 경우
+			title = map.get("newtitle");
+	//		System.out.println("서비스단 변경된 타이틀 확인: " + title);
+		}
+		else { //타이틀 변경이 실패한 경우
+			title = map.get("oldtitle");
+	//		System.out.println("서비스단 변경지 않은 경우의 타이틀 확인: " + title);
+		}
+		return title;
+	} // end of updateListTitle(HashMap<String, String> map)
+
+
+	//리스트 생성 ajax처리를 위한 insert된 리스트 정보를 가져오는 메소드
+	@Override
+	public ListVO getListOne(HashMap<String, String> map) {
+		ListVO vo = dao.getListOne(map);
+		return vo;
+	} // end of getListOne(HashMap<String, String> map)
+
+
+	//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
+	@Override
+	public List<HashMap<String, String>> getProjectMemberInfo(String project_idx) {
+		List<HashMap<String, String>> memberInfo = dao.getProjectMemberInfo(project_idx);
+		return memberInfo;
+	} // end of getProjectMemberInfo(String project_idx)
 
 }

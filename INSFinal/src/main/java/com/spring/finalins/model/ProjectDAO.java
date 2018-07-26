@@ -171,5 +171,37 @@ public class ProjectDAO implements InterProjectDAO{
 	} // end of addCard(HashMap<String, String> map) 
 
 
+	//메인페이지에서 비밀번호 변경하는 메소드
+	@Override
+	public int changePassword(HashMap<String, String> map) {
+		int result = sqlsession.update("dasom.changePassword", map);
+		return result;
+	} // end of changePassword(HashMap<String, String> map)
+
+
+	//리스트 제목을 변경하는 메소드
+	@Override
+	public int updateListTitle(HashMap<String, String> map) {
+		int result = sqlsession.update("dasom.updateListTitle", map);
+		return result;
+	} // end of updateListTitle(HashMap<String, String> map)
+
+
+	//리스트 생성 ajax처리를 위한 insert된 리스트 정보를 가져오는 메소드
+	@Override
+	public ListVO getListOne(HashMap<String, String> map) {
+		ListVO vo = sqlsession.selectOne("dasom.getListOne", map);
+		return vo;
+	} // end of getListOne(HashMap<String, String> map)
+
+
+	//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
+	@Override
+	public List<HashMap<String, String>> getProjectMemberInfo(String project_idx) {
+		List<HashMap<String, String>> memberInfo = sqlsession.selectList("dasom.getProjectMemberInfo", project_idx);
+		return memberInfo;
+	} // end of getProjectMemberInfo(String project_idx)
+
+
 	
 }
