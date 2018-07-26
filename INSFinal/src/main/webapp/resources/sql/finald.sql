@@ -887,3 +887,61 @@ where team_userid = 'jihye'
 	  from ins_team_member A join ins_team B
 	  on A.fk_team_idx = B.team_idx
 	 where team_userid = #{userid} and team_member_admin_status = 3
+   
+   
+   select *
+   from ins_project
+   
+   select *
+   from ins_project_image;
+   
+   select *
+   from ins_list
+   
+   
+   select list_idx, list_name, list_userid, list_delete_status
+    from ins_list C join ( select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, project_favorite_status, project_profilejpg, fk_project_image_idx
+                               from ins_project A join ins_project_member B
+                               on A.project_idx = B.fk_project_idx
+                               where B.project_member_userid = 'ddcat' and project_visibility_st in (0, 1) and project_delete_status=1 ) D
+    	on C.fk_project_idx = D.project_idx
+   	 	where fk_project_idx = 3 and list_name like '%' || '크' || '%'
+   
+   
+   select *
+   from ins_project
+   
+   select *
+   from ins_card
+   order by fk_list_idx
+   
+   select *
+   from ins_list
+   
+   select B.fk_project_idx, A.fk_list_idx, A.card_idx, A.card_title 
+   from ins_card A, ins_list B
+   where fk_project_idx = 3 and fk_list_idx = 1
+      and list_delete_status = 1
+      and card_delete_status = 1
+      and card_title like '%' || '카' || '%'
+      and A.fk_list_idx = B.list_idx;
+   
+   select *
+   from ins_list
+   
+   update ins_card set card_delete_status = 1
+   where card_idx in (3, 11, 13)
+   
+   commit
+   
+   from ins_card
+   
+   select *
+   from ins_list
+   
+   
+   select *
+   from ins_project_member
+   
+  from ins_project A, ins_list B, ins_card C, ins_project_member D
+  where project_delete_status = 1 and ins_project_member = 'ddcat' and project_member_status = 0 and fk_project_idx = 3

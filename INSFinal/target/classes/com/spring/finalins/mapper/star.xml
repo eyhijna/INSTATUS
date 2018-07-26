@@ -133,10 +133,18 @@
  		<result property="userid" 	         	    column="userid" 	              javaType="String" /> 
     </resultMap> 
     <select id="searchMember" parameterType="HashMap" resultMap="searchMemberMap">  
-       select rownum as RNO, userid, nickname, email, org_filename
-		from ins_member
-		where (lower(nickname) like '%' || #{searchWord} || '%'  or lower(email) like '%' || #{searchWord}  || '%') and leave_status = 0 and userid !=  #{login_userid}
-        order by 2 
+         select D.userid, D.nickname, D.email, D.org_filename
+		 from
+		 (
+		 select userid 
+		 from ins_member A left join ins_team_member B
+		 on A.userid = B.team_userid
+		 where nvl(B.fk_team_idx,0) != #{team_idx} and A.userid != #{login_userid} and A.leave_status = 0
+		 group by userid 
+		 ) C join ins_member D 
+		 on C.userid = D.userid
+		 where lower(D.nickname) like '%' || #{searchWord} || '%'  or lower(D.email) like '%' || #{searchWord}  || '%'
+         order by 1
     </select>
     
     

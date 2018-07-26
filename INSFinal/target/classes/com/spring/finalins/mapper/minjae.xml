@@ -25,19 +25,23 @@
 	</select>
 	
 	<!-- header : 해당 user의 팀에 해당하는 프로젝트 리스트를 얻음 -->
-	<resultMap type="com.spring.finalins.model.ProjectVO" id="getProjectListMap">
+	<resultMap type="HashMap" id="getProjectListMap">
 		<result property="project_idx" column="project_idx" javaType="String"/>
 		<result property="fk_team_idx" column="fk_team_idx" javaType="String"/>
 		<result property="project_name" column="project_name" javaType="String" />
-		<result property="project_visibility_st" column="project_visibility_st" javaType="String"/>
-		<result property="project_delete_status" column="project_delete_status" javaType="String"/>
-		<result property="fk_project_image_idx" column="fk_project_image_idx" javaType="String" />
+		<result property="project_image_name" column="project_image_name" javaType="String" />
+		<result property="project_favorite_status" column="project_favorite_status" javaType="String" />
 	</resultMap>
 	<select id="getProjectList" parameterType="HashMap" resultMap="getProjectListMap">
-		select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
-		from ins_project A join ins_project_member B
-		on A.project_idx = B.fk_project_idx
-		where B.project_member_userid = #{userid} and fk_team_idx = #{fk_team_idx}
+		   select project_idx, fk_team_idx, project_name, project_image_name, project_favorite_status
+		   from ins_project A, ins_project_image B, ins_project_member C
+		   where project_delete_status = 1 
+		      and project_member_status = 0
+		      and project_member_userid = #{userid}
+		      and fk_team_idx = #{fk_team_idx}
+		      and A.fk_project_image_idx = B.project_image_idx
+		      and A.project_idx = C.fk_project_idx
+		  order by project_favorite_status desc
 	</select>
 	
 	<!-- header : 검색을 위해 teamList 를 얻음 -->

@@ -35,9 +35,9 @@ public class MinjaeService implements InterMinjaeServie {
 	
 	// header : 해당 user의 팀에 해당하는 프로젝트 리스트를 얻음
 	@Override
-	public List<ProjectVO> getProjectList(HashMap<String, String> map) {
+	public List<HashMap<String, String>> getProjectList(HashMap<String, String> map) {
 		
-		List<ProjectVO> projectList = dao.getProjectList(map);
+		List<HashMap<String, String>> projectList = dao.getProjectList(map);
 		
 		return projectList;
 	}

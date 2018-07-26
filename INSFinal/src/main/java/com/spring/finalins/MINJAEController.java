@@ -101,24 +101,19 @@ public class MINJAEController {
 		map.put("userid", loginuser.getUserid());
 		
 		// 해당하는 팀의 프로젝트 목록을 갖고 옴
-		List<ProjectVO> projectList = service.getProjectList(map);
-		
-		for(int i=0; i<projectList.size(); i++) {
-			System.out.println(projectList.get(i).getProject_name());
-		}
+		List<HashMap<String, String>> projectList = service.getProjectList(map);
 		
 		JSONArray jsonArr = new JSONArray();
 		
 		if(projectList.size() > 0) {
-			for(ProjectVO projectvo:projectList) {
+			for(HashMap<String, String> projectmap:projectList) {
 				JSONObject jsonObj = new JSONObject();
 				
-				jsonObj.put("project_idx", projectvo.getProject_idx());
-				jsonObj.put("fk_team_idx", projectvo.getFk_team_idx());
-				jsonObj.put("project_name", projectvo.getProject_name());
-				jsonObj.put("project_visibility_st", projectvo.getProject_visibility_st());
-				jsonObj.put("project_delete_status", projectvo.getProject_delete_status());
-				jsonObj.put("fk_project_image_idx", projectvo.getFk_project_image_idx());
+				jsonObj.put("project_idx", projectmap.get("project_idx"));
+				jsonObj.put("fk_team_idx", projectmap.get("project_idx"));
+				jsonObj.put("project_name", projectmap.get("project_idx"));
+				jsonObj.put("project_image_name", projectmap.get("project_image_name"));
+				jsonObj.put("project_favorite_status", projectmap.get("project_favorite_status"));
 				
 				jsonArr.put(jsonObj);
 				
