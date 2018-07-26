@@ -16,7 +16,7 @@ public interface InterWoneyDAO {
 	
 	HashMap<String, String> cardCheckTitleInfo(String cardIdx); // 체크타이틀 받아오기
 	
-	List<HashMap<String, String>> cardCheckListInfo(String cardIdx); // 체크리스트 받아오기
+	List<HashMap<String, String>> cardCheckListInfo(String checklistidx); // 체크리스트 받아오기
 	
 	List<HashMap<String, String>> cardLabelListInfo(String cardIdx); // 카드 라벨리스트 받아오기
 	
@@ -92,5 +92,9 @@ public interface InterWoneyDAO {
 	int setLabelAdd(HashMap<String, String> map); // 카드  라벨추가
 
 	int setLabelDelete(HashMap<String, String> map); // 카드 라벨 삭제
+
+	int getCheckListtotalCNT(String checklistidx); // 체크리스트 총 갯수
+
+	int getCheckListcheckCNT(String checklistidx); // 체크리스트 체크된 갯수
 
 }

@@ -57,8 +57,8 @@ public class WoneyService implements InterWoneyService{
 	
 	// 체크리스트 받아오기
 	@Override
-	public List<HashMap<String, String>> cardCheckListInfo(String cardIdx) {
-		List<HashMap<String, String>> cardCheckList = dao.cardCheckListInfo(cardIdx);
+	public List<HashMap<String, String>> cardCheckListInfo(String checklistidx) {
+		List<HashMap<String, String>> cardCheckList = dao.cardCheckListInfo(checklistidx);
 		return cardCheckList;
 	}
 	
@@ -417,5 +417,19 @@ public class WoneyService implements InterWoneyService{
 		int n = dao.setLabelDelete(map);
 		return n;
 	}
+
+	// 스킬바 퍼센트 받아오기
+	@Override
+	public int getChecklistskilbar(String checklistidx) {
+		
+		int checkListtotalCNT = dao.getCheckListtotalCNT(checklistidx); // 체크리스트 총 갯수
+		
+		int checkListcheckCNT = dao.getCheckListcheckCNT(checklistidx); // 체크리스트 체크된 갯수
+		double m = (double)checkListcheckCNT/checkListtotalCNT;
+		int n =(int)(m * 100);
+		return n;
+	}
+
+
 
 }

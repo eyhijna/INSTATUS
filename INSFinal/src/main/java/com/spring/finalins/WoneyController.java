@@ -56,14 +56,26 @@ public class WoneyController {
 		String url = MyUtil.getCurrentURL(request);
 		//	System.out.println("현재페이지 확인용:" + url);
 		session.setAttribute("goBackURL", url); //세션에 url정보를 저장시킨다.
-	
+
 		String cardIDX =  request.getParameter("cardIDX");
 		String listIDX =  request.getParameter("listIDX");
 		String projectIDX =  request.getParameter("projectIDX");
 		
 		HashMap<String, String> cardMap = service.getCardInfo(cardIDX); // 카드정보 받아오기
 		HashMap<String, String> cardDetailMap = service.getCardDetailInfo(cardIDX); // 카드 상세 받아오기
+		//////////////////////////////////////////////////////////////////////////////////////// 코멘트 br태그 \n으로 변경
 		List<HashMap<String, String>> cardCommentList = service.cardCommentInfo(cardIDX);// 카드 코멘트 받아오기
+		for(HashMap<String, String> map : cardCommentList) {
+			System.out.println( map.get("CARDCOMMENTCONTENT"));
+			String CARDCOMMENTCONTENT =  map.get("CARDCOMMENTCONTENT");
+			
+			CARDCOMMENTCONTENT = CARDCOMMENTCONTENT.replaceAll("<br/>", "\n");
+			map.put("CARDCOMMENTCONTENT", CARDCOMMENTCONTENT);
+			System.out.println( map.get("CARDCOMMENTCONTENT"));
+		}
+		
+		////////////////////////////////////////////////////////////////////////////////////////
+		
 		HashMap<String, String> cardDueDateMap = service.cardDueDateInfo(cardIDX); // 카드 완료일 받아오기
 		
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -71,9 +83,10 @@ public class WoneyController {
 		cardCheckTitleMap =	service.cardCheckTitleInfo(cardIDX); // 체크타이틀 받아오기
 		
 		List<HashMap<String, String>> cardCheckList = new ArrayList<HashMap<String, String>>() ;
-		
+		int checkListSkilbar = 0; 
 		if(cardCheckTitleMap !=null) {
 		cardCheckList =	service.cardCheckListInfo(cardCheckTitleMap.get("CARDCHECKLISTIDX")); // 체크리스트 받아오기
+		checkListSkilbar = service.getChecklistskilbar(cardCheckTitleMap.get("CARDCHECKLISTIDX")); // 스킬바 퍼센트 받아오기
 		}
 		////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -91,7 +104,9 @@ public class WoneyController {
 		cardRecordIDXMap.put("cardIdx", cardIDX);
 		
 		List<HashMap<String, String>> cardRecordList = service.getCardRecordInfo(cardRecordIDXMap);// 카드 기록 받아오기
-			
+	
+		
+		
 		request.setAttribute("cardMap", cardMap);
 		request.setAttribute("cardDetailMap", cardDetailMap);
 		request.setAttribute("cardCommentList", cardCommentList);
@@ -102,6 +117,7 @@ public class WoneyController {
 		request.setAttribute("cardCheckList", cardCheckList);
 		request.setAttribute("cardLabelList", cardLabelList);
 		request.setAttribute("cardLabelCNT", cardLabelCNT);
+		request.setAttribute("checkListSkilbar", checkListSkilbar);
 
 		if(cardMap != null) {
 			int cnt = service.cardDescriptionCNT(cardIDX); // 카드 Description 존재 여부 체크
@@ -316,7 +332,8 @@ public class WoneyController {
 		String listIdx= request.getParameter("listIdx");
 		String projectIdx=request.getParameter("projectIdx");
 		String recordstatus = "Comment을 추가했습니다.";
-		content = content.replaceAll("\r\n", "<br/>");
+		content = content.replaceAll("\n", "<br/>");
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+content);
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("nickname", nickname);
@@ -668,17 +685,31 @@ public class WoneyController {
 		return "goCheckListJSON.notiles";
 	}// end of goCheckLisTitletEdit()------------------	
 	
-	// ==== 카드  체크리스트 생성 ====
-	@RequestMapping(value="/goCheckListAdd.action", method= {RequestMethod.POST})
-	public String goCheckListAdd(HttpServletRequest request) {
+	// ==== 카드  체크리스트 스킬바 ====
+	@RequestMapping(value="/skilbar.action", method= {RequestMethod.GET})
+	public String skilbar(HttpServletRequest request) {
 		String cardchecklistIdx = request.getParameter("cardchecklistIdx");
-		String checkListContent = request.getParameter("checkListContent");
 		
-		HashMap<String, String> map = new HashMap<String, String>(); 
-		map.put("cardchecklistIdx", cardchecklistIdx);
-		map.put("checkListContent", checkListContent);
+		int checkListSkilbar = service.getChecklistskilbar(cardchecklistIdx); // 스킬바 퍼센트 받아오기
+		String str_jsonarray ="";
+		JSONArray jsonarr = new JSONArray();
 
-		int n = service.setCheckListAdd(map);
+		String str_jsonobj ="";
+		JSONObject jsonobj = new JSONObject();
+		
+		jsonobj.put("checkListSkilbar", checkListSkilbar);
+		
+		str_jsonobj = jsonobj.toString();
+		request.setAttribute("str_jsonobj", str_jsonobj);
+		
+		return "goCheckListJSON.notiles";
+	}// end of goCheckListAdd()------------------
+	
+	// ==== 체크리스트 불러오기 ====
+	@RequestMapping(value="/checklistselect.action", method= {RequestMethod.GET})
+	public String checklistselect(HttpServletRequest request) {
+		String cardchecklistIdx = request.getParameter("cardchecklistIdx");
+		
 		String str_jsonarray ="";
 		JSONArray jsonarr = new JSONArray();
 
@@ -696,8 +727,23 @@ public class WoneyController {
 		str_jsonarray = jsonarr.toString();
 		request.setAttribute("str_jsonarray", str_jsonarray);
 		
-		//System.out.println("CARDCHECKLISTTITLE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:"+str_jsonarray);System.out.println("CARDCHECKLISTTITLE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:"+str_jsonarray);
 		return "goCheckListJSONArr.notiles";
+	}// end of goCheckListAdd()------------------
+	
+	
+	// ==== 카드  체크리스트 생성 ====
+	@RequestMapping(value="/goCheckListAdd.action", method= {RequestMethod.POST})
+	public String goCheckListAdd(HttpServletRequest request) {
+		String cardchecklistIdx = request.getParameter("cardchecklistIdx");
+		String checkListContent = request.getParameter("checkListContent");
+		
+		HashMap<String, String> map = new HashMap<String, String>(); 
+		map.put("cardchecklistIdx", cardchecklistIdx);
+		map.put("checkListContent", checkListContent);
+
+		int n = service.setCheckListAdd(map);
+
+		return "goCheckListNodata.notiles";
 	}// end of goCheckListAdd()------------------	
 			
 	// ==== 카드  체크리스트 체크 상태 변경 ====
@@ -745,24 +791,8 @@ public class WoneyController {
 		map.put("checkDetailIdx", checkDetailIdx);
 
 		int n = service.setCheckListDelete(map);
-		String str_jsonarray ="";
-		JSONArray jsonarr = new JSONArray();
-
-		List<HashMap<String, String>> cardCheckList = service.cardCheckListInfo(cardchecklistIdx); // 체크리스트 받아오기
 		
-		for(HashMap<String, String> cardChecListMap :cardCheckList) {
-			JSONObject jsonobj = new JSONObject();	
-			jsonobj.put("CARDCHECKLISTDETAILIDX", cardChecListMap.get("CARDCHECKLISTDETAILIDX"));
-			jsonobj.put("FKCARDCHECKLISTIDX", cardChecListMap.get("FKCARDCHECKLISTIDX"));
-			jsonobj.put("CARDCHECKLISTTODO",cardChecListMap.get("CARDCHECKLISTTODO") );
-			jsonobj.put("CARDCHECKLISTTODOSTATUS",cardChecListMap.get("CARDCHECKLISTTODOSTATUS") );
-			
-			jsonarr.put(jsonobj);
-		}
-		str_jsonarray = jsonarr.toString();
-		request.setAttribute("str_jsonarray", str_jsonarray);
-		
-		return "goCheckListJSONArr.notiles";
+		return "goCheckListNodata.notiles";
 	}// end of goCheckListDelete()------------------
 	
 	// ==== 카드  체크리스트 타이틀 삭제 ====

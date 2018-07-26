@@ -54,8 +54,8 @@ public class WoneyDAO implements InterWoneyDAO {
 	
 	// 체크리스트 받아오기
 	@Override
-	public List<HashMap<String, String>> cardCheckListInfo(String cardIdx) {
-		List<HashMap<String, String>> cardCheckList = sqlsession.selectList("woney.cardCheckListInfo", cardIdx);
+	public List<HashMap<String, String>> cardCheckListInfo(String checklistidx) {
+		List<HashMap<String, String>> cardCheckList = sqlsession.selectList("woney.cardCheckListInfo", checklistidx);
 		return cardCheckList;
 	}
 	
@@ -312,6 +312,20 @@ public class WoneyDAO implements InterWoneyDAO {
 	@Override
 	public int setLabelDelete(HashMap<String, String> map) {
 		int n = sqlsession.delete("woney.setLabelDelete", map);
+		return n;
+	}
+
+	// 체크리스트 총 갯수
+	@Override
+	public int getCheckListtotalCNT(String checklistidx) {
+		int n = sqlsession.selectOne("woney.getCheckListtotalCNT", checklistidx);
+		return n;
+	}
+
+	// 체크리스트 체크된 갯수
+	@Override
+	public int getCheckListcheckCNT(String checklistidx) {
+		int n = sqlsession.selectOne("woney.getCheckListcheckCNT", checklistidx);
 		return n;
 	}
 

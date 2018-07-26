@@ -5,7 +5,12 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-
+/* 
+	window.opener.location.reload();
+	window.close(); */
+	
+	/* window.onbeforeunload = fn_onClose; */
+	
 	$(".content").hide(); // comment 수정 시 효과
 	$("#checkListAdd").hide(); // 체크리스트 추가시 효과
 	$("#checkListTitleEdit").hide(); // 체크리스트 타이틀 수정 시 효과
@@ -14,19 +19,26 @@ $(document).ready(function(){
 /* 	if($("#inputcss").val().trim = ""){
 		titleSelect();
 	} */
-	
+	/* 
 	$("#inputcss").keydown(function(event) {
-		titleUpdate();
-	/* 	if (event.keyCode == 13) {
+		//titleUpdate();
+	 	if (event.keyCode == 13) {
 			titleUpdate();
-		}  */
+		}  
 	}); // end of $("#inputcss").keydown()
-
- 	/* $('body').click(function(e) {
+ */
+ 
+ 	$("#inputcss").keydown(function(event) {
+	
+	 	if (event.keyCode == 13) {
+			titleUpdate();
+		}  
+	}); // end of $("#inputcss").keydown()
+ 	$('body').click(function(e) {
 		if(!$('#titleInput').has(e.target).length) { 
 			titleUpdate();
 		}  
-	});// end of $('body').click()------------------  */
+	});// end of $('body').click()------------------  
 	
 	// 코멘트 리스트로 불렀을때 지정된 코멘트를 선택하기 위해 숫자생성
 	var count = 1;
@@ -36,29 +48,39 @@ $(document).ready(function(){
 		$("#commentEdit"+count).hide();
 	}
 	
+	// 코멘트 수정
+	$(document).on("click",".goCommentEdit",function(){
+		var index =  $(this).next().val();
+		var commentContent =  $(this).next().next().val();
+		
+		$("#comment"+index).hide();
+		$("#Editcontent"+index).val(commentContent);
+		$("#commentEdit"+index).show();
+	});
+	
 	// DueDate
 	var datecheckCNT = $("#datecheckCNT").val();
 	if(datecheckCNT == 0){ // 체크해제
-		$(".dueCheck").removeClass("duedateCheck");
+		$("#colorCheck").removeClass("duedateCheck");
 		$("#dateCheck").prop("checked", false);
 	}else if(datecheckCNT == 1){// 체크
-		$(".dueCheck").addClass("duedateCheck");
+		$("#colorCheck").addClass("duedateCheck");
 		$("#dateCheck").prop("checked", true);
 	}
 	
-	// DueDate 클릭시 색을 바꿔주는 함수
+	/* // DueDate 클릭시 색을 바꿔주는 함수
 	$("#dateCheck").bind("click", function(){
 		 var checkBox = document.getElementById("dateCheck");
-		  
+		  alert(checkBox);
 		 if (checkBox.checked == true){
-		//	 alert("체크");
+			 alert("체크");
 			 checkChange();
 			 
 		 }else{
-			// alert("체크해제");
+			 alert("체크해제");
 			 checkChange();
 		 }
-	});// end of $("#dateCheck").bind()
+	});// end of $("#dateCheck").bind() */
 	
 	// 체크리스트 클릭시 효과 시작
 	$("#checkListText").bind("click", function(){
@@ -119,11 +141,11 @@ $(document).ready(function(){
 	
 	// Ajax안에서 체크리스트 삭제 클릭 시 체크리스트 삭제
 	$(document).on("click",".checkListDelete",function(){
-		alert("checkListDelete ");
+		//alert("checkListDelete ");
 		var cnt =/* $("#indexval").val(); */$(this).next().val();
 		var checklistdetailIdx = $("#checklistIdx"+cnt).val();
-		alert(cnt);
-		alert(checklistdetailIdx);
+		//alert(cnt);
+		//alert(checklistdetailIdx);
 		goCheckListDelete(checklistdetailIdx);
 	}); // end of $(document).on()
 	
@@ -167,7 +189,23 @@ $(document).ready(function(){
 	});
 	/////////////////////////////////////////////////// */
 	
+	$(window).bind("beforeunload", function (e){
+
+		window.opener.location.reload();
+		window.close();
+
+	});
+	
+
+	
 });// end of $(document).ready()
+
+/* function fn_onClose(){
+	window.opener.location.reload();
+	window.close();
+} */
+
+
 
 //card 로그인 체크
 function cardLoginCheck(){
@@ -391,10 +429,10 @@ function titleUpdate(){
 		 		success: function() {
 		 			$("#attachdiv").empty();
 		       		var html = "<form role='form' name='fileFrm' enctype='multipart/form-data'>";
-			 			html += 	"<input type='text' name='projectIdx' value='${cardRecordIDXMap.projectIdx}'/>";
-			 			html += 	"<input type='text' name='listIdx' value='${cardRecordIDXMap.listIdx}'/>";
-			 			html +=		"<input type='text' name='userid' value='${sessionScope.loginuser.userid}'/>"
-			 			html +=		"<input type='text' name='fkcardidx' value='${cardMap.CARDIDX}'/>";  
+			 			html += 	"<input type='hidden' name='projectIdx' value='${cardRecordIDXMap.projectIdx}'/>";
+			 			html += 	"<input type='hidden' name='listIdx' value='${cardRecordIDXMap.listIdx}'/>";
+			 			html +=		"<input type='hidden' name='userid' value='${sessionScope.loginuser.userid}'/>"
+			 			html +=		"<input type='hidden' name='fkcardidx' value='${cardMap.CARDIDX}'/>";  
 			 			html += 	"<div class='form-group' >";
 			 			html += 		"<input name='attach' id='attach' type='file' />";   
 			 			html += 		"<input type='hidden' name='fk_card_idx' value='${cardMap.CARDIDX}'/>";                                
@@ -422,7 +460,8 @@ function titleUpdate(){
  function goAddComment(){
 	 var CNT = LoginCheck();
 		if(CNT != 0){
-			var contentval = $("#content").val().trim();
+			var contentval = $("#content").val();
+			//alert(contentval);
 			if(contentval == "") {
 				alert("댓글 내용을 입력하세요!!");
 				return;
@@ -442,7 +481,7 @@ function titleUpdate(){
 				type: "POST",
 				//dataType: "JSON",
 				success: function() {
-					javascript:history.go(0);
+				 	javascript:history.go(0); 
 					cardRecordInfo();
 				/*  	$("#commentList").empty();
 				 	$("#content").val("");
@@ -484,13 +523,7 @@ function titleUpdate(){
  } // end of goAddComment()
  
  //////////////////////////////////////////////////////////////
- /* 코멘트 수정 이벤트 */
- function goCommentEdit(cnt,commentcontent){
-	$("#comment"+cnt).hide();
-	$("#Editcontent"+cnt).val(commentcontent);
-	$("#commentEdit"+cnt).show();
- }
- 
+
  function goCommentCancel(cnt){
 	$("#comment"+cnt).show();
 	$("#commentEdit"+cnt).hide();
@@ -502,8 +535,8 @@ function titleUpdate(){
 	 var EditOldcontent = $("#EditOldcontent"+cnt).val();
 	 var Editcontent = $("#Editcontent"+cnt).val().trim();
 	 
-	 alert("EditOldcontent" + EditOldcontent);
-	 alert("Editcontent" + Editcontent);
+	// alert("EditOldcontent" + EditOldcontent);
+	 //alert("Editcontent" + Editcontent);
 	 var CNT = LoginCheck();
 		if(CNT != 0){
 			if(EditOldcontent != Editcontent){
@@ -648,12 +681,13 @@ function titleUpdate(){
 		 		data : form_data,
 		 		dataType: "JSON",
 		 		success: function(json) {
-		 			alert("하하핳");
-		 			alert("확인용"+json.datecheckCNT);
+		 				 			
 					if(json.datecheckCNT == 0){ // 체크가 안된 상태
-						$(".dueCheck").removeClass("duedateCheck");
+						$("#colorCheck").removeClass("duedateCheck");
+						$("#dateCheck").prop("checked", false);
 					}else if(json.datecheckCNT == 1){ // 체크가 된 상태
-						 $(".dueCheck").addClass("duedateCheck");
+						 $("#colorCheck").addClass("duedateCheck");
+						 $("#dateCheck").prop("checked", true);
 					}
 				}, 
 				error: function(request, status, error){ 
@@ -751,6 +785,103 @@ function goCheckLisTitletEdit(){
 	}// //end of if()	 
 }// end of goCheckListAdd()
  
+//체크리스트 스킬바
+function skillbar(cardchecklistIdx){
+	var form_data = {cardchecklistIdx : cardchecklistIdx};
+ 
+	$.ajax({		
+ 		url:"skilbar.action",
+ 		type:"GET",
+ 		data : form_data,
+ 		async: false,
+ 		dataType: "JSON",
+ 		success: function(json){
+               // alert("실행2");
+                
+	 			var html = "<div class='skillbar'>";
+	 				html +=		"<div class='skills' style='width: "+json.checkListSkilbar+"%; background-color: #808080;'>"+json.checkListSkilbar+"%</div>"
+	 				html +=	"</div>"
+	 				html +=	"<br/>"
+	 				html +=	"<br/>"
+	 			$("#cardCheckBoxList").append(html);
+	 				
+	 			//	alert($("#cardCheckBoxList").html());
+		}, 
+		error: function(request, status, error){ 
+ 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+ 		}
+ 	
+	}); // end of ajax({})
+	
+}
+
+//체크리스트 불러오기
+function checklistselect(cardchecklistIdx){
+	var form_data = {cardchecklistIdx : cardchecklistIdx
+					};
+ 
+	$.ajax({		
+ 		url:"checklistselect.action",
+ 		type:"GET",
+ 		data : form_data,
+ 		async: false,
+ 		dataType: "JSON",
+ 		success: function(json){
+ 			//alert("실행2");
+ 			$("#cardCheckBoxList").empty();
+ 			var	html = "";
+ 			skillbar(cardchecklistIdx);
+ 			if(json.length > 0){
+	 			
+	 			
+	 			$.each(json, function(entryIndex,entry){
+	 				//alert("실행3");
+		 				html += 	"<div class='checkboxList'>";
+						html += 	"<label style='float: left;'>";
+						html += 		"<input type='checkbox'  id='checkliststatus"+entryIndex+"' class='checklist'/>";
+						html += 		"<span class='cr'><i class='cr-icon glyphicon glyphicon-ok'></i></span>";		
+						html +=			"<input type='hidden' id='checklistIdx"+entryIndex+"' value='"+entry.CARDCHECKLISTDETAILIDX+"' />";
+						html +=	   		"<input type='hidden' id='checklist"+entryIndex+"' value='"+entry.CARDCHECKLISTTODOSTATUS+"' />";
+						html += 	"</label>";
+						html += 		"<span id ='checkboxlist'  style='font-weight: bold'>"+entry.CARDCHECKLISTTODO+"</span>";
+						html += 		"<div align='left' style='float: right;'>";
+						html += 		"<span style='cursor: pointer;' class='checkListDelete'><i class='fa fa-trash'></i></span>";
+						html +=			"<input type='hidden' id='indexval' value='"+entryIndex+"'/>";
+						html += 		"</div>";
+						html += "</div>";
+						html += "<br/>";
+						
+						//alert("checklist 체크확인 : "+ entry.CARDCHECKLISTTODOSTATUS);
+						
+				
+	 			}); 
+	 		
+	 			$("#cardCheckBoxList").append(html);
+	 			//alert("실행4");
+	 			//alert("checklist 체크확인 : "+cardchecklisttodostatus);
+	 			$.each(json, function(entryIndex,entry){
+	 				if(entry.CARDCHECKLISTTODOSTATUS==0){ // 체크해제
+						 $('#checkliststatus'+entryIndex).prop("checked", false);
+					}else if(entry.CARDCHECKLISTTODOSTATUS==1){
+						 $('#checkliststatus'+entryIndex).prop("checked", true);
+					}
+		        
+	 				 
+	 			});
+	 			
+	 			$("#CheckListContent").val("");
+	 			$("#checkListAdd").hide();
+	 			$("#checkListText").show();
+ 			}
+		}, 
+		error: function(request, status, error){ 
+ 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+ 		}
+ 	
+	}); // end of ajax({})
+	
+}
+ 
 // 체크리스트 추가
 function goCheckListAdd(){
 	var checkListContent =  $("#CheckListContent").val().trim(); // 체크리스트 리스트
@@ -768,45 +899,8 @@ function goCheckListAdd(){
 			 		url:"goCheckListAdd.action",
 			 		type:"POST",
 			 		data : form_data,
-			 		dataType: "JSON",
-			 		success: function(json) {
-			 			$("#cardCheckBoxList").empty();
-			 			var	html = "";
-			 			$.each(json, function(entryIndex,entry){
-							
-				 				html += 	"<div class='checkboxList'>";
-								html += 	"<label style='float: left;'>";
-								html += 		"<input type='checkbox'  id='checkliststatus"+entryIndex+"' class='checklist'/>";
-								html += 		"<span class='cr'><i class='cr-icon glyphicon glyphicon-ok'></i></span>";		
-								html +=			"<input type='hidden' id='checklistIdx"+entryIndex+"' value='"+entry.CARDCHECKLISTDETAILIDX+"' />";
-								html +=	   		"<input type='hidden' id='checklist"+entryIndex+"' value='"+entry.CARDCHECKLISTTODOSTATUS+"' />";
-								html += 	"</label>";
-								html += 		"<span id ='checkboxlist'  style='font-weight: bold'>"+entry.CARDCHECKLISTTODO+"</span>";
-								html += 		"<div align='left' style='float: right;'>";
-								html += 		"<span style='cursor: pointer;' class='checkListDelete'><i class='fa fa-trash'></i></span>";
-								html +=			"<input type='hidden' id='indexval' value='"+entryIndex+"'/>";
-								html += 		"</div>";
-								html += "</div>";
-								html += "<br/>";
-					        
-			 			}); 
-			 			$("#cardCheckBoxList").html(html);
-			 			
-			 			$(".checklist").each(function(index,  item){
-
-			 				var cardchecklisttodostatus = $("#checklist"+index).val();
-
-			 				// alert("checklist 체크확인 : "+cardchecklisttodostatus);
-			 				 if(cardchecklisttodostatus==0){ // 체크해제
-			 					 $(this).prop("checked", false);
-			 				 }else if(cardchecklisttodostatus==1){
-			 					 $(this).prop("checked", true);
-			 				 }
-			 			});
-			 			
-			 			$("#CheckListContent").val("");
-			 			$("#checkListAdd").hide();
-			 			$("#checkListText").show();
+			 		success: function() {
+			 			checklistselect(cardchecklistIdx);
 					}, 
 					error: function(request, status, error){ 
 			 			alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -836,14 +930,17 @@ function goCheckListChange(checkDetailIdx, checkListStatus,checklisttodostatusid
 	 		url:"goCheckListChange.action",
 	 		type:"POST",
 	 		data : form_data,
+	 		async: false,
 	 		dataType: "JSON",
 	 		success: function(json){
-	 			
+	 			//alert("실행1");
+	 			checklistselect(cardchecklistIdx);
+	 			//alert("실행");
 	 			if(json.checkListStatus== 0){// 체크 해제
-	 				alert(json.checkListStatus);
+	 				//alert(json.checkListStatus);
 	 				$("#"+checklisttodostatusid).val("0");
 	 			}else{
-	 				alert(json.checkListStatus);
+	 				//alert(json.checkListStatus);
 	 				$("#"+checklisttodostatusid).val("1");
 	 			}	 		
 			}, 
@@ -868,44 +965,10 @@ function goCheckListDelete(checkDetailIdx){
 	 		url:"goCheckListDelete.action",
 	 		type:"POST",
 	 		data : form_data,
-	 		dataType: "JSON",
-	 		success: function(json){
-	 	 		
-	 			if(json.length > 0){
-		 			$("#cardCheckBoxList").empty();
-		 			var	html = "";
-		 			$.each(json, function(entryIndex,entry){
-						
-			 				html += 	"<div class='checkboxList'>";
-							html += 	"<label style='float: left;'>";
-							html += 		"<input type='checkbox'  id='checkliststatus"+entryIndex+"' class='checklist'/>";
-							html += 		"<span class='cr'><i class='cr-icon glyphicon glyphicon-ok'></i></span>";		
-							html +=			"<input type='hidden' id='checklistIdx"+entryIndex+"' value='"+entry.CARDCHECKLISTDETAILIDX+"' />";
-							html +=	   		"<input type='hidden' id='checklist"+entryIndex+"' value='"+entry.CARDCHECKLISTTODOSTATUS+"' />";
-							html += 	"</label>";
-							html += 		"<span id ='checkboxlist'  style='font-weight: bold'>"+entry.CARDCHECKLISTTODO+"</span>";
-							html += 		"<div align='left' style='float: right;'>";
-							html += 		"<span style='cursor: pointer;' class='checkListDelete' ><i class='fa fa-trash'></i></span>";
-							html +=			" <input type='hidden' id='indexval' value='"+entryIndex+"'/>";
-							html += 		"</div>";
-							html += "</div>";
-							html += "<br/>";
-							
-		 			}); 
-		 			$("#cardCheckBoxList").html(html);
-		 			
-		 			$(".checklist").each(function(index,  item){
-	
-		 				var cardchecklisttodostatus = $("#checklist"+index).val();
-	
-		 				// alert("checklist 체크확인 : "+cardchecklisttodostatus);
-		 				 if(cardchecklisttodostatus==0){ // 체크해제
-		 					 $(this).prop("checked", false);
-		 				 }else if(cardchecklisttodostatus==1){
-		 					 $(this).prop("checked", true);
-		 				 }
-		 			});
-	 			}
+	 		//dataType: "JSON",
+	 		success: function(){
+	 			
+	 			checklistselect(cardchecklistIdx);
 	 		
 			}, 
 			error: function(request, status, error){ 
@@ -999,7 +1062,6 @@ function goCheckListTitleDelete(){
      	<!-- 옵션 -->
         <div id="option">
         <c:if test="${cardDueDateMap != null || not empty cardLabelList}">
-      
          <div class="panel panel-default" style="margin-top: 2%">
                <div class="panel-heading">
                   <i class="fa fa-plus"></i>
@@ -1009,13 +1071,19 @@ function goCheckListTitleDelete(){
                    <div class="row">
                  	 <c:if test="${cardDueDateMap != null}">
                  		<div id="dueCheck">
-	                   		<div class="commentCss dueCheck labelCss" style="margin: 10px 10px 10px 10px;"> <!-- style="padding: 10px 10px 1px 10px; margin: 10px 600px 10px 0px;" -->
-							        <!-- 	<label style="float: left;" > -->
-							              <input type="checkbox" id="dateCheck">  
-							            <!-- <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span> -->
-								              
-								        <!-- </label> -->
-									 <span data-toggle="modal" href="#modalDate2">${cardDueDateMap.CARDDUEDATE}</span></p>
+	                   		<div class="commentCss labelCss" id="colorCheck" style="margin: 10px 10px 10px 10px; padding: 0 6px 12px 1px;  height: 40px;"> 			  
+										<!-- <label style="float: left;" >
+										    <input type="checkbox" id="dateCheck"/>
+									     <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>       
+										</label> -->
+										<div class="btn-group btn-group-vertical" id="dateCheckdiv" data-toggle="buttons">
+										    <label class="btn active">
+										          <input type="checkbox" id="dateCheck"><i class="fa fa-square-o"></i>
+												<i class="fa fa-check-square-o"></i>
+											</label>
+										</div>
+									
+									 <span data-toggle="modal" href="#modalDate2" style="font-size: 13px">${cardDueDateMap.CARDDUEDATE}</span></p>
 							   </div>
 					    </div>
 					</c:if>
@@ -1073,7 +1141,7 @@ function goCheckListTitleDelete(){
 											 </div>	
 								 		</c:if>
 							</c:if> 
-							</div>
+						</div>
                    </div>
                    <!-- /.row (nested) -->
                </div>
@@ -1104,9 +1172,9 @@ function goCheckListTitleDelete(){
 			        </form>
 			      </div>
 			      <div class="modal-footer">
-			        <button type="button" class="btn btn-danger cardDueDateDelete">Delete</button>
-			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			        <button type="button" class="btn btn-primary doneDate" id="doneDate">Save</button>
+			      	<button type="button" class="btn btn-danger cardDueDateDelete">Delete</button>
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-default doneDate">Save</button>
 			      </div>
 			    </div>
 			  </div>
@@ -1133,7 +1201,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]" style="border-right: 0px;"></span>
 						                    <span> </span>
 						                </label>
-						                 <label for="label6" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 31px;" >
+						                 <label for="label6" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 32px;" >
 						                </label>
 						            </div>
 						        </div>
@@ -1144,7 +1212,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label7" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 31px;" >
+						                <label for="label7" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 32px;" >
 						                </label>
 						            </div>
 						        </div>
@@ -1155,7 +1223,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label8" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+						                <label for="label8" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1166,7 +1234,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label9" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+						                <label for="label9" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1177,7 +1245,7 @@ function goCheckListTitleDelete(){
 						                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 						                    <span> </span>
 						                </label>
-						                <label for="label10" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+						                <label for="label10" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 						                </label>
 						            </div>
 						        </div>
@@ -1258,7 +1326,7 @@ function goCheckListTitleDelete(){
                  </div>
                  <!-- /.row (nested) -->
              </div>
-             <!-- /Attachment panel-body -->        
+             <!-- /Attachment panel-body -->     
          </div>
          <!-- /Attachment panel -->
            
@@ -1289,29 +1357,44 @@ function goCheckListTitleDelete(){
 		                &nbsp;<button type="button" class="btn btn-default" style="font-weight: bold;" id="checkListTitleCancel" ><i class="fa fa-times-circle"></i>Cancel</button>
 		             </div>
 	        
-	             
+	                 
 	             <div class="panel-body">
 	                 <div class="row">
 	                     <div class="col-lg-6">
 	                         <form role="form" name="commentFrm">
 	                             <div class="form-group" id="cardCheckBoxList">
 									 	
+									 	<!-- 스킬바 -->
+									 	<div class="skillbar">
+  											<div class="skills" style="width: ${checkListSkilbar}%; background-color: #808080;">${checkListSkilbar}%</div>
+										</div>
+										<br/>
+										<br/>
+									 	
+									 	
 									 	<!-- 체크리스트가 있으면 -->
 									 	<c:if test="${not empty cardCheckList}">
 									 		<c:forEach var="list" items="${cardCheckList}" varStatus="status">
 										        <div class="checkboxList">
-										        	<label style="float: left;" >
+										     <%--    	    
+												<div class="btn-group btn-group-vertical"  data-toggle="buttons">
+												    <label class="btn active">
+												        <input type="checkbox" id="checkliststatus${status.index}" class="checklist"><i class="fa fa-square-o fa-2x"></i>
+														<i class="fa fa-check-square-o fa-2x"></i>
+														<input type="hidden" id="checklistIdx${status.index}" value="${list.CARDCHECKLISTDETAILIDX}" />
+											            <input type="hidden" id="checklist${status.index}" value="${list.CARDCHECKLISTTODOSTATUS}" />
+													</label>
+												</div> --%>
+										       	<label style="float: left;" >
 											            <input type="checkbox" id="checkliststatus${status.index}" class="checklist"/>
 											            <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
 											            <input type="hidden" id="checklistIdx${status.index}" value="${list.CARDCHECKLISTDETAILIDX}" />
 											            <input type="hidden" id="checklist${status.index}" value="${list.CARDCHECKLISTTODOSTATUS}" />
-											            
-											        </label>
+											    </label>
 											          <span id ="checkboxlist"  style="font-weight: bold">${list.CARDCHECKLISTTODO}</span>
 											          <div align="left" style="float: right;">
-											          <span style="cursor: pointer;" class="checkListDelete" ><i class="fa fa-trash"></i></span>
-											          <input type="hidden" id="indexval" value="${status.index}"/>
-											          
+											            <span style="cursor: pointer;" class="checkListDelete" ><i class="fa fa-trash"></i></span>
+											            <input type="hidden" id="indexval" value="${status.index}"/>
 											          </div>
 										        </div>
 										        <br/>
@@ -1392,17 +1475,24 @@ function goCheckListTitleDelete(){
                          	  </c:if>
                               <form role="form">
                                 <div class="form-group">
-                                	${map.CARDNICKNAME}<br/>	                                        
-                                	<div class="commentCss">
-								 <!--  <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:100%;"> -->
-								  <p>${map.CARDCOMMENTCONTENT}</p>
+                              		<div class="chip">
+                                		<img src="<%= request.getContextPath() %>/resources/files/${sessionScope.loginuser.server_filename}">
+                                	  	${map.CARDNICKNAME}<br/>
+                                	</div>	                                        
+                                <div class="commentCss">
+								  ${map.CARDCOMMENTCONTENT}
+								 
 								</div>
 								<div align="right">
 								<span style="color:grey; font-size: 10px; text-align: right; font-weight: bold;">${map.CARDCOMMENTDATE}</span>
 								</div>
                                 </div>
                                	 <c:if test="${sessionScope.loginuser.userid == map.CARDCOMMENTUSERID}">
-                                 <button type="button" class="btn btn-default" style="font-weight: bold;" onClick="goCommentEdit('${status.count}','${map.CARDCOMMENTCONTENT}');"><i class="fa fa-pencil-square-o"></i>Edit</button>
+                                 <button type="button" class="btn btn-default goCommentEdit" style="font-weight: bold;"  >
+                                 <i class="fa fa-pencil-square-o"></i>Edit</button>
+                                 <input type="hidden" value="${status.count}"/>
+                                 <input type="hidden" value="${map.CARDCOMMENTCONTENT}"/>
+                                 
                             	 <button type="button" class="btn btn-default" style="font-weight: bold;" onClick="goCommentDelete('${cardMap.CARDIDX}','${map.CARDCOMMENTIDX}')"><i class="fa fa-trash"></i>Delete</button>
                                 <%--  <button type="button" class="btn btn-default btnDelete" style="font-weight: bold;"><i class="fa fa-trash"></i>Delete</button><input type="text" value="${cardMap.CARDIDX}"/><input type="text" value="${map.CARDCOMMENTIDX}" /> --%>   
                                  </c:if>

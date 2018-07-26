@@ -51,8 +51,11 @@
     <script src="<%=ctxpath %>/resources/card/dist/js/sb-admin-2.js"></script>
 
 	<!-- Woney Css -->
-	<link rel="stylesheet" type="text/css" href="<%= ctxpath %>/resources/card/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%= ctxpath %>/resources/card/css/style.css?ver=1" />
 	
+	<!-- 체크박스 -->
+	<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
 	
 
 	

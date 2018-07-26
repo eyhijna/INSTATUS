@@ -122,7 +122,7 @@
 	<select id="cardCheckListInfo" parameterType="String" resultMap="cardCheckListMap">
 		select card_checklist_detail_idx ,fk_card_checklist_idx,card_checklist_todo, card_checklist_todo_status
 		from ins_card_checklist_detail
-		where fk_card_checklist_idx = #{cardIdx}
+		where fk_card_checklist_idx = #{checklistidx}
 		order by card_checklist_detail_idx
 	</select>
 	
@@ -373,6 +373,21 @@
 		where fk_card_idx = #{cardIdx} and
 		card_label = #{labelid}
 	</delete>
+	
+	<!-- // 체크리스트 총 갯수 -->
+	<select id="getCheckListtotalCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_checklist_detail
+		where fk_card_checklist_idx= #{checklistidx}
+	</select>
+	
+	<!-- // 체크리스트 체크된 갯수 -->
+	<select id="getCheckListcheckCNT" parameterType="String" resultType="Integer">
+		select count(*)
+		from ins_card_checklist_detail
+		where fk_card_checklist_idx= #{checklistidx} and
+		card_checklist_todo_status= 1
+	</select>
 	
 </mapper>
  

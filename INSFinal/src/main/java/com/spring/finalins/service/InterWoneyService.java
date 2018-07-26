@@ -18,7 +18,7 @@ public interface InterWoneyService {
 	
 	HashMap<String, String> cardCheckTitleInfo(String cardIdx); // 체크타이틀 받아오기
 	
-	List<HashMap<String, String>> cardCheckListInfo(String cardIdx); // 체크리스트 받아오기
+	List<HashMap<String, String>> cardCheckListInfo(String checklistidx); // 체크리스트 받아오기
 	
 	List<HashMap<String, String>> cardLabelListInfo(String cardIdx); // 카드 라벨리스트 받아오기
 	
@@ -83,5 +83,7 @@ public interface InterWoneyService {
 	int setLabelAdd(HashMap<String, String> map); // 카드  라벨추가
 
 	int setLabelDelete(HashMap<String, String> map); // 카드 라벨 삭제
+
+	int getChecklistskilbar(String checklistidx); // 스킬바 퍼센트 받아오기
 
 }

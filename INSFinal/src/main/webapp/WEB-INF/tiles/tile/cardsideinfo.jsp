@@ -20,7 +20,7 @@
 		var cardduedateIdx = $("#cardduedateIdx").val();
 		
 		if(datepicker1 == "" && datepicker2 ==""){ // DueDate가 값이 없으면
-			alert("날짜를 입력하세요");
+			//alert("날짜를 입력하세요");
 			return;
 		 }else if(datepicker1 != "" && datepicker2 ==""){ // DueDate1의 값이 있으면
 			 if(cardduedateIdx == "" || cardduedateIdx== 0){
@@ -37,14 +37,17 @@
 	}); // end of $("#doneDate").bind()
     
 	// DueDate Ajax 처리 후 체크 해제 및 체크 
-	$(document).on("click","#dateCheck",function(){
-		 var checkBox = document.getElementById("dateCheck");
+	$(document).on("click","#dateCheckdiv",function(){
+		var checkBoxid= $("#dateCheck").attr('id');
+		var checkBox = document.getElementById(checkBoxid);
+		//alert(checkBox.checked);
 		 if (checkBox.checked == true){
+			// alert("체크");
 			 checkChange();
 		 }else{
 			 checkChange();
 		 }
-	
+
 	});
 	
 	// DueDate 삭제
@@ -82,7 +85,7 @@
 	
 	// 체크리스트 추가  
 	$(document).on("click","#goCheckListADD",function(){
-		alert("add중");
+		//alert("add중");
 		goCheckListAdd();
 	});
 
@@ -237,19 +240,28 @@ function goDueDateView(cardidx){
  		dataType: "JSON",
     	success: function(json) {
     		$("#dueCheck").empty();
- 	        var html = "<div class='commentCss dueCheck labelCss' id='dueCheck' style='margin: 10px 10px 10px 10px;'>"			  	  
- 	        		 +  	"<p><input type='checkbox' id='dateCheck'>"
+ 	        var html = "<div class='commentCss labelCss' id='colorCheck' style='margin: 10px 10px 10px 10px; padding: 0 6px 12px 1px;  height: 40px;'>"			  	  
+ 	        		/*  +  	"<p><input type='checkbox' id='dateCheck'>"
  					 +		"<span data-toggle='modal' href='#modalDate2'>"+json.CARDDUEDATE+"</span></p>"
- 					 +	"</div>"
+ 					 +	"</div>" */
+ 					 +		"<div class='btn-group btn-group-vertical' id='dateCheckdiv' data-toggle='buttons'>"
+					 +   		"<label class='btn active'>"
+				     +     			"<input type='checkbox' id='dateCheck'><i class='fa fa-square-o'></i>"
+					 +				"<i class='fa fa-check-square-o'></i>"
+					 +			"</label>"
+					 +		"</div>"
+					 +		"<span data-toggle='modal' href='#modalDate2' style='font-size: 15px'>"+json.CARDDUEDATE+"</span></p>"
+					 +	"</div>" 
  					 
  	       	$("#dueCheck").html(html);
+			//alert("json.CARDCHECK"+json.CARDCHECK);
 		 	if(json.CARDCHECK == 0){ // 체크가 안된 상태
      			
-				$(".dueCheck").removeClass("duedateCheck");
+				$("#colorCheck").removeClass("duedateCheck");
 				$("#dateCheck").prop("checked", false);
 			}else if(json.CARDCHECK == 1){ // 체크가 된 상태
 			
-				$(".dueCheck").addClass("duedateCheck");
+				$("#colorCheck").addClass("duedateCheck");
 				$("#dateCheck").prop("checked", true);
 			}
     		
@@ -282,7 +294,7 @@ function goDueDateAdd(cardidx,datepicker){
 	 		data : form_data,
 	 		dataType: "JSON",
      		success: function(json) {
-     			alert("dudate 생성"+json.cardLabelCNT);
+     			//alert("dudate 생성"+json.cardLabelCNT);
      			if(json.cardLabelCNT == 0){
      		 	$("#option").empty();
 	 	        var html = "<div class='panel panel-default' style='margin-top: 2%'>"
@@ -391,7 +403,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		 		data : form_data,
 		 	 	dataType: "JSON", 
 	     		success: function(json) {
-	     			alert("dudate 삭제"+json.cardLabelCNT);
+	     			//alert("dudate 삭제"+json.cardLabelCNT);
 	     			if(json.cardLabelCNT==0){
 	     				$("#option").empty();
 	     			}else{
@@ -636,7 +648,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 			
 				var html ="";
 				if(json.cardLabelCNT > 0 && json.cardLabelCNT < 5){
-					html+=  "<div class=labelCss' >";
+					html+=  "<div class='labelCss' >";
 					html+=  "<button type='button' class='btn btn-default' style='border: 1px solid gray; width: 50px; height: 32px; margin-top: 10px;' data-toggle='modal' href='#modalLabels2'><i class='fa fa-plus'></i></button> &nbsp;";
 					html+=  "</div>";
 				}
@@ -834,7 +846,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]" style="border-right: 0px;"></span>
 					                    <span> </span>
 					                </label>
-					                 <label for="label1" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 31px;" >
+					                 <label for="label1" class="[ btn btn-primary LabelCheckBtn]"  style="border: 0px; width: 150px; height: 32px;" >
 					                </label>
 					            </div>
 					        </div>
@@ -845,7 +857,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label2" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 31px;" >
+					                <label for="label2" class="[ btn btn-success LabelCheckBtn ]"  style="border: 0px; width: 150px; height: 32px;" >
 					                </label>
 					            </div>
 					        </div>
@@ -856,7 +868,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label3" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+					                <label for="label3" class="[ btn btn-info LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 					                </label>
 					            </div>
 					        </div>
@@ -867,7 +879,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label4" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+					                <label for="label4" class="[ btn btn-warning LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 					                </label>
 					            </div>
 					        </div>
@@ -878,7 +890,7 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 					                    <span class="[ glyphicon glyphicon-ok LabelCheckSpan ]"></span>
 					                    <span> </span>
 					                </label>
-					                <label for="label5" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 31px;">
+					                <label for="label5" class="[ btn btn-danger LabelCheckBtn ]" style="border: 0px; width: 150px; height: 32px;">
 					                </label>
 					            </div>
 					        </div>
