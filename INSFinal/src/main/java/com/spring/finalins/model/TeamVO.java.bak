@@ -1,7 +1,5 @@
 package com.spring.finalins.model;
 
-import org.springframework.web.multipart.MultipartFile;
-
 public class TeamVO {
 
 	private String team_idx;
@@ -13,9 +11,6 @@ public class TeamVO {
 	private String file_size;
 	private String org_filename;
 	
-	private MultipartFile attach; // ��¥ ���� ==> WAS(��Ĺ)��ũ�� �����.
-    // MultipartFile attach �� ����Ŭ �����ͺ��̽� tblBoard ���̺��� �÷��� �ƴϴ�.!!!!!
-
 	public TeamVO() {}
 	
 	public TeamVO(String team_idx, String admin_userid, String team_name, String team_delete_status,
@@ -97,10 +92,4 @@ public class TeamVO {
 		this.org_filename = org_filename;
 	}
 
-	public MultipartFile getAttach() {
-		return attach;
-	}
-	public void setAttach(MultipartFile attach) {
-		this.attach = attach;
-	}
 }

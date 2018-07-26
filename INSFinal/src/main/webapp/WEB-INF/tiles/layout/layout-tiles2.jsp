@@ -16,7 +16,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
- <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/resources/bootstrap-3.3.7-dist/css/bootstrap.css">
+ <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/resources/jihye/bootstrap-3.3.7-dist/css/bootstrap.css">
     
   <%-- 스마트 에디터 구현 시작(no frame 사용시) --%>
    
@@ -36,7 +36,7 @@
   <%-- 스마트 에디터 구현 끝(no frame 사용시) --%>    
       
   <script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/jquery-2.0.0.js"></script>
-  <script type="text/javascript" src="<%=request.getContextPath() %>/resources/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+  <script type="text/javascript" src="<%=request.getContextPath() %>/resources/jihye/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
    
   <%-- 스마트 에디터 구현 시작(iframe 사용시) --%>  
   

@@ -799,40 +799,12 @@ public class JihyeController {
      		return "jihye/jobAgelineRankShowJSON"; 
      	}
          
-         
-         
-        // 프로젝트 페이지에서 내가 활동한 기록을 보여주기 /안보여주기 를 위해 switch값을 넘긴다.    	
-     	/*@RequestMapping(value="/swichMyRecordJSON.action", method={RequestMethod.POST})
-     	public String requireLogin_swichMyRecord(HttpServletRequest req, HttpServletResponse res) {
-     		 
-     		HttpSession session = req.getSession();
-			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-			
-			String userid = null;
 
-			if (loginuser != null) {
-				userid = loginuser.getUserid();
-			}
-     		 
-     		 String switchVal = req.getParameter("switchVal");
-     		 
-     		 System.out.println(switchVal);
-     		
-    		int n =0;
-    		 if(switchVal.equalsIgnoreCase("1")) {    			 
-     			 n = service.updateIns_personal_alarm(userid);    			 
-     		 }
-     		 
-     		 if(n==1) {
-     			String str_jsonarray =service.getMyProfile(userid);
-         		
-         		req.setAttribute("str_jsonArr", str_jsonarray);
-         		
-     		 }
-     		 
-     		 return "jihye/swichMyRecordJSON";
-     		 
-     	}*/
+     	
+     	
+     	
+     	
+  
      	
      	@RequestMapping(value="/switchMyRecord.action", method={RequestMethod.POST})
      	public String requireLogin_switch(HttpServletRequest req, HttpServletResponse res) {

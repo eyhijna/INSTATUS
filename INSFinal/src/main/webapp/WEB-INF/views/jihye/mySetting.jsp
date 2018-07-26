@@ -4,6 +4,15 @@
 <%-- <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>      --%>
     
 <jsp:include page="top.jsp" /> 
+
+
+<style>
+
+.btnTeam{
+    background-color:rgb(255, 82, 82);  
+      color: white;
+}
+</style>
    
 <script>
 
@@ -42,11 +51,11 @@ function invitedTeams(){
 			      html += "<tr>"			        			           
 			           + "<td style='width: 60%;'><span style='color: orange;'>"+entry.TEAM_NAME+"</span> 에서 초대하셨습니다.</td> "
 			           +  "<td style='width: 10%;'>"
-	                   +  "<button type='button' class='btn btn-primary btn-sm'  name='approve' id='approve' value='승인' onclick='approve();'>승인</button>"
+	                   +  "<button type='button' class='btn btnTeam btn-sm'  name='approve' id='approve' value='승인' onclick='approve();'>승인</button>"
 	                   +  "</td>"
 	                   +  "<td style='width: 10%;'>"
-	                   +  "<button type='button' class='btn btn-warning btn-sm'  name='deny' id='deny' value='거절' onclick='deny();'>거절</button>"
-	                   + "<input type='text' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	    			   
+	                   +  "<button type='button' class='btn btnTeam btn-sm'  name='deny' id='deny' value='거절' onclick='deny();'>거절</button>"
+	                   + "<input type='hidden' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	    			   
 	                   +  "</td>"
 	                   + "</tr>"
 			          
@@ -105,11 +114,11 @@ function approve(){
 			      html += "<tr>"
 			           + "<td style='width: 60%;'><span style='color: orange;'>"+entry.TEAM_NAME+"</span> 에서 초대하셨습니다.</td> "
 			           +  "<td style='width: 10%;'>"
-	                   +  "<button type='button' class='btn btn-primary btn-sm'  name='approve'id='approve' value='승인' onclick='approve();'>승인</button>"
+	                   +  "<button type='button' class='btn btnTeam btn-sm'  name='approve'id='approve' value='승인' onclick='approve();'>승인</button>"
 	                   +  "</td>"
 	                   +  "<td style='width: 10%;'>"
-	                   +  "<button type='button' class='btn  btn-warning btn-sm'  name='deny'   id='deny' value='거절' onclick='deny();'>거절</button>"
-	                   + "<input type='text' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	
+	                   +  "<button type='button' class='btn  btnTeam btn-sm'  name='deny'   id='deny' value='거절' onclick='deny();'>거절</button>"
+	                   + "<input type='hidden' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	
 	                   +  "</td>"
 	                   + "</tr>"	             			   
 			   });
@@ -164,11 +173,11 @@ function approve(){
 				      html += "<tr>"
 				           + "<td style='width: 60%;'><span style='color: orange;'>"+entry.TEAM_NAME+"</span> 에서 초대하셨습니다.</td> "
 				           +  "<td style='width: 10%;'>"
-		                   +  "<button type='button' class='btn btn-primary btn-sm'  name='approve'id='approve' value='승인' onclick='approve();'>승인</button>"
+		                   +  "<button type='button' class='btn btnTeam btn-sm'  name='approve'id='approve' value='승인' onclick='approve();'>승인</button>"
 		                   +  "</td>"
 		                   +  "<td style='width: 10%;'>"
-		                   +  "<button type='button' class='btn  btn-warning btn-sm'  name='deny'   id='deny' value='거절' onclick='deny();'>거절</button>"
-		                   + "<input type='text' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	
+		                   +  "<button type='button' class='btn  btnTeam btn-sm'  name='deny'   id='deny' value='거절' onclick='deny();'>거절</button>"
+		                   + "<input type='hidden' name='fk_team_idx' id='fk_team_idx' value='"+entry.FK_TEAM_IDX+"'>"	
 		                   +  "</td>"
 		                   + "</tr>"	             			   
 				   });
@@ -241,11 +250,5 @@ function approve(){
    </div> 
 </div>
 
-
-<!-- <script src="resources/jihye/bootstrap4/popper.js"></script> 
-<script src="resources/jihye/bootstrap4/bootstrap.min.js"></script>
-<script src="resources/jihye/plugins/easing/easing.js"></script>
-<script src="resources/jihye/plugins/parallax-js-master/parallax.min.js"></script>
-<script src="resources/jihye/checkout_custom.js"></script> -->
 
 

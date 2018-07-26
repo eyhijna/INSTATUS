@@ -18,13 +18,13 @@
 }
 
 .previous {
-    background-color: #f1f1f1;
-    color: black;
+       background-color:rgb(255, 82, 82);  
+       color: white;
 }
 
 .next {
-    background-color: #4CAF50;
-    color: white;
+      background-color:rgb(255, 82, 82);  
+      color: white;
         width: 100px;
 }
 
@@ -32,6 +32,7 @@
     border-radius: 50%;
 
 }
+
 
 
 

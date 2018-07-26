@@ -125,10 +125,10 @@
 
 .topBack {
 <%--    width: 100%;
-   background-image: url('<%= request.getContextPath() %>/resources/jihye/top2.jpg'); --%>
-  background-color:  white;   
+   background-image: url('<%= request.getContextPath() %>/resources/jihye/top3.jpg');  --%>
+   
  
-
+    background-color: white;
 }
 
 
@@ -159,49 +159,40 @@ function test(){
 </script>
 
 <div class="topBack" >
-<!--    <div class="cart_container" style="padding-top: 0px;padding-bottom: 0px;" > -->
+    <div class="cart_container" style="padding-top: 0px;padding-bottom: 0px;" > 
       <div class="container" >
-     <!--     <div class="row" >
-            <div class="col" > -->
+         <div class="row" >
+            <div class="col" > 
 
 				<div class="grid-container" style="border: 0px solid black; margin_bottom: 100px;">
-				       <div class="grid-item item1"> <!--grid-item  -->
-				     
-				       <c:if test="${sessionScope.loginuser.server_filename == null}"> 
-				        
+				       <div class="grid-item item1"> <!--grid-item  -->				     
+				       <c:if test="${sessionScope.loginuser.server_filename == null}"> 				        
 				           <div id="profileImg2" class="avatar2" style="border: 0px solid black;"  data-toggle="modal" data-target="#myModal"> 
 				               <img alt="Avatar2" class="avatar2" src="<%= request.getContextPath() %>/resources/files/20180716092958347996517292548.jpg">               
 				            </div> 
 				      </c:if>
-				        <c:if test="${sessionScope.loginuser.server_filename != null}"> 
-				        
+				       <c:if test="${sessionScope.loginuser.server_filename != null}"> 				        
 				           <div id="profileImg2" class="avatar2" style="border: 0px solid black;"  data-toggle="modal" data-target="#myModal"> 
 				               <img alt="Avatar2" class="avatar2" src="<%= request.getContextPath() %>/resources/files/${sessionScope.loginuser.server_filename}">               
 				            </div> 
 				      </c:if>  
-				        </div>
+				      </div>
 				 
 					  <div class="grid-item item2" >
-					    <br/>
-					    
-					    <!--
-					        color: #333;
-							  background-color: #fff;
-							  border-color: #ccc;
-					      -->
-					  
+					    <br/>					    
 					    <input type="hidden" value="${sessionScope.loginuser.userid}" />   
 						   <span style="color:rgb(255, 82, 82); font-weight: bold;">  이  름 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.name}</span></br></br>
 						     <span style="color:rgb(255, 82, 82); font-weight: bold;"> 이메일 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">   ${sessionScope.loginuser.email} </span></br></br>
 						    <span style="color:rgb(255, 82, 82); font-weight: bold;">  닉네임 : </span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.nickname} </span></br></br>         
 					  </div> 
-				</div>  
-		 </div>
-	<!--   </div>
-    </div> -->
-<!--   </div> -->
+				</div>  <!-- end of grid Container --> 
+				
+		  </div>
+       </div>
+    </div>
+  </div>
     		 		
- </div> 
+ 
  
  
 
@@ -236,29 +227,29 @@ function test(){
   
     
   
- <%-- 상단에 탭메뉴이다. 탭을 클릭하면 링크타고 페이지 이동한다. --%> 
-<div class="navtab" align="center" style="background-color: white;">        
-    <ul class="nav nav-tabs abc">
-        <c:if test="${sessionScope.loginuser.userid.equals('admin') }">  
-            <li><a class="topNav"data-toggle="tab5" href="<%= request.getContextPath() %>/managementMember.action">Management</a></li> 
-       </c:if>
-       <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">  
-	       <li><a class="topNav" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
-	       <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
-       </c:if> 
-       
-	       <li><a class="topNav"  data-toggle="tab2" href="<%= request.getContextPath() %>/qna.action">Q&A</a></li>
-	     <c:if test="${sessionScope.loginuser.userid.equals('admin') }">     
-	       <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/adminChart.action">Chart</a></li> 
-	     </c:if> 
-	      <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">     
-	     <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/mySetting.action">Setting</a></li> 
-	     </c:if> 
-   </ul>   
-</div>  
+		 <%-- 상단에 탭메뉴이다. 탭을 클릭하면 링크타고 페이지 이동한다. --%> 
+		<div class="navtab" align="center" style="background-color: white;">        
+		    <ul class="nav nav-tabs abc">
+		        <c:if test="${sessionScope.loginuser.userid.equals('admin') }">  
+		            <li><a class="topNav"data-toggle="tab5" href="<%= request.getContextPath() %>/managementMember.action">Management</a></li> 
+		       </c:if>
+		       <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">  
+			       <li><a class="topNav" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
+			       <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
+		       </c:if> 
+		       
+			       <li><a class="topNav"  data-toggle="tab2" href="<%= request.getContextPath() %>/qna.action">Q&A</a></li>
+			     <c:if test="${sessionScope.loginuser.userid.equals('admin') }">     
+			       <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/adminChart.action">Chart</a></li> 
+			     </c:if> 
+			      <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">     
+			     <li><a class="topNav" data-toggle="tab3" href="<%= request.getContextPath() %>/mySetting.action">Setting</a></li> 
+			     </c:if> 
+		   </ul>   
+		</div>  
  
 
-
+ </div>
  
 
 
