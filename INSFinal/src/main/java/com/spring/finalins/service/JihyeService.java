@@ -184,6 +184,13 @@ public class JihyeService implements InterJihyeService{
 		return n;
 	}
 
+	// 내가 가입신청한 팀목록 불러오기
+	@Override
+	public List<HashMap<String, String>> getRequestTeamName(String userid) {
+		List<HashMap<String, String>> teamName = dao.getRequestTeamName(userid);
+		return teamName;
+	}
+
 
 
 

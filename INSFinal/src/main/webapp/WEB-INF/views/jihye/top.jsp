@@ -75,14 +75,14 @@
     vertical-align: middle;
     width: 200px;
     height: 200px; 
-    border-radius: 70%; 
+     border-radius: 70%;  
     border: 0px solid gold;
 }
 
 .abc {
       /*  border: 3px solid gold;  */
-      padding-left:45%;
-     padding-right:35%;   
+      padding-left:42%;
+     padding-right:30%;   
 }
 
 .tab-content{
@@ -91,10 +91,11 @@
 }
 
 .topNav {
-  color: white;
+/*   color: white; */
    font-weight : bold;
-  font-size: 17px;
-  background-color: rgb(255, 82, 82);
+  font-size: 14px;
+            background: #e2e4e6;
+   color: black;
 }
 
 
@@ -124,14 +125,45 @@
 } */
 
 .topBack {
-<%--    width: 100%;
-   background-image: url('<%= request.getContextPath() %>/resources/jihye/top3.jpg');  --%>
-   
- 
+
     background-color: white;
 }
 
+.filebox label {
+       display: inline-block; 
+       padding: .5em .75em; 
+       color: #999;
+       font-size: inherit; 
+       line-height: normal; 
+       vertical-align: middle; 
+       background-color: #fdfdfd; 
+       cursor: pointer; 
+       border: 0px solid #ebebeb; 
+       border-bottom-color: #e2e2e2; 
+       border-radius: .25em; } 
+        
+.filebox input[type="file"] { /* 파일 필드 숨기기 */ 
+       position: absolute; 
+       width: 1px; 
+       height: 1px; 
+       padding: 0;
+       margin: -1px; 
+       overflow: hidden;  
+       clip:rect(0,0,0,0); 
+       border: 0; 
+       } 
+.btnFileUpload {
+    background-color:rgb(255, 82, 82);  
+      color: white;
+}
 
+.filebox img
+{
+  max-width:100%; 
+  max-height:100%;
+  margin:auto;
+  display:block;
+}
 </style>
 
 <script type="text/javascript">
@@ -167,7 +199,7 @@ function test(){
 				<div class="grid-container" style="border: 0px solid black; margin_bottom: 100px;">
 				       <div class="grid-item item1"> <!--grid-item  -->				     
 				       <c:if test="${sessionScope.loginuser.server_filename == null}"> 				        
-				           <div id="profileImg2" class="avatar2" style="border: 0px solid black;"  data-toggle="modal" data-target="#myModal"> 
+				           <div id="profileImg2" class="avatar2" style="border: 0px solid black;"  data-toggle="modal" data-target="#myModal"> 				              
 				               <img alt="Avatar2" class="avatar2" src="<%= request.getContextPath() %>/resources/files/20180716092958347996517292548.jpg">               
 				            </div> 
 				      </c:if>
@@ -181,9 +213,9 @@ function test(){
 					  <div class="grid-item item2" >
 					    <br/>					    
 					    <input type="hidden" value="${sessionScope.loginuser.userid}" />   
-						   <span style="color:rgb(255, 82, 82); font-weight: bold;">  이  름 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.name}</span></br></br>
-						     <span style="color:rgb(255, 82, 82); font-weight: bold;"> 이메일 :</span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">   ${sessionScope.loginuser.email} </span></br></br>
-						    <span style="color:rgb(255, 82, 82); font-weight: bold;">  닉네임 : </span> <span style="color:rgba(0, 0, 0, 0.54); font-weight: bold;">  ${sessionScope.loginuser.nickname} </span></br></br>         
+						   <span style="color:black; font-size: 15pt;">  이  름 :</span><span style="font-weigth: bold">   ${sessionScope.loginuser.name}</br></br>
+						     <span style="color:black; font-size: 15pt;"> 이메일 :</span> <span style="font-weigth: bold">  ${sessionScope.loginuser.email} </span></br></br>
+						    <span style="color:black; font-size: 15pt;">  닉네임 : </span><span style="font-weigth: bold"> ${sessionScope.loginuser.nickname} </span></br></br>         
 					  </div> 
 				</div>  <!-- end of grid Container --> 
 				
@@ -206,18 +238,23 @@ function test(){
       <div class="modal-content" style="width: 80%;margin-right: 20%;">
            <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">×</button>
-                <h4 class="modal-title">Modal Header</h4>
+                <h4 class="modal-title"><span style="color:rgb(255, 82, 82); font-weight: bold; ">Change Profile Image</span></h4>
            </div>
-           <div class="modal-body">
+           <div class="modal-body filebox" >      <%-- style="background-image: url('./resources/files/${sessionScope.loginuser.server_filename}');   " --%>
+               <img alt="Avatar2" src="<%= request.getContextPath() %>/resources/files/${sessionScope.loginuser.server_filename}" > 
+                 </br>             
+                             <span style="font-weight: bold;">프로필 사진을 변경하시겠습니까?</span>  
+                 </br>
+                 </br>
                 <form name="profileImgFrm" id="profileImg" enctype="multipart/form-data">
-                   <input type="file" id="attach" name="attach">
-                    <button type="button" class="btn btn-primary" onclick="test();">Save changes</button> 
-                    <input type="hidden" id="url" name="url" > 
+                   <label for="attach" style="background-color:rgb(255, 82, 82); color: white;">업로드</label>
+                   <input type="file" id="attach" name="attach">                    
+                    <input type="hidden" id="url" name="url" >                                         
                  </form>   
-                 <!--  <button type="button" id="changeProfileImgJSON"class="btn btn-primary">Save changes</button>  -->
            </div>
            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>   
+               <button type="button" class="btn btnFileUpload" onclick="test();">Save changes</button> 
+              <button type="button" class="btn btnFileUpload" data-dismiss="modal">Close</button>   
            </div>
       </div>
       
@@ -236,6 +273,7 @@ function test(){
 		       <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">  
 			       <li><a class="topNav" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
 			       <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
+			        <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/activity.action">Activity</a></li> 
 		       </c:if> 
 		       
 			       <li><a class="topNav"  data-toggle="tab2" href="<%= request.getContextPath() %>/qna.action">Q&A</a></li>

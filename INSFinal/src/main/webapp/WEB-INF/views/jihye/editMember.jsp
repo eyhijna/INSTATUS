@@ -13,8 +13,11 @@
               color: black;
              }
 .btnEditMember{
-     background-color: rgb(255, 82, 82); 
-    color: white;
+       /*         background: #e2e4e6;    */ 
+            background: #e2e4e6;
+    color: #fff;
+   /*   background-color: rgb(255, 82, 82); 
+    color: white; */
 }             
           
 </style>
@@ -328,13 +331,19 @@
          
              <br/>
 
-             
+  
             </form>
          </div>
-         <button id="btn-submit" type="submit" class="btn btnEditMember" value="submit" style="width:90px;">정보수정</button> 
+         <button id="btn-submit" type="submit" class="btn btnEditMember" value="submit" style="width:90px;">
+         <span style="font-size: 10pt; font-weight: bold; color:black;">정보수정</span>    
+         </button> 
           <!-- 버튼 태그마다 type속성을 넣어줘야 한다.브라우저 마다 각기 다른 기본값을 사용하기 때문이다.  -->
-         <button id="editCancel" type="button"  class="btn btnEditMember" onclick="location.href='${goBackURL}'" style="width: 90px;">취소</button> 
-         <button id="editCancel" type="button"  class="btn btnEditMember" onclick="goDel();" style="width: 90px;">탈퇴</button>   
+         <button id="editCancel" type="button"  class="btn btnEditMember" onclick="location.href='${goBackURL}'" style="width: 90px;">
+         <span style="font-size: 10pt; font-weight: bold; color:black;">취소</span>  
+         </button> 
+         <button id="editCancel" type="button"  class="btn btnEditMember" onclick="goDel();" style="width: 90px; background-color: rgb(255, 82, 82); ">
+         <span style="font-size: 10pt; font-weight: bold; color:white; ">탈퇴</span>  
+         </button>   
       
              
      </c:if>  

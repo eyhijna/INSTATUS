@@ -147,7 +147,14 @@ public class JihyeDAO implements InterJihyeDAO{
 	@Override
 	public int updateIns_personal_alarm(HashMap<String,String> map) {
 		int n = sqlsession.update("jihye.updateIns_personal_alarm", map);
-		return n;	}
+		return n;	
+	}
+
+	@Override
+	public List<HashMap<String, String>> getRequestTeamName(String userid) {
+		List<HashMap<String, String>> teamName = sqlsession.selectList("jihye.getRequestTeamName", userid);
+		return teamName;
+	}
 
 
 	

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
-<%-- <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>    --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>   
 <%
    String ctxpath = request.getContextPath();
 %>
@@ -47,6 +47,12 @@ table, th, td, input, textarea {border: solid gray 1px;}
 #table td{width: 860px;}
 .long {width: 470px;}
 .short {width: 120px;} 
+
+.btnWriteQna{
+   background: #e2e4e6;
+   color: black;
+   font-weight: bold;
+}
 
 </style> 
   
@@ -122,10 +128,10 @@ table, th, td, input, textarea {border: solid gray 1px;}
                <div class="row" >
                   <div class="col">  
                     <c:if test="${!sessionScope.loginuser.userid.equals('admin')}">         
-                     <div class="cart_title">QnA 문의하기</div>
+                     <div  style="color:black; font-size: 15pt; padding-left: 20px;">QnA 문의하기</div>
                      </c:if> 
                      <c:if test="${sessionScope.loginuser.userid.equals('admin')}">         
-                     <div class="cart_title">QnA 답변하기</div>
+                     <div  style="color:black; font-size: 15pt; padding-left: 20px;">QnA 답변하기</div>
                      </c:if> 
                      <br/>
                   </div>
@@ -1013,8 +1019,8 @@ table, th, td, input, textarea {border: solid gray 1px;}
 				      <input type="hidden" name="replyChk" value="${replyChk}" />
 				      
 				      <div id="writeqna">
-				      <button type="button" class="btn btn-primary btn-sm"  id="btnWrite">쓰기</button>
-				      <button type="button" class="btn btn-primary btn-sm"  onClick="javascript:history.back();">취소</button>
+				      <button type="button" class="btn btnWriteQna btn-sm"  id="btnWrite"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;확인</button>
+				      <button type="button" class="btn btnWriteQna btn-sm"  onClick="javascript:history.back();">취소</button>
 				       </div>
                  </form>  
    

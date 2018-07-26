@@ -29,8 +29,9 @@
 }
 
 .btnQna {
-    background-color: rgb(255, 82, 82); 
-    color: white;
+             background: #e2e4e6;
+   color: black;
+   font-weight: bold;
 }
 
 </style> 
@@ -103,7 +104,7 @@ function chooseCategory(){
             
                <div class="row" >
                   <div class="col">            
-                     <div class="cart_title">QnA 게시판</div>
+                     <div  style="color:black; font-size: 15pt; padding-left: 20px;">QnA 게시판</div>
                      <br/>
                   </div>
                </div>      
@@ -113,13 +114,14 @@ function chooseCategory(){
 			                <div align="left"class="categorybtn">
 				                <button class="btn btnQna"  onclick="<%= request.getContextPath() %>/qna.action" >전체보기</button>
 				                <button class="btn btnQna" name="colname"  value="1" onclick="chooseCategory();">기술문의</button>
-				                <button class="btn btnQna" name="colname" value="2" onclick="chooseCategory();">기타</button>
+				                <button class="btn btnQna" name="colname" value="2" onclick="chooseCategory();"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;기타</button>
+			                     <c:if test="${(sessionScope.loginuser).userid != 'admin'}">
+			                     <button  id="goWrite"type="button" class="btn btnQna" onClick="goWrite();" style="margin-left:800px;">Q&A 글쓰기</button>	                
+			                    </c:if>
 			                </div> 
 		               </form> 
 		                   <div align="right">
-			                    <c:if test="${(sessionScope.loginuser).userid != 'admin'}">
-			                     <button  id="goWrite"type="button" class="btn btnQna" onClick="goWrite();">Q&A 글쓰기</button>	                
-			                    </c:if>
+			                   
 		                   </div>
                  </div>
                 

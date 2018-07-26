@@ -31,7 +31,7 @@
    
    <!-- 내가 속한 팀목록 보여주기 -->
     <select id="getTeamList" parameterType="String" resultType="com.spring.finalins.model.TeamVO">
-	    select team_name
+	    select team_name, team_idx, server_filename
 		from ins_team A join ins_team_member B
 		on A.team_idx = B.fk_team_idx
 		where team_userid = #{userid} and team_member_admin_status in (0,1,2)
@@ -146,9 +146,24 @@
    <!-- 팀초대 거절하기 -->
    <delete id="denyTeam" parameterType="HashMap" >
       delete from ins_team_member
-      where team_userid = #{userid} and team_member_admin_status = 3 and fk_team_idx = #{fk_team_idx} 
+      where team_userid = #{userid} and fk_team_idx = #{fk_team_idx} 
    </delete>
 
+
+      <!-- 내가 가입 신청한  팀목록 불러오기 -->
+    <resultMap type="HashMap" id="getRequestTeamNameMap">
+      <result property="TEAM_NAME"                 column="team_name"                  javaType="String" />
+      <result property="TEAM_USERID"               column="team_userid"                javaType="String" />
+      <result property="TEAM_MEMBER_ADMIN_STATUS"  column="team_member_admin_status"   javaType="String" />
+      <result property="FK_TEAM_IDX"  column="fk_team_idx"   javaType="String" />
+    </resultMap>  
+   <select id="getRequestTeamName" parameterType="String" resultMap="getRequestTeamNameMap">
+      select team_name, team_userid, team_member_admin_status, fk_team_idx
+	  from ins_team_member A join ins_team B
+	  on A.fk_team_idx = B.team_idx
+	 where team_userid = #{userid} and team_member_admin_status = 4    
+   </select>
+   
    
    <!-- ////////////////////////////////////////////////////////////// -->
    

@@ -19,6 +19,11 @@
    
    a{text-decoration: none;}
     */
+.btnView {
+      background: #e2e4e6;
+   color: black;
+   font-weight: bold;
+}    
   
 </style>
 
@@ -130,22 +135,22 @@
 	                    <br/>
 					   	<%-- admin인 경우 답글에 대해서만 수정/삭제 보여주기   <!-- 이미 답글을 등록했기 때문에 삭제가 불가하다. -->--%>
 				        <%--  <button type="button" class="btn btn-primary btn-sm" onClick="javascript:location.href='<%= request.getContextPath() %>/qna.action'">목록보기</button> --%>
-					        <button type="button" class="btn btn-primary btn-sm" onClick="javascript:history.back();">목록보기</button>
+					        <button type="button" class="btn btnView btn-sm" onClick="javascript:history.back();"> <span class="glyphicon glyphicon-list"></span>&nbsp;&nbsp;목록보기</button>
 					   <c:if test="${!sessionScope.loginuser.userid.equals('admin') && qnavo.qna_depthno == 0}">
-						   <button type="button" class="btn btn-info btn-sm" onClick="javascript:location.href='<%= request.getContextPath() %>/editQna.action?qna_idx=${qnavo.qna_idx}'">수정</button>   
-						   <button type="button" class="btn btn-danger btn-sm" onClick="deleteQna('${qnavo.qna_idx}')">삭제</button>
+						   <button type="button" class="btn btnView btn-sm" onClick="javascript:location.href='<%= request.getContextPath() %>/editQna.action?qna_idx=${qnavo.qna_idx}'"><span class='glyphicon glyphicon-pencil'></span>&nbsp;&nbsp;수정</button>   
+						   <button type="button" class="btn btnView btn-sm" onClick="deleteQna('${qnavo.qna_idx}')"><span class="glyphicon glyphicon-trash"></span>&nbsp;&nbsp;삭제</button>
 					   </c:if>
 	   
 				
 					   <c:if test="${sessionScope.loginuser.userid.equals('admin')&& !qnavo.qna_fk_idx.equals('0')}"> <!--  qna_fk_idx가 0이면 원글이다. -->
-						   <button type="button" class="btn btn-info btn-sm" onClick="javascript:location.href='<%= request.getContextPath() %>/editQna.action?qna_idx=${qnavo.qna_idx}'">수정</button>  		    				    	      
+						   <button type="button" class="btn btnView btn-sm" onClick="javascript:location.href='<%= request.getContextPath() %>/editQna.action?qna_idx=${qnavo.qna_idx}'"><span class='glyphicon glyphicon-pencil'></span>&nbsp;&nbsp;수정</button>  		    				    	      
 					   </c:if>
 					    <c:if test="${sessionScope.loginuser.userid.equals('admin')&& !qnavo.qna_fk_idx.equals('0') && qnavo.qna_depthno == 0}"> 
-					   <button type="button" class="btn btn-danger btn-sm" onClick="deleteQna('${qnavo.qna_idx}')">삭제</button>	
+					   <button type="button" class="btn btnView btn-sm" onClick="deleteQna('${qnavo.qna_idx}')"><span class="glyphicon glyphicon-trash"></span>&nbsp;&nbsp;삭제</button>	
 					   </c:if>
 					   
 					   <c:if test="${sessionScope.loginuser.userid.equals('admin') && qnavo.qna_depthno == 0}">
-					       <button id="goWrite" type="button" class="btn btn-warning btn-sm" onClick="replyQna();">답변글쓰기</button>
+					       <button id="goWrite" type="button" class="btn btnView btn-sm" onClick="replyQna();">답변글쓰기</button>
 					    </c:if> 
 	    
 		
@@ -160,7 +165,7 @@
    </div>       
 </div>
 
-<
+
 
 
 <%-- 삭제 form --%>

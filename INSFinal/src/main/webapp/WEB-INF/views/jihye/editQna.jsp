@@ -43,7 +43,13 @@
    #table th {width: 860px;}
    
    a {text-decoration: none;}
-   
+ 
+.btnEdit{
+
+        background: #e2e4e6;
+   color: black;
+   font-weight: bold;
+}   
   
 </style>
 
@@ -986,8 +992,8 @@
 
    
    <br/>
-   <button type="button" class="btn btn-primary btn-sm" id="btnUpdate">완료</button>
-   <button type="button" class="btn btn-warning btn-sm" onClick="javascript:history.back();" >취소</button>  
+   <button type="button" class="btn btnEdit btn-sm" id="btnUpdate"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;확인</button>
+   <button type="button" class="btn btnEdit btn-sm" onClick="javascript:history.back();" >취소</button>  
   
 <form name="editFrm">
       <input type="hidden" name="qna_idx" value="${qnavo.qna_idx}" />

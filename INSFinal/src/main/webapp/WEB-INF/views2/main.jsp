@@ -183,6 +183,8 @@ body {
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal" onClick="createTeam();" id="submitBtn"  style="color:black; font-weight:bold;">Submit</button>
           <button type="button" class="btn btn-default" data-dismiss="modal"  style="color:black; font-weight:bold;">Close</button>
+          
+           ㅏㅓ;ㅏ
         </div>
         
       </div> 

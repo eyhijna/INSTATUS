@@ -37,6 +37,8 @@ public interface InterJihyeService {
 
 	int updateIns_personal_alarm(HashMap<String,String> map); // ins_personal_alarm값 변경하기
 
+	List<HashMap<String, String>> getRequestTeamName(String userid); // 내가 가입신청한 팀목록 불러오기
+
 	
 
 	

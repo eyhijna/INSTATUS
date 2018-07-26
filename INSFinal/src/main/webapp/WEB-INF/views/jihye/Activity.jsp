@@ -6,7 +6,7 @@
 <jsp:include page="top.jsp" /> 
 
 <style>
- .mypageA {
+.mypageA {
     text-decoration: none;
     display: inline-block;
     padding: 8px 16px;
@@ -17,46 +17,98 @@
     color: black;
 }
 
-
-.button {
- 
-    background-color: #e6e6e6;
-    border: 0px solid gray; 
-    color:white;
-    height : 80px;
-    width : 250px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px; 
-    cursor: pointer;
-
-    border-radius: 5px; 
-    outline: none; 
-    font-weight:bold;
+.previous {
+       background-color:rgb(255, 82, 82);  
+       color: white;
 }
 
-.button:hover {background-color: #ffffff}
-
-.button:active {
-  background-color: #ffffff;
-  box-shadow: 3px 3px #666;
-  transform: translateY(4px);
+.next {
+      background-color:rgb(255, 82, 82);  
+      color: white;
+        width: 100px;
 }
 
-#btnTeamId{
+.round {
+    border-radius: 50%;
+
+}
+
+
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+
+}
+
+.switch input {display:none; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px; 
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+ background-color:rgb(255, 82, 82);   /* #2196F3; */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
    
-     position: relative; 
-    
-    background-size: 250px 80px;
-    /*  opacity: 0.7; */
-     background-repeat: no reqpeat;
 }
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 25px;
+   
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#switchJihye{
+  width: 50px;
+  padding-bottom: 0px;
+  padding-left: 800px;
+}
+
+
+
+
 
 </style>
 
 
-<!-- <script type="text/javascript">
+<script type="text/javascript">
 
 $(document).ready(function(){
 	
@@ -121,59 +173,16 @@ function swichMyRecord(switchVal){
 }   
 
  
-</script> -->
- 
-<!--  <div class="super_container"> 
-   <div class="cart_container" style="padding-top: 20px;">   -->
-       <div class="container" > 
+</script>
+
+
+
+ <div class="container" > 
          <div class="row" >
             <div class="col" > 
 
-				 	  <div class="tab-content"> 
-				 	   </br>
-				 	  <span style="font-weight:bold; font-size:25px; color: black;">List of Team</span>
-				
-				 	  </br>
-				 	  </br>
-				 	  </br>
-						   <%--   <div id="profile" class="tab-pane fade in active">  
-						           <!-- 팀목록 -->
-							       <div>
-							         <table class="table table-hover"> 
-							          <thead>
-							            <tr>
-							              <th style="color:black; font-size: 15pt;">Teams</th>
-							            </tr>
-							          </thead>
-							          <tbody>
-							          <c:if test="${teamList.size() <1 }">						         					        
-							              <td style="text-align: center;" colspan="5">${sessionScope.loginuser.name}님이 소속된 팀이 없습니다.</td>
-							            </c:if> 
-							              <c:if test="${teamList.size() > 0}">  
-                                             <c:forEach var="teamvo" items="${teamList}">
-									            <tr>
-									              <td style="padding: 0px;"><a href="<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}" class="mypageA">${teamvo.team_name}</a></td>      
-									            </tr>
-							 
-							                </c:forEach>
-							             </c:if> 
-							           </tbody>
-							         </table> 
-							       </div> --%>
-							       
-							       <!-- ///////////////////////////////////////////////////////// -->
-							       <div>
-							        <div style="display: block; ">
-							         <c:if test="${teamList.size() > 0}">  
-							           <c:forEach var="teamvo" items="${teamList}">
-							       
-								 	   <button type="button" class="button btnTeam" id="btnTeamId" style="margin-right: 50px;margin-bottom: 30px;  background-image: url('<%= request.getContextPath() %>/resources/files/${teamvo.server_filename}');" onclick="location.href='<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}'">${teamvo.team_name}</button>
-                                    </c:forEach>
-							       </c:if>
-							       </div> 
-							       </div>
-							
-	<%-- 					          <!-- activity 기록 목록 -->	
+			
+												          <!-- activity 기록 목록 -->	
 						   					        					          
 							      <div>
 							        <table class="table table-hover">
@@ -228,13 +237,13 @@ function swichMyRecord(switchVal){
 							             </c:forEach> 
 							                </c:if>  
 							         </tbody>					
-							         </table>  --%>
-							  <%--        
-							           #117. 페이지바 보여주기
+							         </table> 
+							         
+							           <%-- #117. 페이지바 보여주기 --%>
 								   <div align="center" style="width: 70%; margin-top: 20px;  margin-left: 100px;  margin-right: auto;">
 								       ${pagebar}
 								   </div>
-						 --%>
+						
 							               
 					        </div>
 					  </div>
@@ -242,8 +251,10 @@ function swichMyRecord(switchVal){
              </div>
          </div>
    
-<%-- 
+
 <form name = "switchFrm">
 <input type="hidden" id="switchVal"  name="switchVal">
 <input type="hidden" value="${ins_personal_alarm}" >
-</form> --%>
+</form>
+
+
