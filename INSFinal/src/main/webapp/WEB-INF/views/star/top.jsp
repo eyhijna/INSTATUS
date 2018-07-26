@@ -206,7 +206,7 @@
 		      
 		    	  var html = "<span style='font-size: 25pt; font-weight: bold; color: black;'>"+json.team_name+"</span>&nbsp;&nbsp;";
 		    	     if(json.team_visibility_status == 0){
-		    	    	 html += "   <span style='color: red;' class='glyphicon glyphicon-eye-close'></span><span style='color:gray; font-size: 12pt;'>&nbsp;&nbsp;private</span>";
+		    	    	 html += "   <span style='color: #ff5252;' class='glyphicon glyphicon-eye-close'></span><span style='color:gray; font-size: 12pt;'>&nbsp;&nbsp;private</span>";
 		    	     } 
 		    	     else if(json.team_visibility_status == 1){
 		    	         html += "   <span style='color: blue;' class='glyphicon glyphicon-eye-open'></span><span style='color:gray; font-size: 12pt;'>&nbsp;&nbsp;public</span>";

@@ -424,9 +424,11 @@
 		
 		
 		
-   function  searchBarAjax( ){ // 일반회원이 팀내를 검색할때 
+   function  searchBarAjax( ){ // 관리자가 팀원을 검색할때 
       
-	  var form_data = { searchWord : $("#searchWord").val() };  
+	  var form_data = { searchWord : $("#searchWord").val()
+		               , "team_idx" : ${teamvo.team_idx} };  
+   
 			
 	  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
 		  alert("you must login. go to login page..");
@@ -459,7 +461,7 @@
 							             // 반대는 toUpperCase()
 							             // 만약 ("#searchWord").val().toLowerCase() 이 ja라면 ajax 프로그래밍을 예로 듦면 index값은 1이 나온다
 							     
-							    html += "<li><a style='cursor:pointer;' class='first'>"+entry.nickname+"&nbsp;("+entry.email+")"; 
+							    html += "<li><a style='cursor:pointer;' class='first'>"+entry.nickname+"&nbsp;("+entry.userid+")"; 
 							    html += "</a><input type='hidden' id='memberId' value='"+entry.userid+"'/> </li>";  
 						   });// end of each   
 						 
@@ -803,11 +805,11 @@
 	  <button type="button" class="btn btn1" disabled="disabled" ><span style="font-weight: bold;">Members of Team Boards</span></button>
 	  
 	  <c:if test="${memberCnt > 0}"> <!-- 팀원이 존재했을때  -->
-	    <button type="button" class="btn btn1" id="showBtn"><span style="font-weight: bold; color:black;">Team Members ( ${memberCnt + 1} )</span></button>  
+	    <button type="button" class="btn btn1" id="showBtn" disabled="disabled"><span style="font-weight: bold; color:black;">Team Members ( ${memberCnt + 1} )</span></button>  
       </c:if>
 	  
 	  <c:if test="${memberCnt == 0 }"> <!-- 팀원이 존재하지 않을때  -->
-	    <button type="button" class="btn btn1" id="searchBtn" onClick="searchMember();"><span style="font-weight: bold; color:black;">Team Members</span></button>
+	    <button type="button" class="btn btn1" id="searchBtn" onClick="searchMember();" disabled="disabled"><span style="font-weight: bold; color:black;">Team Members</span></button>
 	  </c:if>
 	</div>
 	

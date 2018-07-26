@@ -7,7 +7,13 @@
 <script type="text/javascript">
     $(document).ready(function(){
     //   console.log("홈페이지 로딩되었습니다.");
-    	   
+    
+    	$("#new_team_name").keydown(function(key) {
+            if (key.keyCode == 13) {
+               $("#submitBtn").click();
+            }
+        });
+    	
 		$("#btnLogin").click(function(){
 	           goLogin(event); 
 	    }); // end of $("#btnLogin").click
@@ -390,6 +396,27 @@
 		
    }); // end of $(document).ready()---------------------------    
 
+   function createTeam(){ // 팀생성 유효성검사
+   	
+   	var frm = document.teamFrm;
+       var team_name = $("#new_team_name").val(); 
+       
+ 	    var regexp_team_name = new RegExp(/^[A-Za-z0-9]{1,20}$/g); 
+ 	    
+ 	    var bool = regexp_team_name.test(team_name);
+       
+   	if(bool== false || team_name.trim() == ""){
+   		alert("Team name must includes A-Z or 0-9 and be 1 to 20 letters");
+   		$("#team_name").val(""); 
+   		return;
+   	} 
+   	
+   	frm.method="POST";
+   	frm.action="<%= request.getContextPath()%>/createTeam.action";
+   	frm.submit();
+   	
+   }
+   
    
     function goLogin(event){  
       if(${sessionScope.loginuser != null}){ //이미 로그인 된 상태라면
@@ -612,11 +639,17 @@ body{overflow: hidden;}
       </c:if>
     </form>
     
+     <form name="infoFrm"> 
+		<input type="hidden" name="team_idx" id="team_idx"/>
+		<input type="hidden" name="nav" id="nav"/>    
+	 </form> 
+	  
     <div class="text-right">
       <div style="text-align: center; color: gray; margin-top: 10px;">
        <c:if test="${sessionScope.loginuser != null}">
          <a data-toggle="modal" href="#myModal" style="font-size: 14pt; color: white; font-weight: bold;">Create Project...</a>
-         
+         <br/>
+         <a data-toggle="modal" href="#myModal2" style="font-size: 14pt; color: white; font-weight: bold;">Create Team</a>
          </c:if>
       </div>
       <div class="credits">
@@ -711,7 +744,33 @@ body{overflow: hidden;}
     </div>
   </div>
   
-  
+  <!-- 팀 생성 모달 -->
+   <div class="modal fade" id="myModal2" role="dialog" >
+    <div class="modal-dialog">
+    
+      <div class="modal-content" style="display:inline-block; left:90px; top: 100px; width: 400px; " >
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title" style="color:black; font-weight: bold;">Create a team</h4>
+        </div>
+        
+        <div class="modal-body">
+         <form name="teamFrm">
+		    <div class="form-group">
+		      <label for="team_name">Team name:</label>
+		      <input type="text" class="form-control" id="new_team_name" placeholder="Enter team name" name="new_team_name">
+		    </div>
+         </form>
+        </div>
+       
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="createTeam();" id="submitBtn"  style="color:black; font-weight:bold;">Submit</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"  style="color:black; font-weight:bold;">Close</button>
+        </div>
+        
+      </div> 
+    </div>
+  </div>
   <!-- 아이디찾기 modal -->
   <div class="modal fade" id="findID-modal" role="dialog" >
     <div class="modal-dialog" style="width:400px;">

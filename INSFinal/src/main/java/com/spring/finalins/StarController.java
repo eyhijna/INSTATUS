@@ -418,7 +418,9 @@ public class StarController {
 	  public String wordSearchJSON(HttpServletRequest req) {
   
 		     String searchWord = req.getParameter("searchWord"); 
-		     
+		     String team_idx = req.getParameter("team_idx");
+		     System.out.println("wordSearch team_idx확인용 :"+team_idx);
+		      
 		     String str_jsonArray = null; 
 		  
 		     HttpSession session = req.getSession();
@@ -428,6 +430,7 @@ public class StarController {
 			 if(!searchWord.trim().isEmpty()) {  
 				HashMap<String, String> map = new HashMap<String, String>();
 			    map.put("searchWord", searchWord); 
+			    map.put("team_idx", team_idx);
 			    map.put("login_userid", loginuser.getUserid());
 				str_jsonArray = service.getSearchMember(map); // 검색결과를 받아옴(페이징처리O)  
 			 }//end of if

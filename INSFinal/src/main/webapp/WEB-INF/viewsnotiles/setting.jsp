@@ -189,7 +189,7 @@
 	      <tr>
 	        <c:if test="${tvo.team_visibility_status == 0 }">
 	           <td style="padding-top:12px; padding-bottom:11px;">
-	             <span style='color: red;' class='glyphicon glyphicon-eye-close'></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Private - </span>This team is private. It's not indexed or visible to those outside the team.
+	             <span style="color: #ff5252" class="glyphicon glyphicon-eye-close"></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Private - </span>This team is private. It's not indexed or visible to those outside the team.
 	             <button type="button" class="btn" onClick="changeView();" style="margin-left:45px;"><span style="font-weight: bold; color:black;">Change to public</span></button>
 	           </td> 
 	        </c:if>
@@ -210,7 +210,7 @@
 		      
 		      <tr>
 		         <td style="padding-top:12px; padding-bottom:11px;">
-		           <span class="glyphicon glyphicon-remove-sign" style="color:red;"></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Do you want to break up the team?</span>
+		           <span class="glyphicon glyphicon-remove-sign" style="color:#ff5252;"></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Do you want to break up the team?</span>
 		           <button type="button" class="btn" onClick="breakTeam();" style="margin-left:365px;"><span style="font-weight: bold; color:black;">Yes</span></button>
 		         </td>
 		      </tr>
@@ -223,7 +223,7 @@
 		      
 		      <tr>
 		         <td style="padding-top:19px; padding-bottom:0px;">
-		           <span class="glyphicon glyphicon-check"></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Who wants to join the team</span>
+		           <span class="glyphicon glyphicon-check" style="color:#ff5252"></span>&nbsp;&nbsp;<span style="font-weight: bold; color:black;">Who wants to join the team</span>
 		         </td>
 		      </tr>
 		  </c:if>
