@@ -40,6 +40,16 @@
 	 showRank();
 		
   });
+  
+//card 로그인 체크
+  function loginCheck(){
+  	if(  ${sessionScope.loginuser.userid == null || sessionScope.loginuser.userid == "" || empty sessionScope.loginuser.userid }  ) {
+      	alert("로그인이 필요한 메뉴입니다.");
+      	opener.window.location ="/finalins/index.action";
+      	close();
+
+      } // end of if~else------------------------------- 
+  } // end of LoginCheck()
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
 	function showNowTime() {
@@ -93,6 +103,9 @@
 	// 직업별 인원수 rank
 	function getTableRank(){
 		
+		var CNT = loginCheck();
+		
+	 if(CNT != 0){
 		$.ajax({
 			url: "rankShowJSON.action",
 		    type: "GET",
@@ -127,12 +140,16 @@
 	             alert(" code: " + request.status + "\n"+"message: " + request.responseText + "\n"+"error: " + error);
 	        }
 		});
-		
+	 }	
 		
 	}// end of getTableRank()
 	
 	
 	function getChartRank(){
+		
+		var CNT = loginCheck();
+		
+		 if(CNT != 0){
 		
 		$.ajax({
 			url: "rankShowJSON.action",
@@ -259,7 +276,7 @@
 		});
 
 		
-		
+		 }
 		
 		
 	} // end of getCharRank()
@@ -267,7 +284,11 @@
 
 	
 
-          function callAjax(){        
+    function callAjax(){    
+		
+    	var CNT = loginCheck();
+		
+   	 if(CNT != 0){
             $.ajax({
              
                url: "adminChartJSON_job.action",
@@ -356,10 +377,15 @@
             
                
             });
-          }   
+   	     }       
+     }   
 
 
-      function callAjax2(){             
+      function callAjax2(){  
+    	  
+    	  var CNT = loginCheck();
+  		
+    		 if(CNT != 0){
             $.ajax({
                 
                url: "adminChartJSON_ageline.action",
@@ -437,20 +463,28 @@
                  }
               
             });
-         }
+            
+    		 }      
+      }
       
       
   	function showRank(){
+  		var CNT = loginCheck();
+		
+  		 if(CNT != 0){
 
 		getTableRank();
 		getChartRank();
 		callAjax();
 	    callAjax2();
+	    
+  		 } 
      /*    var timejugi = 10000;   // 시간을 1초 마다 자동 갱신하려고.
 		
 		setTimeout(function() {
 			           showRank();	
 					}, timejugi); */
+   					
 	} // end of showRank()
    
 </script>

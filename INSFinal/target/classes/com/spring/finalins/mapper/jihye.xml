@@ -31,7 +31,7 @@
    
    <!-- 내가 속한 팀목록 보여주기 -->
     <select id="getTeamList" parameterType="String" resultType="com.spring.finalins.model.TeamVO">
-	    select team_name, team_idx, server_filename
+	    select team_name, team_idx, server_filename, team_visibility_status
 		from ins_team A join ins_team_member B
 		on A.team_idx = B.fk_team_idx
 		where team_userid = #{userid} and team_member_admin_status in (0,1,2) and team_delete_status = 1
