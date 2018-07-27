@@ -45,8 +45,7 @@
    a {text-decoration: none;}
  
 .btnEdit{
-
-        background: #e2e4e6;
+    background: #e2e4e6;
    color: black;
    font-weight: bold;
 }   
@@ -115,7 +114,7 @@
 	
 </script>	
 
-<div style="padding-left: 10%;">
+<div style="padding-left: 25%;">
    <h1 style="margin-bottom: 30px;">글 내용 보기</h1>
 
    
@@ -126,23 +125,15 @@
             <td>${qnavo.qna_idx}</td>
         </tr>  
          <tr>
-            <th  style="width: 70px; text-align: center;">카테고리</th>
-            <td>
-                         <%--      <c:if test="!sessionScope.loginuser.userid.equals('admin')">   --%>
-                               <select id="fk_qna_category_idx" name="fk_qna_category_idx">
-                                  <option selected value="1">기술문의</option>
-                                  <option value="2">기타</option>
-                               </select>
-                   <%--             </c:if> --%>
-                               
-                           <%--      <c:if test="sessionScope.loginuser.userid.equals('admin')">  
-                               <select name="fk_qna_category_idx">
-                                  <option selected value="1">답변</option>
-                                 <!--  <option value="2">기타</option> -->
-                               </select>
-                               </c:if>  --%>
-                           </td>
-                        </tr>   
+            <th style="width: 70px; text-align: center;">카테고리</th>
+            <td>                      
+                <select id="fk_qna_category_idx" name="fk_qna_category_idx">
+                   <option selected value="1">기술문의</option>
+                   <option value="2">기타</option>
+                </select>
+
+           </td>
+        </tr>   
         <tr>
             <th  style="width: 70px; text-align: center;">성명</th>
             <td>${sessionScope.loginuser.name}</td>

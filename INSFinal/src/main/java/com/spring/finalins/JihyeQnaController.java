@@ -626,6 +626,8 @@ public class JihyeQnaController {
   			}
 
   			writer.println("<script type='text/javascript'>alert('파일 다운로드 실패!!')</script>");
+  			
+  			return "jihye/qna.tiles";
 
   		}
   		

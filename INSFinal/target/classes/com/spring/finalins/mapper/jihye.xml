@@ -34,7 +34,7 @@
 	    select team_name, team_idx, server_filename
 		from ins_team A join ins_team_member B
 		on A.team_idx = B.fk_team_idx
-		where team_userid = #{userid} and team_member_admin_status in (0,1,2)
+		where team_userid = #{userid} and team_member_admin_status in (0,1,2) and team_delete_status = 1
    </select>
    
 <!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->  
@@ -91,7 +91,7 @@
 				on A.fk_project_idx = B.project_idx
 				join ins_list C
 				on A.fk_list_idx = C.list_idx
-				join ins_card D
+				left join ins_card D
 				on A.fk_card_idx = D.card_idx
 				where record_userid = #{userid}
 		 ) V
@@ -99,20 +99,9 @@
 		where T.rno between #{startRno} and #{endRno}
 		order by project_record_idx desc
    </select>  
-<!--     <select id="getMyRecordList" parameterType="String" resultMap="getMyRecordListMap">	   
-		    select project_Name, list_name, card_title, record_userid, project_record_time, record_dml_status, fk_card_idx
-			from ins_project_record A join ins_project B
-			on A.fk_project_idx = B.project_idx
-			join ins_list C
-			on A.fk_list_idx = C.list_idx
-			join ins_card D
-			on A.fk_card_idx = D.card_idx
-			where record_userid = #{userid}
-		    order by project_record_time desc
-   </select> -->  
+
    
-   
-   
+
 <!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->   
    
    <!-- 프로필 이미지 변경하기 -->
@@ -146,11 +135,11 @@
    <!-- 팀초대 거절하기 -->
    <delete id="denyTeam" parameterType="HashMap" >
       delete from ins_team_member
-      where team_userid = #{userid} and fk_team_idx = #{fk_team_idx} 
+      where team_userid = #{userid} and fk_team_idx = #{fk_team_idx} and team_member_admin_status = #{team_member_admin_status}
    </delete>
 
 
-      <!-- 내가 가입 신청한  팀목록 불러오기 -->
+    <!-- 내가 가입 신청한  팀목록 불러오기 -->
     <resultMap type="HashMap" id="getRequestTeamNameMap">
       <result property="TEAM_NAME"                 column="team_name"                  javaType="String" />
       <result property="TEAM_USERID"               column="team_userid"                javaType="String" />

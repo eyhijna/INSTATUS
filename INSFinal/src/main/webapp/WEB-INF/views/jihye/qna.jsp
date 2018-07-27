@@ -145,11 +145,7 @@ function chooseCategory(){
                           <th style="text-align: center; white-space: pre;" >제목</th>
                           <th style="text-align: center; white-space: pre;" >작성일자</th>
                           <th style="text-align: center; white-space: pre;" >작성자</th>
-                         <!--  <th style="text-align: center; white-space: pre;" >답변상태</th> -->
-                          <!-- ==== #144. 파일여부를 보여주도록 수정 ==== -->
-				        <!--   <th style="text-align: center; white-space: pre;">첨부파일</th> -->
-<!-- 				          <th  style="width: 100px; text-align: center;">크기(bytes)</th> -->
-				        
+      
                         </tr>
                    </thead>   
                    
@@ -189,25 +185,7 @@ function chooseCategory(){
 				                 </c:if>      
 		                                <td>${map.qna_date}</td>
 		                                <td>${map.fk_userid}</td>
-		                                
-		                                
-	                            <%--   <c:if test="${map.qna_depthno == 0}">
-	                                     <td><span style="color: blue; ">대기중</span></td>
-	                              </c:if>
-	                              <c:if test="${map.qna_depthno == 1}">
-	                                     <td><span style="color: red; text-size: bold;">답변완료</span></td>
-	                              </c:if> --%>
-	                              
-	                             <%-- ==== #145. 첨부파일 여부 표시하기 ==== --%>
-				              <%--    <td align="center" >
-				                    
-				                 </td>  --%>
-				              <%--    <td align="center" >
-				                      <c:if test="${not empty map.qna_byte}">
-				                        ${map.qna_byte}
-				                     </c:if>   
-				                  </td> 
-	                               --%>
+	
 	                              
                                  </tr>
                               </c:forEach>

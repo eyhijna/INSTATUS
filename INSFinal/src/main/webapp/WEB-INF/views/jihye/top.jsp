@@ -200,7 +200,7 @@ function test(){
 				       <div class="grid-item item1"> <!--grid-item  -->				     
 				       <c:if test="${sessionScope.loginuser.server_filename == null}"> 				        
 				           <div id="profileImg2" class="avatar2" style="border: 0px solid black;"  data-toggle="modal" data-target="#myModal"> 				              
-				               <img alt="Avatar2" class="avatar2" src="<%= request.getContextPath() %>/resources/files/20180716092958347996517292548.jpg">               
+				               <img alt="Avatar2" class="avatar2" src="<%= request.getContextPath() %>/resources/files/20180726153350620877817488252.jpg">               
 				            </div> 
 				      </c:if>
 				       <c:if test="${sessionScope.loginuser.server_filename != null}"> 				        
@@ -267,9 +267,9 @@ function test(){
 		 <%-- 상단에 탭메뉴이다. 탭을 클릭하면 링크타고 페이지 이동한다. --%> 
 		<div class="navtab" align="center" style="background-color: white;">        
 		    <ul class="nav nav-tabs abc">
-		        <c:if test="${sessionScope.loginuser.userid.equals('admin') }">  
+		    <%--     <c:if test="${sessionScope.loginuser.userid.equals('admin') }">  
 		            <li><a class="topNav"data-toggle="tab5" href="<%= request.getContextPath() %>/managementMember.action">Management</a></li> 
-		       </c:if>
+		       </c:if> --%>
 		       <c:if test="${!sessionScope.loginuser.userid.equals('admin') }">  
 			       <li><a class="topNav" data-toggle="tab1" href="<%= request.getContextPath() %>/mypage.action">Profile</a></li>
 			       <li><a class="topNav"data-toggle="tab4" href="<%= request.getContextPath() %>/editMember.action">Edit</a></li> 
