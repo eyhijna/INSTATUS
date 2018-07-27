@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.tools.ant.util.SymbolicLinkUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class JihyeController {
 	private InterJihyeService service;
 
 
-	// ====== #132. 파일업로드 및 다운로드를 해주는 FileManager 클래스 의존객체 주입하기(DI: Dependency Injection) ========
+	// ====== # 파일업로드 및 다운로드를 해주는 FileManager 클래스 의존객체 주입하기(DI: Dependency Injection) ========
 	/*
 	   이전에 파일 업로드는 cos.jar를 사용하였지만 
 	   이제부터 FileManager.java를 사용할 것이다.
@@ -48,7 +49,7 @@ public class JihyeController {
 	public FileManager fileManager;
 	
 	
-  // my-1. 로그인을 해야만 마이페이지로 이동(requiredLogin)
+    // 로그인을 해야만 마이페이지로 이동(requireLogin)
 	@RequestMapping(value="/mypage.action", method= {RequestMethod.GET})
 	public String requireLogin_mypage(HttpServletRequest req, HttpServletResponse res){
 		
@@ -63,32 +64,22 @@ public class JihyeController {
 		
 		if(!userid.equalsIgnoreCase("admin")) {
 		
-	// ============ 내가 속한 팀목록 보여주기  ///////////////////////////////////////////////////////////////////////////////////////// 
+	    // ============ 내가 속한 팀목록 보여주기   
 	    List<TeamVO> teamList = service.getTeamList(userid);
 	
 		req.setAttribute("teamList", teamList);
 	
 		}
 		else if(userid.equalsIgnoreCase("admin")){
-			/*String msg ="접근이 불가합니다.";
-			String loc ="index.action";
-			
-			req.setAttribute("msg", msg);
-			req.setAttribute("loc", loc);*/
-			
+		     // 관리자일 경우 차트 페이지로 바로 이동하게 하였다.
 			return "jihye/adminChart.tiles";
-		}
-		
-		String ins_personal_alarm = loginuser.getIns_personal_alarm();
-		req.setAttribute("ins_personal_alarm", ins_personal_alarm);
-		
+		}	
 		return "jihye/mypage.tiles";
 	}
 	
+
 	
-	/////////////////////////////////////////////////////////////
-	
-	
+	// 내가 활동한 기록 페이지
 	@RequestMapping(value="activity.action", method = {RequestMethod.GET})
 	public String requireLogin_activity(HttpServletRequest req, HttpServletResponse res) {
 		
@@ -101,15 +92,12 @@ public class JihyeController {
 			userid = loginuser.getUserid();
 		}
 		
-		if(!userid.equalsIgnoreCase("admin")) {
-	    
-		///////////////////////////////////////////////////////////////////////////////////////////////////   
-	           List<HashMap<String,String>> myRecordList = null;
-			
-			
+		if(!userid.equalsIgnoreCase("admin")) {		
+	        List<HashMap<String,String>> myRecordList = null;
+						
 			HashMap<String, String> map = new HashMap<String, String>();
 		    
-		 // ===== #110. 페이징 처리 하기 =====
+		     // ===== #110. 페이징 처리 하기 =====
 			String str_currentShowPageNo = req.getParameter("currentShowPageNo");
 
 			int totalCount = 0; // 총 게시물 건 수 알기
@@ -191,17 +179,19 @@ public class JihyeController {
 
 			// =====  페이지바 만들기(먼저, 페이지바에 나타낼 총 페이지 갯수(totalPage) 구해야 한다.) =====
 			String pagebar = "<ul>";
-			pagebar += MyUtil.getSearchPageBar("mypage.action", currentShowPageNo, sizePerPage, totalPage, blockSize,
+			pagebar += MyUtil.getSearchPageBar("activity.action", currentShowPageNo, sizePerPage, totalPage, blockSize,
 					map.get("colname"), map.get("search"), null); // period는 없으니까 null 을 넣어준다.
 			pagebar += "</ul>";
 
 			req.setAttribute("pagebar", pagebar);
 			req.setAttribute("myRecordList", myRecordList);
-	///////////////////////////////////////////////////////////////////////
+
 		}		
 		
+		String ins_personal_alarm = loginuser.getIns_personal_alarm();
+		req.setAttribute("ins_personal_alarm", ins_personal_alarm);
 		
-		return "jihye/Activity.tiles"; 
+		return "jihye/activity.tiles"; 
 	
 	}
 	
@@ -554,7 +544,7 @@ public class JihyeController {
 	   }
 	   
 	   
-	   // setting page 
+	   // 나를 초대한 혹은 내가 가입신청한 팀목록 페이지
 	   @RequestMapping(value="/mySetting.action", method= {RequestMethod.GET})
 	   public String requireLogin_setting(HttpServletRequest req, HttpServletResponse res) {
 		return "jihye/mySetting.tiles";  
@@ -562,7 +552,7 @@ public class JihyeController {
 		   
 	   }
 	   
-	   // setting page 
+	   // 나를 초대한 팀 목록 보여주기
 	   @RequestMapping(value="/mySettingJSON.action", method= {RequestMethod.GET})
 	   public String requireLogin_settingJSON(HttpServletRequest req, HttpServletResponse res) {  
 		   
@@ -602,18 +592,61 @@ public class JihyeController {
 	      return "jihye/mySettingJSON";
 	   }
 	   
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// 내가 가입신청한 팀목록 보여주기	
+		@RequestMapping(value="/reqTeamNameJSON.action", method={RequestMethod.GET})
+		public String requireLogin_reqTeamName(HttpServletRequest req, HttpServletResponse res) {
+		
+			HttpSession session = req.getSession();
+			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
+			
+			String userid = null;
+			
+			if (loginuser != null) {
+			   userid = loginuser.getUserid();
+			}
+		
+				// 1) 우선 나를 초대한 팀명 불러오기
+				List<HashMap<String, String>> teamName = service.getRequestTeamName(userid);
+				
+				JSONArray jsonArr = new JSONArray();  //아무것도 안 넣으면 []
+				
+				for(HashMap<String, String> map2 : teamName) {
+				JSONObject jsonObj = new JSONObject();
+				
+				//밑에 것은 json에 대한 키값이다.
+				jsonObj.put("FK_TEAM_IDX", map2.get("FK_TEAM_IDX")); 
+				jsonObj.put("team_name", map2.get("TEAM_NAME")); 
+				jsonObj.put("TEAM_USERID", map2.get("TEAM_USERID"));
+				jsonObj.put("TEAM_MEMBER_ADMIN_STATUS", map2.get("TEAM_MEMBER_ADMIN_STATUS"));
+				
+				
+				jsonArr.put(jsonObj);
+			}
+		
+			String str_jsonArr = jsonArr.toString();
+			
+			req.setAttribute("str_jsonArr", str_jsonArr);
+			
+			
+			return "jihye/reqTeamNameJSON";
+		}
+
+	   
 	   
 	   // 2) 팀초대 승인할 경우 / 팀 초대 거절할 경우.
 	   @RequestMapping(value="/approveTeamJSON.action", method= {RequestMethod.GET})
 	   public String requireLogin_approveTeam(HttpServletRequest req, HttpServletResponse res) {  
 		   
 		   String approve =req.getParameter("approve");
-		   String deny = req.getParameter("deny");
+		   String deny = req.getParameter("deny"); // 초대받은 팀 거절		
 		   String fk_team_idx = req.getParameter("fk_team_idx");
 		   String TEAM_MEMBER_ADMIN_STATUS = req.getParameter("TEAM_MEMBER_ADMIN_STATUS");
 		   
 		   System.out.println("approve>>>"+approve);
 		   System.out.println("deny>>>"+deny);
+		   System.out.println("TEAM_MEMBER_ADMIN_STATUS>>>"+TEAM_MEMBER_ADMIN_STATUS);
+		   System.out.println("fk_team_idx>>>"+fk_team_idx);
 		   
 		   HttpSession session = req.getSession();
 	       MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
@@ -627,22 +660,21 @@ public class JihyeController {
 		 HashMap<String,String> map = new HashMap<String,String>();	
 		 map.put("userid", userid);
 		 map.put("fk_team_idx", fk_team_idx);
-			
-		 
-	//	 System.out.println("fk_team_idx"+fk_team_idx);
+		 map.put("team_member_admin_status", TEAM_MEMBER_ADMIN_STATUS);
+
 			
 		 int n =0;
 		 
           if(!userid.equalsIgnoreCase("admin")) {
 					
 			if(approve != null && deny == null) {
-			n = service.approveTeam(map);
-				
+			    n = service.approveTeam(map);			
 			}
+			//////////////////////////////////////////////////////////////////////////////////////////////
 			if(approve == null && deny != null){
-			 n = service.denyTeam(map);
+			   n = service.denyTeam(map);
 			}
-	          
+	
           } else if(userid.equalsIgnoreCase("admin")) {
           	String msg ="접근이 불가합니다.";
 			String loc ="index.action";
@@ -652,21 +684,31 @@ public class JihyeController {
 			
 			return "msg.notiles";
 			
-		}	
+		  }	
+          
+          
+          
           List<HashMap<String, String>> teamName = null;
           
-			if(n >0) {
+			
 				
-				if(TEAM_MEMBER_ADMIN_STATUS == "3") {
-				
+				if(TEAM_MEMBER_ADMIN_STATUS.equalsIgnoreCase("3")) {
+				 System.out.println("들어왔다3번");
 			     teamName = service.getInviteTeamName(userid);
-				}else if(TEAM_MEMBER_ADMIN_STATUS == "4"){
+			     
+				}else if(TEAM_MEMBER_ADMIN_STATUS.equalsIgnoreCase("4")){
+					 System.out.println("들어왔다4번");
 				  teamName = service.getRequestTeamName(userid);
 					
 				}
+				
+				
+				
+				
 		          JSONArray jsonArr = new JSONArray();  //아무것도 안 넣으면 []
 		          
 		          for(HashMap<String, String> map2 : teamName) {
+		        	  
 		             JSONObject jsonObj = new JSONObject();
 
 		             //밑에 것은 json에 대한 키값이다.
@@ -682,7 +724,7 @@ public class JihyeController {
 		          String str_jsonArr = jsonArr.toString();
 		          req.setAttribute("str_jsonArr", str_jsonArr); 
 		          
-			}
+		
           
           
            if(TEAM_MEMBER_ADMIN_STATUS == "4") {
@@ -880,47 +922,6 @@ public class JihyeController {
      		
      	}
      
-     	//////////////////////////////////////////////////////
-     	// 내가 요청한 팀내역 불러오기 
-    	
-     	@RequestMapping(value="/reqTeamNameJSON.action", method={RequestMethod.GET})
-     	public String requireLogin_reqTeamName(HttpServletRequest req, HttpServletResponse res) {
-     		  
- 		   HttpSession session = req.getSession();
- 	       MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
- 	       
- 	       String userid = null;
-
- 			if (loginuser != null) {
- 				userid = loginuser.getUserid();
- 			}
- 	
- 		   // ==== 팀에서 초대할 경우 초대 수락/거절 버튼 만들기
- 		   // 1) 우선 나를 초대한 팀명 불러오기
- 			List<HashMap<String, String>> teamName = service.getRequestTeamName(userid);
- 			
- 			JSONArray jsonArr = new JSONArray();  //아무것도 안 넣으면 []
- 	          
- 	          for(HashMap<String, String> map2 : teamName) {
- 	             JSONObject jsonObj = new JSONObject();
-
- 	             //밑에 것은 json에 대한 키값이다.
- 	             jsonObj.put("FK_TEAM_IDX", map2.get("FK_TEAM_IDX")); 
- 	             jsonObj.put("team_name", map2.get("TEAM_NAME")); 
- 	             jsonObj.put("TEAM_USERID", map2.get("TEAM_USERID"));
- 	             jsonObj.put("TEAM_MEMBER_ADMIN_STATUS", map2.get("TEAM_MEMBER_ADMIN_STATUS"));
-
- 	             
- 	             jsonArr.put(jsonObj);
- 	          }
-
- 	          String str_jsonArr = jsonArr.toString();
- 	          	          
- 	          req.setAttribute("str_jsonArr", str_jsonArr);
-
- 		   
- 	      return "jihye/reqTeamNameJSON";
-     	}
-
+     	
 	
 }
