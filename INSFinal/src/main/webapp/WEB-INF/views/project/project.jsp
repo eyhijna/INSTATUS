@@ -581,8 +581,7 @@
 						<c:if test="${vo.cardlist != null}">
 							<c:forEach items="${vo.cardlist}" var="cardvo">
 								<div class="panel panel-default">
-									<div class="panel-body"
-										><%-- onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false" --%>
+									<div class="panel-body" onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false">
 										${cardvo.card_title}
 									</div>
 								</div>
