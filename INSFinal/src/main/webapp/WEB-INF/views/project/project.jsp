@@ -127,7 +127,8 @@
 			var card_title_length = $(this).prev().prev().val().length;
 			var list_idx = $(this).next().next().val();//리스트idx
 			var userid = "${sessionScope.loginuser.userid}";//유저 아이디
-
+			
+			
 			if(card_title_length == 0){
 				alert("카드 타이틀은 공백으로 할 수 없습니다.");
 				$(this).prev().prev().val("");
@@ -150,7 +151,15 @@
 					dataType: "JSON",
 					success: function(data){
 						if(data.result == 1){
-							location.reload();
+						//	location.reload();
+							alert("카드를 생성했습니다.");
+							
+							var html = "<div class='panel panel-default'>"
+									 + "	<div class='panel-body'>"
+									 + "	테스트합니다"
+									 + "	</div>"
+									 + "</div>";
+							$(this).parents(".card-wrapper").append(html);
 						}
 						else{
 							alert("카드 생성에 실패했습니다.");
@@ -159,7 +168,7 @@
 					error: function(request, status, error){ 
 				         alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
 				    }
-				}); //end of $.ajax 
+				}); //end of $.ajax  */
 			}
 		}); // end of $(".btn-addcard").click
 	}); // end of $(document).ready
@@ -569,19 +578,15 @@
 				<!--  list_delete_status != 0 인 경우에만 리스트 노출 -->
 				<div id="list${status.count}" class="well well2"
 					style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
-					<input type="text" class="project_listname newval"
-						value="${vo.list_name}"
-						style="cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold;"
-						maxlength="25" /> &nbsp;&nbsp;&nbsp;<i class="fa fa-align-justify"
-						style="font-size: 24px"></i> <input type="hidden"
-						class="project_listname oldval" value="${vo.list_name}" /> <input
-						type="hidden" class="update_idx" value="${vo.list_idx}"
-						maxlength="4" />
+					<input type="text" class="project_listname newval" value="${vo.list_name}" style="cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold;" maxlength="25" /> 
+					&nbsp;&nbsp;&nbsp;<i class="fa fa-align-justify" style="font-size: 24px"></i> 
+					<input type="hidden" class="project_listname oldval" value="${vo.list_name}" /> 
+					<input type="hidden" class="update_idx" value="${vo.list_idx}" maxlength="4" />
 					<div class="card-wrapper" style="max-height: 595px; overflow-y: auto; margin-top: 5%;">
 						<c:if test="${vo.cardlist != null}">
 							<c:forEach items="${vo.cardlist}" var="cardvo">
 								<div class="panel panel-default">
-									<div class="panel-body" onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false">
+									<div class="panel-body" onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false"> 
 										${cardvo.card_title}
 									</div>
 								</div>
@@ -590,18 +595,14 @@
 					</div>
 					<div style="margin-top: 5%;">
 						<div class="div-addcard">
-							<textarea class="addcard-TA" rows="2" cols="33"
-								placeholder="Enter card title..."></textarea>
+							<textarea class="addcard-TA" rows="2" cols="33" placeholder="Enter card title..."></textarea>
 							<br />
-							<button class="btn btn-default btn-addcard"
-								style="margin-top: 10px;">add Card</button>
-							<button class="btn btn-default btn_cardCancel"
-								style="margin-top: 10px;">cancel</button>
+							<button class="btn btn-default btn-addcard" style="margin-top: 10px;">add Card</button>
+							<button class="btn btn-default btn_cardCancel" style="margin-top: 10px;">cancel</button>
 							<input type="hidden" value="${vo.list_idx}">
 						</div>
-						<span style="font-size: 12pt; color: gray; cursor: pointer;"
-							id="addCardstyle${status.count}" class="addCardstyle"><i
-							class="fa fa-plus"></i>&nbsp;add another card...</span>
+						<span style="font-size: 12pt; color: gray; cursor: pointer;" id="addCardstyle${status.count}" class="addCardstyle">
+						<i class="fa fa-plus"></i>&nbsp;add another card...</span>
 					</div>
 				</div>
 			</c:if>

@@ -711,7 +711,9 @@ body{overflow: hidden;}
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu" style="width: 100%;">
 							<c:forEach items="${sessionScope.projectList}" var="map">
+								<c:if test="${map.team_delete_status == '1'}">
 								<li><a href="<%=request.getContextPath()%>/project.action?project_name=${map.project_name}&projectIDX=${map.project_idx}&team_IDX=${map.team_idx}">${map.project_name}</a></li>
+								</c:if>
 						    </c:forEach>
 					    </ul>
 					</div>

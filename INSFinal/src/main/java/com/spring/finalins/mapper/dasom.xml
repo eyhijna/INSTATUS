@@ -90,12 +90,14 @@
 	
 	<!-- 로그인 한 유저의 프로젝트 이름, 프로젝트idx, 팀idx select -->
 	<resultMap type="HashMap" id="getProjectInfo">
-		<result property="project_idx"   column="project_idx"  javaType="String" />
-		<result property="project_name"  column="project_name" javaType="String" />
-		<result property="team_idx"      column="team_idx"     javaType="String" />
+		<result property="project_idx"         column="project_idx"        javaType="String" />
+		<result property="project_name"        column="project_name"       javaType="String" />
+		<result property="team_idx"            column="team_idx"           javaType="String" />
+		<result property="team_delete_status"  column="team_delete_status" javaType="String" />
 	</resultMap>
 	<select id="getProjectList" parameterType="String" resultMap="getProjectInfo">
-		select fk_project_idx as project_idx, project_name, fk_team_idx as team_idx
+		select fk_project_idx as project_idx, project_name, fk_team_idx as team_idx,
+			   (select team_delete_status from ins_team where team_idx = fk_team_idx) as team_delete_status
 		  from ins_project_member A join ins_project B       
 		    on A.fk_project_idx = B.project_idx
 		 where project_member_userid = #{userid}
