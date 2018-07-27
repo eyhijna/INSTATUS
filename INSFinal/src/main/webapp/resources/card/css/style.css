@@ -339,3 +339,6 @@ box-shadow: none;
   color: white;
 }
 
+/* textarea 사이즈 조절 */
+textarea.autosize { min-height: 50px; }
+

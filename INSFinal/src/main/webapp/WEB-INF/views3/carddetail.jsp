@@ -1011,7 +1011,15 @@ function goCheckListTitleDelete(){
 		}
 	}//end of if()	 
 }// end of goCheckListDelete
- 
+
+// textarea 사이즈 조절
+function resize(obj) {
+	  obj.style.height = "1px";
+	  obj.style.height = (12+obj.scrollHeight)+"px";
+	  alert( obj.style.height);
+}
+
+
 </script>
 <body>
 	<input type="hidden" id="cardchecklistTitle" value="${cardCheckTitleMap.CARDCHECKLISTTITLE}"/>
@@ -1034,7 +1042,7 @@ function goCheckListTitleDelete(){
              
              <!-- 카드 타이틀 변경 -->
               <span class="navbar-brand title" id="titleInput">
-              	<i class="fa fa-columns"></i><input type="text"  id="inputcss" value="${cardMap.CARDTITLE}" /> 
+              	<i class="fa fa-columns"></i><input type="text"  style="width:700px;"  id="inputcss" value="${cardMap.CARDTITLE}"/> 
               	<input type="hidden"  id="inputtitle" value="${cardMap.CARDTITLE}"  />
               </span>
               
@@ -1271,7 +1279,7 @@ function goCheckListTitleDelete(){
                        <div class="col-lg-6">
                            <form role="form">
                                <div class="form-group">
-                                   <textarea class="form-control" id="description" rows="3" >${cardDetailMap.DESCRIPTION}</textarea>
+                                   <textarea class="form-control autosize" onkeydown="resize(this)" onkeyup="resize(this)" id="description" rows="3" >${cardDetailMap.DESCRIPTION}</textarea>
                                </div>
                                 <button type="button" class="btn btn-default" style="font-weight: bold;" onClick="goDescription('${cardMap.CARDIDX}')"><i class="fa fa-floppy-o"></i>Save</button>        
                            </form>
@@ -1410,7 +1418,7 @@ function goCheckListTitleDelete(){
 								<div id="checkListAdd">
 								 <form role="form" >
 	                             <div class="form-group">
-	                           		 <textarea class="form-control" rows="3" id="CheckListContent" placeholder="Add an item..."></textarea>
+	                           		 <textarea class="form-control autosize" onkeydown="resize(this)" onkeyup="resize(this)" rows="3" id="CheckListContent" placeholder="Add an item..."></textarea>
 	                             </div>
 		                            <button type="button" class="btn btn-default" style="font-weight: bold;" id="goCheckListADD"><i class="fa fa-plus"></i>Add</button>
 									<button type="button" class="btn btn-default" style="font-weight: bold;" id="checkListCancel" ><i class="fa fa-times-circle"></i>Cancel</button>      
@@ -1441,7 +1449,7 @@ function goCheckListTitleDelete(){
                              <div class="form-group">
                              	<input type="hidden" id="userid" value="${sessionScope.loginuser.userid}" />
                              	<input type="hidden" id = "nickname" value="${sessionScope.loginuser.nickname}" />
-                                 <textarea class="form-control" rows="3" id="content"></textarea> 
+                                 <textarea class="form-control autosize" onkeydown="resize(this)" onkeyup="resize(this)" rows="3" id="content"></textarea> 
                              </div>
                             	 <input type="hidden" id="cardidx" value="${cardMap.CARDIDX}"/>
                               <button type="button" class="btn btn-default" style="font-weight: bold;" onClick="goAddComment();"><i class="fa fa-floppy-o"></i>Save</button>        
@@ -1506,7 +1514,7 @@ function goCheckListTitleDelete(){
 	                           	</c:if>
 	                           	<form role="form">
 	                               <div class="form-group" >
-                                     <textarea class="form-control" rows="3"  name="content" id="Editcontent${status.count}"></textarea> 
+                                     <textarea class="form-control autosize" onkeydown="resize(this)" onkeyup="resize(this)" rows="3"  name="content" id="Editcontent${status.count}"></textarea> 
                                      <input type="hidden" id="EditOldcontent${status.count}" value="${map.CARDCOMMENTCONTENT}"/>
                                  </div>
                                   <button type="button" class="btn btn-default" style="font-weight: bold;" onClick="goEditComment('${cardMap.CARDIDX}','${map.CARDCOMMENTIDX}','${status.count}');"><i class="fa fa-floppy-o"></i>Save</button>
