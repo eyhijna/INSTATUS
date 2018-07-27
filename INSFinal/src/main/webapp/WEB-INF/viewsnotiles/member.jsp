@@ -68,12 +68,11 @@
 </style>
 <script type="text/javascript">
    $(document).ready(function(){
-	   
-	   
+	    
        var memberCnt_val = ${memberCnt};
 	   
-	   if(memberCnt_val > 0){ // 팀원들이 있는 경우
-		   showMember("1");
+	   if(memberCnt_val > 0){ // 팀원들이 있는 경우    
+		    showMember("1");
 	   }
 	   else{ // 팀원이 없는 경우(나자신제외)
 		    $("#searchBtn").click(); 
@@ -242,12 +241,9 @@
 		   var adminuserid = $("#teamAdmin").val().trim(); 
 		   
 		   if(adminuserid == useridval){ //내 권한을 바꿨을때  
+			     
 			    
-			   alert(adminuserid);
-		       alert(useridval); 
-			    
-			   var countsecondAD = ${secondAdminCnt}; 
-			   alert(countsecondAD);
+			   var countsecondAD = ${secondAdminCnt};  
 				 
 				  if(countsecondAD >= 2){ // 부운영자가 2명이상 있다면 선택할 수 있게끔 모달창을 띄운다.
 					 
@@ -308,9 +304,7 @@
 	   $("#toNormal").click(function(){ 
 		   
 		   var useridval = $("#toNormal").val().trim();
-		   var adminuserid = $("#teamAdmin").val().trim();
-		   alert(useridval);
-		   alert(adminuserid);
+		   var adminuserid = $("#teamAdmin").val().trim(); 
 		   
 		   if(adminuserid == useridval){ //내 권한을 바꿨을때  
 			    
@@ -570,8 +564,7 @@
 	  	      data:form_data,
 	  	      dataType:"JSON",
 	  	      success:function(json){
-	  	    	   
-	  	    	     
+	  	    	    
 	  	    	     var html = "";
 	  	    	      
 	  	    	         html += "<table class='table'> "; 
@@ -666,21 +659,29 @@
   
    function searchMember(){ // 팀원들이 존재하지 않을때 
 	   
-	   var html =  "<form name='searchFrm'>";
-	       html += "<div style=' margin-left: 250px; margin-top:50px; '>";
-	       html += "   <img src='resources/img/letter.png' alt='' style='width:110px;height:110px; margin-left:145px;'>";
-	       html += "   <h2 style='margin-top:10px; font-size:28pt; font-weight:bold; color:black; margin-left:62px;'>Invite Your Team</h2>";
-		   html +=  "      <input type='text' placeholder='Search Member' name='searchWord' id='searchWord' style='width:300px;'>";
-		   html +=  "      <input type='hidden' name='searchUserid' id='searchUserid' style='width:100px;'>";
-		   html +=  "      <button type='button' id='searchmember' class='btn btn-primary' style='font-weight:bold; width:140px; margin-bottom:5px;'>Invite to Team</button>";
+	   var html =   " <c:if test='${(sessionScope.loginuser).userid == teamvo.admin_userid}'>   ";   
+	       html +=  "  <form name='searchFrm'>";
+	       html +=  "   <div style=' margin-left: 250px; margin-top:50px; '>";
+	       html +=  "     <img src='resources/img/letter.png' alt='' style='width:110px;height:110px; margin-left:145px;'>";
+	       html +=  "     <h2 style='margin-top:10px; font-size:28pt; font-weight:bold; color:black; margin-left:62px;'>Invite Your Team</h2>";
+		   html +=  "        <input type='text' placeholder='Search Member' name='searchWord' id='searchWord' style='width:300px;'>";
+		   html +=  "        <input type='hidden' name='searchUserid' id='searchUserid' style='width:100px;'>";
+		   html +=  "       <button type='button' id='searchmember' class='btn btn-primary' style='font-weight:bold; width:140px; margin-bottom:5px;'>Invite to Team</button>";
 		   
-		   html +=  "    <div id='display' class='dropdown'>"; 
-	       html +=  "      <ul class='dropdown-menu' id='displayData'></ul>";  
-	       html +=  "	 </div>"; 
+		   html +=  "      <div id='display' class='dropdown'>"; 
+	       html +=  "        <ul class='dropdown-menu' id='displayData'></ul>";  
+	       html +=  "	   </div>"; 
 		   
 		   
-		   html +=  "</div>"; 
-		   html +=  "</form>";
+		   html +=  "   </div>"; 
+		   html +=  "  </form>";
+		   html +=  " </c:if>";
+		   
+		   html +=  "<c:if test='${(sessionScope.loginuser).userid != teamvo.admin_userid}'>   "; 
+		   html +=  "  <table>";
+		   html +=  "   <td><tr><span class='glyphicon glyphicon-exclamation-sign' style='color:black;'> </span><span>&nbsp;There is no members</span></tr></td>";
+		   html +=  "  </table>";
+		   html +=  "</c:if>";
 	   
 	   $("#input").html(html);
 	   
@@ -861,11 +862,11 @@
 	    <div class="modal-dialog">
 	    
 	      <!-- Modal content-->
-	      <div class="modal-content" style="right: 300px; top: 100px; width: 450px; ">
+	      <div class="modal-content" style="left: 400px; top: 100px; width: 450px; ">
 	        <div class="modal-header">
 	          <button type="button"  class="close" data-dismiss="modal">&times;</button>
 	          <h4 class="modal-title" style="color:black; font-weight: bold;">Change Permission</h4>
-	        </div>
+	        </div> 
 	        <div class="modal-body">
 	          <h4 style="font-weight:bold; color:black;" >Choose Permission</h4>
 	           <div style="padding: 32px; display: block;" class="btn-group-vertical">
@@ -888,7 +889,7 @@
     <div class="modal-dialog">
     
       <!-- Modal content-->
-      <div class="modal-content" id="Modal2Content" style="right: 330px; top: 130px; width: 400px;" >
+      <div class="modal-content" id="Modal2Content" style="left: 330px; top: 130px; width: 400px;" >
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title" style="color:black; font-weight:bold;">Choose member</h4>

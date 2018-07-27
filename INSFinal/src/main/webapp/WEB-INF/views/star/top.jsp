@@ -160,11 +160,11 @@
 		    	  html += "<tr> ";
 		    	  
 		    	  if(json.file_size == 0){  
-		    	      html += " <a data-toggle='modal' href='#myModal' ><img src='<%= request.getContextPath() %>/resources/img/"+json.org_filename+"' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' /></a>";
-		    	  }
+		    	      html += "<img src='<%= request.getContextPath()%>/resources/img/"+json.org_filename+"' data-toggle='modal' href='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' />";
+		    	  }   
 		   		  
 		    	  if(json.file_size != 0){
-		    		  html += "<a data-toggle='modal' href='#myModal' ><img src='<%= request.getContextPath() %>/resources/files/"+json.server_filename+"' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' /></a>";
+		    		  html += "<img src='<%= request.getContextPath()%>/resources/files/"+json.server_filename+"'  data-toggle='modal' href='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' />";
 		    	      
 		    	  }
 		    	    
@@ -186,7 +186,8 @@
   function showTeamName(){
 
 	  var team_idx_val = ${teamvo.team_idx};
-	  
+
+
 	  var data_form = {team_idx : team_idx_val};
 	  
 	  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
@@ -203,7 +204,7 @@
 		      success:function(json){
 		    	  
 		    	  $("#infoTeam").empty();
-		      
+		          
 		    	  var html = "<span style='font-size: 25pt; font-weight: bold; color: black;'>"+json.team_name+"</span>&nbsp;&nbsp;";
 		    	     if(json.team_visibility_status == 0){
 		    	    	 html += "   <span style='color: #ff5252;' class='glyphicon glyphicon-eye-close'></span><span style='color:gray; font-size: 12pt;'>&nbsp;&nbsp;private</span>";
@@ -211,12 +212,24 @@
 		    	     else if(json.team_visibility_status == 1){
 		    	         html += "   <span style='color: blue;' class='glyphicon glyphicon-eye-open'></span><span style='color:gray; font-size: 12pt;'>&nbsp;&nbsp;public</span>";
 		     		 }
-		    	      
-		    	      html += "<div style='padding-top:20px;'>"; 
-		    	      html += "	 <button type='button' class='btn' onClick='Editprofile();'><span class='glyphicon glyphicon-pencil'></span>&nbsp;&nbsp;&nbsp;<span style='font-size: 10pt; font-weight: bold; color:black;'>Edit Team Profile</span></button>";
+		    	     
+		    	      html += "<div style='padding-top:20px;'>";  
+		    	      html += " <c:forEach items='${memberList}' var='member' varStatus='var'>";  
+		              html += "   <c:if test='${(sessionScope.loginuser).userid == member.team_userid && ( mystatus == 1 || mystatus == 2 )}'>";
+		    	      html += "	   <button type='button' class='btn' onClick='Editprofile();'><span class='glyphicon glyphicon-pencil'></span>&nbsp;&nbsp;&nbsp;<span style='font-size: 10pt; font-weight: bold; color:black;'>Edit Team Profile</span></button>";
+		    	      html += "   </c:if>";
+		    	      html += " </c:forEach>";
+		    	        
+		    	      html += "   <c:if test='${(sessionScope.loginuser).userid != member.team_userid && (mystatus == null || mystatus == 3 || mystatus == 4)}'>"; 
+		    	      html += "	       <button type='button' class='btn' onClick='joinTeam(\""+${teamvo.team_idx}+"\");' style='background-color:#ff5252'><span class='glyphicon glyphicon-plus' style='color:white;'></span>&nbsp;&nbsp;&nbsp;<span style='font-size: 10pt; font-weight: bold; color:white;'>Do you want to join this team?</span></button>";
+		    	      html += "        <form name='joinFrm'>";
+		    	      html += "          <input type='hidden' name='team_idx' id='team_idx'/>";
+		    	      html += "        </form>"; 
+		    	      html += "   </c:if>"; 
 		    	      html += "</div>";
 		    	      
-		         $("#infoTeam").html(html);    
+		         $("#infoTeam").html(html);   
+		         
 		      },
 		      error: function(request, status, error){
 					alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
@@ -265,10 +278,18 @@
   		frm.method="POST";
   		frm.action="<%= request.getContextPath()%>/EditEnd.action";
   		frm.submit(); 
-  	} 
-  	
-  	
-  }//end of ready
+  	}  
+  } 
+  
+  function joinTeam(team_idx){ // public일때 회원이 가입신청 버튼을 누를때 
+	    
+	    var frm = document.joinFrm;
+        frm.team_idx.value = team_idx;  
+        
+	    frm.method="POST";
+        frm.action="<%= request.getContextPath()%>/wantJoinTeam.action";
+        frm.submit(); 
+  } 
 </script>
 
 <div> 
@@ -285,7 +306,7 @@
     
       <!-- Modal content-->
       
-	      <div class="modal-content" style="display:inline-block; right: 600px; top: 100px; width: 400px; ">
+	      <div class="modal-content" style="display:inline-block; right: 170px; top: 100px; width: 400px; ">
 	        <div class="modal-header">
 	          <button type="button" class="close" data-dismiss="modal">&times;</button>
 	          <h4 class="modal-title" style="color:black; font-weight: bold;">Set Team Image</h4>

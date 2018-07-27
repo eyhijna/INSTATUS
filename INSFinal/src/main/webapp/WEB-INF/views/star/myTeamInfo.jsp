@@ -67,7 +67,7 @@
     	if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
 	  		  alert("you must login. go to login page..");
 	  		  location.href="<%= request.getContextPath()%>/index.action";   
-  	    } 
+  	    }  
   	    else{
 	    	$.ajax({
 	    		
@@ -97,7 +97,7 @@
     	if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
 	  		  alert("you must login. go to login page..");
 	  		  location.href="<%= request.getContextPath()%>/index.action";   
-  	    } 
+  	    }  
   	    else{
 	    	$.ajax({
 	    		
@@ -121,11 +121,14 @@
 
 
     <div class="navtab" align="center">        
-        <ul class="nav nav-tabs abc">
-		    <li><a data-toggle="tab1" onClick="board();"><span style="font-weight: bold; color: black;">Board</span></a></li>
-		    <li><a data-toggle="tab1" onClick="member();"><span style="font-weight: bold; color: black;">Member</span></a></li>
-		    <li><a data-toggle="tab1" onClick="setting();"><span style="font-weight: bold; color: black;">Setting & Alarm</span></a></li> 
-		   
+        <ul class="nav nav-tabs abc"> 
+		       <li><a data-toggle="tab1" onClick="board();"><span style="font-weight: bold; color: black;">Board</span></a></li>
+		       <li><a data-toggle="tab1" onClick="member();"><span style="font-weight: bold; color: black;">Member</span></a></li>
+		  <c:forEach items="${memberList}" var="member">
+             <c:if test="${(sessionScope.loginuser).userid == member.team_userid && ( mystatus == 1 || mystatus == 2 )}">   
+		       <li><a data-toggle="tab1" onClick="setting();"><span style="font-weight: bold; color: black;">Setting & Alarm</span></a></li>    
+	         </c:if>
+	      </c:forEach>
 	    </ul> 
    </div>     
    

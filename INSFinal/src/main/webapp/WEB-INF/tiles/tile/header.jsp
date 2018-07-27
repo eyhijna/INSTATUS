@@ -224,7 +224,7 @@
 									
 								if(json.length < 2){
 									
-									 html += "<br/><a href='#'><span class='result'>"+str+"</span></a>";
+									 html += "<br/><a href='/finalins/showTeam.action?team_idx="+entry.team_idx+"'><span class='result'>"+str+"</span></a>";
 									 
 									 $("#team_drop1").html(html);
 									
@@ -232,7 +232,7 @@
 								else{
 									
 									if(entryIndex < 2){
-										html += "<br/><a href='#'><span class='result'>"+str+"</span></a>";
+										html += "<br/><a href='/finalins/showTeam.action?team_idx="+entry.team_idx+"'><span class='result'>"+str+"</span></a>";
 										
 									}
 									

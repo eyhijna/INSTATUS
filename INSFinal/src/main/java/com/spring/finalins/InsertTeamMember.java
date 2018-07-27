@@ -2,6 +2,7 @@ package com.spring.finalins;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.spring.finalins.common.MyUtil;
 import com.spring.finalins.model.MemberVO;
+import com.spring.finalins.model.TeamMemberVO;
 import com.spring.finalins.model.TeamVO;
 import com.spring.finalins.service.InterStarService;
 
@@ -91,7 +93,7 @@ public class InsertTeamMember {
 			 if("yes".equals(session.getAttribute("createTeam"))) { //팀생성 페이지를 통해 들어왔다면 
 			     m = service.checkMemberExist(map); // 팀안에 중복되어있는지 검사 
 			    if(m == 0) {
-			        n = service.insertTeamMember(map); // 중복되어있지 않다면 insert해준다.   
+			        n = service.insertTeamMember(map); // 중복되어있지 않다면 insert해준다.  
 			        if(n==0) {
 			    		 try { //dispatcher 예외처리를 위한 try-catch
 				    		    String msg = "팀테이블 생성 실패";
@@ -115,7 +117,17 @@ public class InsertTeamMember {
 								e.printStackTrace();
 							} // end of try-catch 
 			    	 }//end of if
-			        
+			         else {
+			        	
+			        	List<TeamMemberVO> memberList = service.teamMemberList(teamvo.getTeam_idx()); // 팀의 회원정보들을 불러오는 메소드 
+						request.setAttribute("memberList", memberList);  
+					   	  
+					    n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+					    if(n>0) { 
+					         TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
+					    	 request.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+					    }
+			        }//end of else
 			        session.removeAttribute("createTeam");
 			    }
 			 } 

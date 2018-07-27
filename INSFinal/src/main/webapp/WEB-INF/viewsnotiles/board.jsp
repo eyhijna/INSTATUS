@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,10 +82,7 @@
  		    		   
  		    		    $.each(json, function(entryindex, entry){
  		    		    	
- 		    		    	 html += "<div align='left' style='display: inline-block; margin-left:30px;'>"
-		    		  				 // + "<a href='/MyMVC/prodView.do?pnum="+entry.pnum+"'>" 
-		    		  				 // + "<img width='120px;' height='130px;' src='images/"+entry.pimage1+"'>"
-		    		  				 //  + "</a>"	project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+ 		    		    	 html += "<div align='left' style='display: inline-block; margin-left:30px;'>" 
 	    		  			 html += "<br/><button type='button' class='button'>"+entry.project_name+"</button>";    					   
 	    		  			 html += "<input type='hidden' name='project_idx' value='"+entry.project_idx+"'>";
 	    		  			 html += "<br/><br/></div>"; 
@@ -92,8 +91,7 @@
  		    		    });//end of each
  		    	   }//end of if  
  		    	       html += "<div style='clear: both;'>&nbsp;</div>";
- 		    	       	
- 		    	       	// === *** HIT 상품 결과를 출력해주기 *** ===
+ 		    	       	 
  		    	        $("#displayResult").append(html);
  		    	         
  		    	        $("#btnMore").val(parseInt(start) + length );
@@ -107,11 +105,7 @@
  			    		 }
  			    	      
  		    	       	$("#count").text(parseInt($("#count").text()) + json.length ); 
- 		    	       	// 변수를 읽어올때는 $()로 사용한다. 없어도 상관없지만 xml에서 읽어온 객체변수인것을 표시하기위해 사용 
- 		    	       	
- 		    	       	// === *** 더보기 버튼을 계속해서 눌러서 count 와 totalHITCount 가 일치하는 경우 (=더이상 볼 상품이 없는경우) 
- 		    	       	//         버튼내용을 처음으로 라고 변경하고 변경된 버튼을 클릭 시 맨 처음 상품3개만 보여지도록 한다.(=countHIT를 0으로 초기화)*** ===
- 		    	       	if($("#count").text() == $("#totalCount").text() ){
+ 		    	      	if($("#count").text() == $("#totalCount").text() ){
  		    	       		$("#btnMore").text("Back");
  		    	       		$("#count").text("0");
  		    	       	} 
@@ -133,7 +127,11 @@
 
   <div style="width: 100%; margin-top: 60px; margin-bottom: 30px;">
 	 <div style="display: block; margin-left:430px; margin-bottom:35px;">
- 	   <button type="button" class="button">Create a new board</button>
+	   <c:forEach items="${memberList}" var="member">
+          <c:if test="${(sessionScope.loginuser).userid == member.team_userid && ( mystatus == 1 || mystatus == 2 )}">   
+ 	  	     <button type="button" class="button">Create a new board</button>
+ 	  	  </c:if>
+ 	   </c:forEach> 
  	 </div> 
 	 <div id="displayResult" style="margin-left: 400px; border: 0px solid gray;"> 
  	 </div>	    		   

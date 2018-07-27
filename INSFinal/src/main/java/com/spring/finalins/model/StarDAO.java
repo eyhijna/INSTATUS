@@ -236,5 +236,19 @@ public class StarDAO implements InterStarDAO {
 		List<ProjectVO> projectList = sqlsession.selectList("star.getProjectList", map2);
 		return projectList;
 	}
+	
+	// 팀의 회원정보들을 불러오는 메소드
+	@Override
+	public List<TeamMemberVO> teamMemberList(String team_idx) {
+		List<TeamMemberVO> memberList = sqlsession.selectList("star.teamMemberList", team_idx);
+		return memberList;
+	}
+
+	// 회원이 팀가입을 요청할때
+	@Override
+	public int wantJoinTeam(HashMap<String, String> map) {
+		int n = sqlsession.update("star.wantJoinTeam", map);
+		return n;
+	}
  
 }
