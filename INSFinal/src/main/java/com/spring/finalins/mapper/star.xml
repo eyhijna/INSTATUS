@@ -143,7 +143,7 @@
 		 group by userid 
 		 ) C join ins_member D 
 		 on C.userid = D.userid
-		 where lower(D.nickname) like '%' || #{searchWord} || '%'  or lower(D.email) like '%' || #{searchWord}  || '%'
+		 where lower(D.nickname) like '%' || #{searchWord} || '%'  or lower(D.userid) like '%' || #{searchWord}  || '%'
          order by 1
     </select>
     
@@ -251,7 +251,7 @@
 		     , B.ins_personal_alarm
 		from ins_team_member A left join ins_member B
 		on A.team_userid = B.userid
-		where A.fk_team_idx = #{team_idx} and A.team_member_admin_status != 4 and A.team_member_admin_status != 3 and (lower(B.nickname) like '%' || #{searchMyTmember} || '%'  or lower(B.email) like '%' || #{searchMyTmember} || '%' or lower(B.userid)like '%' || #{searchMyTmember} || '%') 
+		where A.fk_team_idx = #{team_idx} and A.team_member_admin_status != 4 and A.team_member_admin_status != 3 and (lower(B.nickname) like '%' || #{searchMyTmember} || '%'  or lower(B.userid) like '%' || #{searchMyTmember} || '%' or lower(B.userid)like '%' || #{searchMyTmember} || '%') 
     </select>
     
     <select id="myTeamMemberList" parameterType="String" resultType="com.spring.finalins.model.TeamMemberVO">
@@ -279,11 +279,17 @@
  		<result property="userid" 	         	    column="userid" 	              javaType="String" /> 
     </resultMap> 
     <select id="getSearchExceptTeamMember" parameterType="HashMap" resultMap="searchExceptMemberMap">
- 		select userid, nickname, email, org_filename
-		from ins_member A left join ins_team_member B
-        on A.userid = B.team_userid 
-		where (lower(A.nickname) like '%' || #{searchWord} || '%'  or lower(A.email) like '%' || #{searchWord}  || '%') and A.leave_status = 0 and userid !=  #{login_userid} and nvl(B.FK_TEAM_IDX,0) != #{team_idx}  
-        order by 2  
+ 		 select D.userid, D.nickname, D.email, D.org_filename
+		 from
+		   (
+		     select userid 
+			 from ins_member A left join ins_team_member B
+			 on A.userid = B.team_userid
+			 where B.fk_team_idx = #{team_idx}  
+		   ) C right join ins_member D
+		  on C.userid = D.userid
+		  where C.userid is null and (lower(D.nickname) like '%' || #{searchWord} || '%'  or lower(D.userid) like '%' || #{searchWord}  || '%') and D.leave_status = 0 and D.userid !=  #{login_userid}
+		  order by 1
     </select>
     
     <select id="joinMemberCount" parameterType="String"  resultType="Integer">
@@ -320,7 +326,17 @@
 		   )T
 		 where T.RNO between #{startRno} and #{endRno}
     </select>
+     
+    <select id="teamMemberList" parameterType="String" resultType="com.spring.finalins.model.TeamMemberVO">
+        select fk_team_idx, team_userid, team_member_admin_status
+        from ins_team_member
+        where fk_team_idx = #{team_idx}
+    </select>
     
+    <update id="wantJoinTeam" parameterType="HashMap">
+        insert into ins_team_member(fk_team_idx, team_userid, team_member_admin_status)
+        values(#{team_idx}, #{login_userid},  4 )  
+    </update>
 </mapper>
  
  

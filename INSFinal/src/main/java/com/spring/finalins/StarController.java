@@ -35,7 +35,7 @@ public class StarController {
 	  
 	  @Autowired
 	  private FileManager fileManager;
-	  
+	 /* 
 	  // 팀을 만드는 페이지로 이동 
 	  @RequestMapping(value="/main.action", method={RequestMethod.GET})
 	  public String requireLogin_main(HttpServletRequest req, HttpServletResponse res) {
@@ -47,7 +47,7 @@ public class StarController {
 		   req.setAttribute("countTeam", n);
 		   
 		   return "main.tiles2";
-	  }
+	  }*/
 	  
 	  // 가입된 팀 목록을 보여주는 메소드 JSON
 	  @RequestMapping(value="/showTeamList.action", method={RequestMethod.GET})
@@ -57,8 +57,9 @@ public class StarController {
 		   MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		    
 		   String str_jsonArray = service.getTeamListJSON(loginuser.getUserid()); // 가입된 팀 목록가져오기
-		  
+		   
 		   System.out.println("확인용 teamList JSON "+str_jsonArray);
+		    
 		   req.setAttribute("str_jsonArray", str_jsonArray); 
 		   
 		   return "teamListJSON.notiles";
@@ -103,15 +104,62 @@ public class StarController {
 			  
 		  String team_idx = req.getParameter("team_idx");
 		  System.out.println("확인용 team_idx(showTeam.action) :"+team_idx);
-		   
-		  TeamVO teamvo = service.teamInfoVO(team_idx);
+		 
+		  HttpSession session = req.getSession();
+		  MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		    
+		  String msg = "";
+	      String loc = "";
+		  if(loginuser == null) {
+			   msg = "로그인이 필요한 메뉴입니다.";
+			   loc = "/finalins/index.action";
+			  
+			  req.setAttribute("msg", msg);
+			  req.setAttribute("loc", loc);
+			  
+			  return "msg.notiles";
+		  }
 		  
+		  TeamVO teamvo = service.teamInfoVO(team_idx);
+		   
 		  String nav = "1"; 
 		  req.setAttribute("nav", nav);
 	      req.setAttribute("team_idx", team_idx);
-	   	  req.setAttribute("teamvo", teamvo);
-			 
-		  return "star/myTeamInfo.tiles";   
+	   	  req.setAttribute("teamvo", teamvo); 
+	   	  
+	      List<TeamMemberVO> memberList = service.teamMemberList(team_idx); // 팀의 회원정보들을 불러오는 메소드
+	   	  req.setAttribute("memberList", memberList);
+	   	  
+	   	  HashMap<String, String> map = new HashMap<String, String>();
+	   	  map.put("login_userid", loginuser.getUserid());
+	   	  map.put("team_idx", team_idx);
+	   	  
+	   	  int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+	      if(n>0) { 
+	    	 TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다.
+	    	 if( ("3".equals(myinfo.getTeam_member_admin_status()) || "4".equals(myinfo.getTeam_member_admin_status()) )
+	    			  && "0".equals(teamvo.getTeam_visibility_status())) { // 승락을 받지않은 회원이면서 팀이 비공개라면 막아준다 
+	    		 msg = "권한이 없습니다.";
+		    	 loc = "javascript:history.back();";
+		    	 
+		    	 req.setAttribute("msg", msg);
+		    	 req.setAttribute("loc", loc);
+		    	 
+		    	 return "msg.notiles"; 
+	    	 }
+	    	 else req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	    	  
+	      } 
+	      else if(n==0 && "0".equals(teamvo.getTeam_visibility_status())) { // 팀원이아니면서 팀이비공개라면 막아준다.
+	    	 msg = "권한이 없습니다.";
+	    	 loc = "javascript:history.back();";
+	    	 
+	    	 req.setAttribute("msg", msg);
+	    	 req.setAttribute("loc", loc);
+	    	 
+	    	 return "msg.notiles"; 
+	      }
+	      return "star/myTeamInfo.tiles"; 
 	   }
 	  // 팀 생성 버튼을 눌렀을때 이동되는 페이지 
 	  @RequestMapping(value="/myTeamInfo.action", method={RequestMethod.GET})
@@ -130,12 +178,9 @@ public class StarController {
 				System.out.println("세션확인용");
 				teamvo = service.teamInfoVO(teamvo.getTeam_idx());
 				session.setAttribute("teamvo", teamvo); 
-			}  
+			}   
 			
-			
-			req.setAttribute("team_idx", teamvo.getTeam_idx()); 
-			
-			
+			req.setAttribute("team_idx", teamvo.getTeam_idx());  
 			return "star/myTeamInfo.tiles"; 
 	  }
 	  
@@ -163,44 +208,36 @@ public class StarController {
 		   TeamVO teamvo = service.teamInfoVO(team_idx);
 		   System.out.println("확인용 로그인유저아이디"+loginuser.getUserid());
 		   System.out.println("tmembervo adminstatus "+tmembervo.getTeam_member_admin_status());
+		 
 		   String msg ="";
-		    
-		   if("0".equals(tmembervo.getTeam_member_admin_status())
-				    && ! loginuser.getUserid().equals(teamvo.getAdmin_userid())) {
+		     
+		   List<TeamMemberVO> memberList = service.teamMemberList(team_idx);	  
+		   
+		    int n = service.editTeam(map); //팀 명 변경 
 			   
-			    msg = "권한이 없습니다."; 
-			    String nav = "1"; 
-			    req.setAttribute("msg", msg);
-			    
-				req.setAttribute("nav", nav);
-				req.setAttribute("team_idx", team_idx);
-				req.setAttribute("teamvo", teamvo);
-					  
-			    return "star/myTeamInfo.tiles";  
-		   }
-		   else {
-			   
-			   int n = service.editTeam(map); //팀 명 변경 
-			   
-			   if(n == 0) {
+			if(n == 0) {
 				  msg = "팀명변경 에러";  
 				  String nav = "1"; 
 				  req.setAttribute("msg", msg);
 				    
 				  req.setAttribute("nav", nav);
 				  req.setAttribute("team_idx", team_idx);
-				  req.setAttribute("teamvo", teamvo);
-						  
+				  req.setAttribute("teamvo", teamvo); 	  
 				  return "star/myTeamInfo.tiles";  
-			   }
-			   
-		   }
-		    
+		    }
+
 		   String nav = "1"; 
+		    
+		   int m = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+		   if(m>0) { 
+		         TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
+		    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+		   }
 		   req.setAttribute("nav", nav);
 		   req.setAttribute("team_idx", team_idx);
-		   req.setAttribute("teamvo", teamvo);
-			  
+		   req.setAttribute("teamvo", teamvo); 
+		   req.setAttribute("memberList", memberList);
+		   
 		   return "star/myTeamInfo.tiles";  
 	  }
 	   
@@ -248,6 +285,12 @@ public class StarController {
 			
 		    System.out.println("확인용 tmvo" +tmember.getFk_team_idx());
 		     
+		   	int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+		    if(n>0) {
+		        TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다.
+		        req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+		    } 
+		   	  
 		    req.setAttribute("joinMemberCnt", joinMemberCnt);
 		    req.setAttribute("tmember", tmember);
 		    req.setAttribute("tvo", tvo);
@@ -266,6 +309,18 @@ public class StarController {
 		    MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		    String msg ="";
 		    String loc ="";
+		    
+		    HashMap<String, String> map = new HashMap<String, String>();
+			map.put("login_userid", loginuser.getUserid());
+			map.put("team_idx", team_idx);
+			   	  
+			int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+			if(n>0) { 
+			         TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
+			    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+			}
+			
+		    List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
 		    if(!loginuser.getUserid().equals(teamvo.getAdmin_userid())) {
 		    	// 상태를 변경하려는 유저가 admin이 아니라면 막아준다.
 		    	 msg = "권한이 없습니다."; 
@@ -274,20 +329,21 @@ public class StarController {
 			     req.setAttribute("teamvo", teamvo);
 				 req.setAttribute("team_idx", team_idx); 
 		    	 req.setAttribute("msg", msg);  
-		    	 
+		    	 req.setAttribute("memberList", memberList);
+		    	
 		    	 return "star/myTeamInfo.tiles"; 
 		    }
 		    
 		    String team_visibility_status = req.getParameter("team_visibility_status");
 		    System.out.println("확인용 team_visibility_status"+team_visibility_status);
 		    
-		    HashMap<String, String> map = new HashMap<String, String>();
-		    map.put("team_idx", team_idx);
-		    map.put("team_visibility_status", team_visibility_status); 
+		    HashMap<String, String> map1 = new HashMap<String, String>();
+		    map1.put("team_idx", team_idx);
+		    map1.put("team_visibility_status", team_visibility_status); 
 		    
-		    int n = service.updateViewStatus(map);
+		    int m = service.updateViewStatus(map1);
 		    //team_visibility_status 업데이트
-		    if(n == 0) {
+		    if(m == 0) {
 				    msg = "업데이트 에러발생 ";  
 				    String nav = "3";   
 				    req.setAttribute("msg", msg);  
@@ -295,7 +351,8 @@ public class StarController {
 				    req.setAttribute("teamvo", teamvo);
 				    req.setAttribute("team_idx", team_idx); 
 			    	req.setAttribute("msg", msg);  
-			    	 
+			    	req.setAttribute("memberList", memberList);
+			    	
 			    	return "star/myTeamInfo.tiles"; 
 		    } 
 		    
@@ -303,6 +360,7 @@ public class StarController {
 		    req.setAttribute("nav", nav);   
 		    req.setAttribute("teamvo", teamvo);
 		    req.setAttribute("team_idx", team_idx);
+		    req.setAttribute("memberList", memberList);
 		    
 		    return "star/myTeamInfo.tiles";   
 	  }
@@ -323,6 +381,7 @@ public class StarController {
 				
 				return "msg.notiles";
 			}
+			else{
 			String team_idx = req.getParameter("team_idx");
 			 
 			TeamVO teamvo = service.teamInfoVO(team_idx);
@@ -333,14 +392,24 @@ public class StarController {
 			
 			int memberCnt = service.countMember(map); // 나를 제외한 멤버가 몇명있는지 count해오는 메소드
 			int secondAdminCnt = service.count2Admin(team_idx); // 부운영자 갯수를 가져오는 메소드 
+			List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
 			
 			System.out.println("확인용 부관리자 갯수 "+secondAdminCnt);
+			
+		   	int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+		    if(n>0) {
+		        TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다.
+		        req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+		    } 
+		    
 			req.setAttribute("secondAdminCnt", secondAdminCnt);
 			req.setAttribute("memberCnt", memberCnt);
 			req.setAttribute("team_idx", team_idx); 
 			req.setAttribute("teamvo", teamvo); 
+			req.setAttribute("memberList", memberList);
 			
 		    return "member.notiles";   
+	     }
 	  }
 	  
 	  
@@ -488,7 +557,7 @@ public class StarController {
 			map.put("team_idx", team_idx);
 			
 			int n = service.leaveTeam(map); 
-			
+			List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
 			if(n != 1) {
 
 				   msg = "탈퇴가 실패하였습니다. ";
@@ -498,11 +567,12 @@ public class StarController {
 				   req.setAttribute("nav", nav);
 				   req.setAttribute("team_idx", team_idx);
 				   req.setAttribute("teamvo", teamvo);
-					 
+				   req.setAttribute("memberList", memberList);
+				   
 				   return "star/myTeamInfo.tiles";    
 			}  
 		    req.setAttribute("teamvo", teamvo); 
-		    return "/main.tiles2";   
+		    return "/index.tiles";   
 	     } 
 	  
 	  // 회원 권한을 관리자로 바꾸는 메소드 
@@ -521,6 +591,20 @@ public class StarController {
 		   
 		   TeamVO teamvo = service.teamInfoVO(team_idx);
 		   req.setAttribute("teamvo", teamvo);
+		   List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		   
+		   HttpSession session = req.getSession();
+		   MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		   HashMap<String, String> map1 = new HashMap<String, String>();
+		   map1.put("login_userid", loginuser.getUserid());
+		   map1.put("team_idx", team_idx);
+			   	  
+		   int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		   if(m > 0) { 
+			    TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			    req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+		   }
 		   
 		   if(n == 0) {
 			   
@@ -530,12 +614,12 @@ public class StarController {
 			    req.setAttribute("nav", nav);   
 			    req.setAttribute("teamvo", teamvo);
 			    req.setAttribute("team_idx", team_idx);  
-		    	 
+			    req.setAttribute("memberList", memberList);
+			    
 		    	return "star/myTeamInfo.tiles"; 
 				   
 		   }
-           
-		   HttpSession session = req.getSession();
+            
 		   session.setAttribute("oldAdminStatus", "0");
 		   req.setAttribute("userid", userid);
 		    
@@ -543,7 +627,8 @@ public class StarController {
 		   req.setAttribute("nav", nav);
 		   req.setAttribute("team_idx", team_idx);
 		   req.setAttribute("teamvo", teamvo);
-			     
+		   req.setAttribute("memberList", memberList);
+		   
 		   return "star/myTeamInfo.tiles";     
      } 
 	  
@@ -565,7 +650,20 @@ public class StarController {
 		   map.put("team_idx", team_idx);
 		   map.put("userid", userid);
 		   
+		   List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
 		   
+		   HttpSession session = req.getSession();
+		   MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		   HashMap<String, String> map1 = new HashMap<String, String>();
+		   map1.put("login_userid", loginuser.getUserid());
+	       map1.put("team_idx", team_idx);
+			   	  
+		   int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		   if(m > 0) { 
+			         TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	       }
 		   int n = service.chgTo2ndAdmin(map); // 세컨어드민으로 변경시킴 
 			   
 		   if(n == 0) {
@@ -576,7 +674,8 @@ public class StarController {
 					    req.setAttribute("nav", nav);   
 					    req.setAttribute("teamvo", teamvo);
 					    req.setAttribute("team_idx", team_idx);  
-				    	 
+					    req.setAttribute("memberList", memberList);
+					    
 				    	return "star/myTeamInfo.tiles"; 
 		   }
 		   
@@ -586,6 +685,7 @@ public class StarController {
 		   req.setAttribute("nav", nav);
 		   req.setAttribute("team_idx", team_idx);
 		   req.setAttribute("teamvo", teamvo);
+		   req.setAttribute("memberList", memberList);
 		   
 		   return "star/myTeamInfo.tiles";     
 	 }
@@ -601,14 +701,29 @@ public class StarController {
 		   TeamVO teamvo = service.teamInfoVO(team_idx);
 		   req.setAttribute("teamvo", teamvo);
 		   
-		   HashMap<String, String> map = new HashMap<String, String>(); 
-		   map.put("team_idx", team_idx);
-		   map.put("userid", userid); 
+		   List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		   req.setAttribute("memberList", memberList);
+		   
+		   HttpSession session = req.getSession();
+		   MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		   HashMap<String, String> map = new HashMap<String, String>();
+		   map.put("login_userid", loginuser.getUserid());
+	       map.put("team_idx", team_idx);
+			   	  
+		   int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+		   if(n > 0) { 
+			         TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
+			    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	       } 
+		   
+		   HashMap<String, String> map1 = new HashMap<String, String>(); 
+		   map1.put("team_idx", team_idx);
+		   map1.put("userid", userid); 
 			   
 		   int m=0;
 		  
-		   m = service.chgToNormal(map);
-		   
+		   m = service.chgToNormal(map); 
 		   if(m == 0) {
 					   
 					   String msg = "업데이트 에러 발생 ! ";  
@@ -616,8 +731,8 @@ public class StarController {
 					    req.setAttribute("msg", msg);  
 					    req.setAttribute("nav", nav);   
 					    req.setAttribute("teamvo", teamvo);
-					    req.setAttribute("team_idx", team_idx);  
-				    	 
+					    req.setAttribute("team_idx", team_idx);   
+					    
 				    	return "star/myTeamInfo.tiles"; 
 	
 		   }  
@@ -627,7 +742,8 @@ public class StarController {
 		   String nav = "2"; 
 		   req.setAttribute("nav", nav);
 		   req.setAttribute("team_idx", team_idx);
-		   req.setAttribute("teamvo", teamvo);
+		   req.setAttribute("teamvo", teamvo); 
+		   
 		   return "star/myTeamInfo.tiles";     
     } 
 	  
@@ -642,6 +758,22 @@ public class StarController {
 		 HashMap<String, String> map = new HashMap<String, String>();
 		 map.put("inviteUser", inviteUser);
 		 map.put("team_idx", team_idx);
+		 
+		 List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		 req.setAttribute("memberList", memberList);
+		   
+		 HttpSession session = req.getSession();
+		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		 HashMap<String, String> map1 = new HashMap<String, String>();
+		 map1.put("login_userid", loginuser.getUserid());
+	     map1.put("team_idx", team_idx);
+			   	  
+		 int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		 if(m > 0) { 
+			         TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	     }
 		 
 		 int n = service.inviteMember(map);
 		 String msg = "";
@@ -659,8 +791,8 @@ public class StarController {
          req.setAttribute("team_idx", team_idx);
          
          TeamVO teamvo = service.teamInfoVO(team_idx);
-		 req.setAttribute("teamvo", teamvo);
-		   
+		 req.setAttribute("teamvo", teamvo);   
+		 
 		 return "star/myTeamInfo.tiles"; 
 	  }	  
 	  
@@ -714,6 +846,22 @@ public class StarController {
 		 String userid = req.getParameter("userid");  
 		 String team_idx = req.getParameter("team_idx");
 		 
+		 List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		 req.setAttribute("memberList", memberList);
+		   
+		 HttpSession session = req.getSession();
+		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		 HashMap<String, String> map1 = new HashMap<String, String>();
+		 map1.put("login_userid", loginuser.getUserid());
+	     map1.put("team_idx", team_idx);
+			   	  
+		 int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		 if(m > 0) { 
+			   TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			   req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	     }
+		 
 		 HashMap<String, String> map = new HashMap<String, String>();
 		 map.put("userid", userid);
 		 map.put("team_idx", team_idx);
@@ -737,8 +885,7 @@ public class StarController {
 		 String nav = "3"; 
 		 req.setAttribute("nav", nav);
 		 req.setAttribute("team_idx", team_idx);
-		 req.setAttribute("teamvo", teamvo);
-		 
+		 req.setAttribute("teamvo", teamvo); 
 	   	 return "star/myTeamInfo.tiles";      
 	  }	  
 	  
@@ -749,6 +896,22 @@ public class StarController {
 		 String userid = req.getParameter("userid");  
 		 String team_idx = req.getParameter("team_idx");
 		 
+		 List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		 req.setAttribute("memberList", memberList);
+		   
+		 HttpSession session = req.getSession();
+		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		 HashMap<String, String> map1 = new HashMap<String, String>();
+		 map1.put("login_userid", loginuser.getUserid());
+	     map1.put("team_idx", team_idx);
+			   	  
+		 int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		 if(m > 0) { 
+			   TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			   req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	     }
+		  
 		 HashMap<String, String> map = new HashMap<String, String>();
 		 map.put("userid", userid);
 		 map.put("team_idx", team_idx);
@@ -770,8 +933,7 @@ public class StarController {
 		 req.setAttribute("msg", msg); 
 	     req.setAttribute("nav", nav);
 		 req.setAttribute("team_idx", team_idx);
-		 req.setAttribute("teamvo", teamvo);
-		 
+		 req.setAttribute("teamvo", teamvo); 
 	   	 return "star/myTeamInfo.tiles";    
 	  }	  
 	  
@@ -884,6 +1046,23 @@ public class StarController {
 		 
 		 System.out.println("확인용  chguser "+chguser+"/ team_idx :"+team_idx+"status:"+status); 
 		 
+		 List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+		 req.setAttribute("memberList", memberList);
+		   
+		 HttpSession session = req.getSession();
+		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		   
+		 HashMap<String, String> map1 = new HashMap<String, String>();
+		 map1.put("login_userid", loginuser.getUserid());
+	     map1.put("team_idx", team_idx);
+			   	  
+		 int m = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+		 if(m > 0) { 
+			   TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+			   req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+	     }
+		 
+		 
 		 HashMap<String, String> map = new HashMap<String, String>();
 		 map.put("userid", chguser);
 		 map.put("team_idx", team_idx);
@@ -898,8 +1077,7 @@ public class StarController {
 		 }
 		 else if(n == 1) {
 			 msg = "변경 성공"; 
-		 }
-		 HttpSession session = req.getSession();  
+		 }  
 		 session.setAttribute("oldAdminStatus", status);
 		 
 		 String nav = "2";
@@ -932,6 +1110,8 @@ public class StarController {
 		 HttpSession session =  req.getSession();
 		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		 
+		 String team_idx = req.getParameter("team_idx");
+		 
 		 if(loginuser == null) {
 				String msg = "로그인이 필요한 메뉴입니다.";
 				String loc = "/finalins/index.action";
@@ -940,11 +1120,25 @@ public class StarController {
 				req.setAttribute("loc", loc);
 				
 				return "msg.notiles";
-			}
-		 String team_idx = req.getParameter("team_idx");
-		 req.setAttribute("team_idx", team_idx);
-		 
-		 return "board.notiles";     
+		 }
+		 else {
+			  List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+			  
+			  HashMap<String, String> map = new HashMap<String, String>();
+		   	  map.put("login_userid", loginuser.getUserid());
+		   	  map.put("team_idx", team_idx);
+		   	  
+		   	  int n = service.checkMemberExist(map); //내가 회원에 존재하는지 체크 
+		      if(n>0) { 
+		    	 TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
+		    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+		      }
+		      
+			  req.setAttribute("memberList", memberList);
+			  req.setAttribute("team_idx", team_idx);
+			 
+			  return "board.notiles";     
+		}
 	 }	
 	  
 	  
@@ -967,7 +1161,22 @@ public class StarController {
 			   
 			   TeamVO teamvo = (TeamVO)service.teamInfoVO(team_idx);
 			   req.setAttribute("teamvo", teamvo);
-				 
+				
+			   List<TeamMemberVO> memberList = service.teamMemberList(team_idx);
+			   req.setAttribute("memberList", memberList);
+				   
+			   HttpSession session = req.getSession();
+		       MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+				   
+			   HashMap<String, String> map1 = new HashMap<String, String>();
+		       map1.put("login_userid", loginuser.getUserid());
+			   map1.put("team_idx", team_idx);
+					   	  
+			   int n = service.checkMemberExist(map1); //내가 회원에 존재하는지 체크 
+			   if(n > 0) { 
+					  TeamMemberVO myinfo = service.teamMemberInfo(map1); //존재한다면 나의 status 를 가져온다. 	    	 
+					  req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
+			   }
 			   return "star/myTeamInfo.tiles";  
 		  } 
 		  
@@ -1033,4 +1242,45 @@ public class StarController {
 		    return "projectDisplayJSON.notiles";
 	 }
 	  
+	 // 회원이 팀가입을 요청할때
+	 @RequestMapping(value="/wantJoinTeam.action", method={RequestMethod.POST})
+	 public String requireLogin_wantJoinTeam(HttpServletRequest req, HttpServletResponse res) {
+			  
+			HttpSession session = req.getSession();
+			MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+			
+			String team_idx = req.getParameter("team_idx");
+			 
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("team_idx", team_idx);
+			map.put("login_userid", loginuser.getUserid());
+			
+			String msg = "";
+			String loc = "";
+			
+			int m = service.checkMemberExist(map);//멤버테이블에 존재하는지 확인 
+			if(m>0) { // 팀내에 존재한다면(이미 신청했다면)
+				msg = "You already send request.";
+				loc = "javascript:history.back();";
+				 
+			}
+			else {
+				int n = service.wantJoinTeam(map);   
+				
+				if(n>0) {
+					msg = "Success!";
+					loc = "javascript:history.back();"; 
+				}
+				else if(n==0) {
+					msg = "The request is failed. Please try again";
+					loc = "javascript:history.back();";
+				} 
+			}
+
+			req.setAttribute("loc", loc);
+			req.setAttribute("msg", msg);
+		    return "msg.notiles";
+		    
+	 }
+	 
 }//end of class

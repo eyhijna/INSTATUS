@@ -471,7 +471,21 @@ public class StarService implements InterStarService {
 		int totalCount = dao.projectCnt(map1);
 		return totalCount;
 	}
- 
+
+	// 팀의 회원정보들을 불러오는 메소드
+	@Override
+	public List<TeamMemberVO> teamMemberList(String team_idx) {
+		List<TeamMemberVO> memberList = dao.teamMemberList(team_idx);
+		return memberList;
+	}
+	
+	// 회원이 팀가입을 요청할때
+	@Override
+	public int wantJoinTeam(HashMap<String, String> map) {
+		int n = dao.wantJoinTeam(map);
+		return n;
+	}
+   
   
 	 
 }//end of class
