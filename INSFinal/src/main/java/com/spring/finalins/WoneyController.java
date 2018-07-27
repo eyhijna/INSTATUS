@@ -867,10 +867,11 @@ public class WoneyController {
 		int n = service.setLabelAdd(map);
 		
 		int cardDueDateCNT = service.cardDueDateCNT(cardIdx);
-
+		
 		String str_jsonobj ="";
 		JSONObject jsonobj = new JSONObject();
 		jsonobj.put("CARDDUEDATECNT", cardDueDateCNT);
+		
 		
 		str_jsonobj = jsonobj.toString();
 		request.setAttribute("str_jsonobj", str_jsonobj);
@@ -891,10 +892,13 @@ public class WoneyController {
 		int n = service.setLabelDelete(map);
 		
 		int cardDueDateCNT = service.cardDueDateCNT(cardIdx);
+		int cardLabelCNT = service.cardLabelCNT(cardIdx);
+
 
 		String str_jsonobj ="";
 		JSONObject jsonobj = new JSONObject();
 		jsonobj.put("CARDDUEDATECNT", cardDueDateCNT);
+		jsonobj.put("cardLabelCNT", cardLabelCNT);
 		
 		str_jsonobj = jsonobj.toString();
 		request.setAttribute("str_jsonobj", str_jsonobj);

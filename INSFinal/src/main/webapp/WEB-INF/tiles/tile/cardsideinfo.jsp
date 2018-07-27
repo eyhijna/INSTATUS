@@ -735,8 +735,8 @@ function goDueDateDelete(cardidx,cardduedateIdx){
 		 		data : form_data,
 		 	 	dataType: "JSON", 
 	     		success: function(json) {
-	     			if(json.CARDDUEDATECNT==0){
-	     				
+	     			if(json.CARDDUEDATECNT==0 && json.cardLabelCNT == 0 ){
+	     				//alert("삭제");
 	     				$("#option").empty();
 	     				
 	     				
