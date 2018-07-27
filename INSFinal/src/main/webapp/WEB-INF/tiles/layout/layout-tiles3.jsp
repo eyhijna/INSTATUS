@@ -16,8 +16,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
  	
     <!-- Bootstrap Core CSS -->
     <link href="<%=ctxpath %>/resources/card/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
