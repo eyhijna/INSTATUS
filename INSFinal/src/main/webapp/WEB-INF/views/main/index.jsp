@@ -7,13 +7,13 @@
 <script type="text/javascript">
     $(document).ready(function(){
     //   console.log("홈페이지 로딩되었습니다.");
-    
+    	   
     	$("#new_team_name").keydown(function(key) {
             if (key.keyCode == 13) {
                $("#submitBtn").click();
             }
         });
-    	
+    
 		$("#btnLogin").click(function(){
 	           goLogin(event); 
 	    }); // end of $("#btnLogin").click
@@ -31,12 +31,25 @@
 	    	$("#testcontent").css("background-image","url(./resources/images/" + image_name + ")");	
 	  //  	alert("확인: " + $(this).next().val());/* project_image_name */
 			$("#image_idx").val($(this).next().val());
-	    });
+	    }); // end of $(".background-grid-trigger").click
+	    
 	    
 	     $("#team").bind("change", function(){ // select team값이 바뀔 때 실행
+	    	 
+	    	if($("#team").val() == ""){ //팀을 선택하세요로 변경한 경우 
+	    		$("#pjst").empty();
+	    		var html = "<option value=''>::: 선택하세요 :::</option>";
+	    		$("#pjst").html(html);
+	    		$(".div_pjst_private").remove();
+	    		return;
+	    	} 
+	     
 	    	$("#team").css("border-color", "#2eb82e");
 	    	$("#pjst").css("border-color", "#2eb82e");
 	    	$("#error_teamlist").text("");
+	    	
+	    	$(".div_pjst_private").remove();
+	    	
 	    	var form_data = {teamIDX : $("#team").val()};
 	    	$.ajax({
 	    		url: "getTeamVS.action",
@@ -68,6 +81,75 @@
 	    				}
 	    			}
 	    			$("#pjst").append(html);
+	    			
+	    			
+	    			$("#pjst").bind("change", function(){ //프로젝트 생성에서 노출도 값이 변할 때 
+	    				$(".div_pjst_private").remove();
+	    			
+	    		    	 if( $("#pjst").val() == "1"){ //프로젝트 노출도가 private인 경우 멤버 select창 추가
+	    		    		var html = "<div class='form-group div_style div_pjst_private'>"
+	    		    				 + "	<label for='inner_div' style='margin-top: 10px;'>Select Team mate</label><br/>"
+	    							 + "<div class='inner_div' id='inner_div'>";	
+	    		    		var form_data2 = {"teamIDX" : $("#team").val(), "userid" : "${sessionScope.loginuser.userid}" };
+	    					$.ajax({
+	    						url: "getTeamMemberInfo.action",
+	    						type: "POST",
+	    						data: form_data2,
+	    						dataType: "JSON",
+	    						success: function(data){
+	    							$(".div_pjst_private").remove();
+	    							if(data.length > 0){
+	    								$.each(data, function(entryIndex, entry){
+	    									/* var checkMember = "<input class='input_style' type='checkbox' name='memberID' value='" +  entry.team_userid + "'>&nbsp;" + entry.team_userid
+	    													+ "<br/>"; */
+											var checkMember = "<span class='checkbox_style'>"
+															+ "<input class='input_style' type='checkbox' name='memberID' value='" +  entry.team_userid + "'>&nbsp;" + entry.team_userid
+															+ "</span>"
+															+ "<br/>";	    													
+	    									html += checkMember;
+	    								}); // end of $.each
+	    								html += "</div>"
+	    								html += "<input type='hidden' name='checkedID' />";
+	    								html += "</div>";
+	    		    					$("#div_pjst").after(html);
+	    							}
+	    						},
+	    						error: function(request, status, error){ 
+	    							alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+	    						}
+	    					}); //end of 내부 $.ajax
+	    		 	    }
+	    		    	 else{ //프로젝트 노출도가 public 또는 
+	    		     	 	$(".div_pjst_private").remove();
+		    		    	var html = "<div class='form-group div_style div_pjst_private'>"
+	    		    				 + "	<label for='pjst' style='margin-top: 10px;'>Select Team mate</label><br/>";
+	    		    		
+	    		    		var form_data2 = {"teamIDX" : $("#team").val(), "userid" : "${sessionScope.loginuser.userid}" };
+	    					$.ajax({
+	    						url: "getTeamMemberInfo.action",
+	    						type: "POST",
+	    						data: form_data2,
+	    						dataType: "JSON",
+	    						success: function(data){
+	    							$(".div_pjst_private").remove();
+	    							if(data.length > 0){
+	    								$.each(data, function(entryIndex, entry){
+	    									var checkMember = "<input type='checkbox' name='memberID' value='" +  entry.team_userid + "'>&nbsp;" + entry.team_userid
+	    													+ "<br/>";
+	    									html += checkMember;
+	    								}); // end of $.each
+	    								html += "<input type='hidden' name='checkedID' />"
+	    								html += "</div>";
+	    		    					$("#div_pjst").after(html);
+	    		    					$(".div_pjst_private").hide();
+	    							}
+	    						},
+	    						error: function(request, status, error){ 
+	    							alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+	    						}
+	    					}); //end of 내부 $.ajax
+	    		    	 }
+	    		    }); 
 	    		},
 	    		error: function(request, status, error){ 
 					alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -75,10 +157,32 @@
 	    	}); // end of $.ajax
 	    }); // end of  $("#team").bind
 	    
+	    
   	    
 	    $("#btn-create").click(function(){ //프로젝트 생성버튼을 눌렀을 때
+	    	
 	    	if($("#pjst").val() != "" && $("#pjst").val() != 3 && $("#team").val() != "" && $("#project_name").val() != ""){
+	    		
 	    		var frm = document.PJcreateFrm;
+	    		
+	    		if($("#pjst").val() == "1"){
+		    		var str_checkedID = "";
+		    		
+		    		$("input[name=memberID]:checked").each(function() { //input태그중 name이 membeID인 체크박스중 체크된 것들의 값을 가져옴
+			    		var checked = $(this).val();
+			    		str_checkedID += checked + ",";
+			    	});
+		    		frm.checkedID.value = str_checkedID;
+	    		}
+	    		else if($("#pjst").val() == "0"){
+					var str_checkedID = "";
+		    		
+		    		$("input[name=memberID]").each(function() { //input태그중 name이 membeID인 체크박스중 체크된 것들의 값을 가져옴
+			    		var checked = $(this).val();
+			    		str_checkedID += checked + ",";
+			    	});
+		    		frm.checkedID.value = str_checkedID;
+	    		}
 	    		
 	    		if($("#image_idx").val() == ""){
 	    			frm.image_idx.value = "1";
@@ -105,14 +209,14 @@
 	    		$("#pjst").css("border-color", "#FF0000");
 	    	}
 	    	
-	    });
+	    }); // end of $("#btn-create").click
 	    
 	    $("#project_name").keyup(function(){
 	    	if($("#project_name").val() != ""){
 	    		$("#error_project_name").text("");
 	    		$("#project_name").css("border-color", "#2eb82e");
 	    	}
-	    });
+	    }); // end of $("#project_name").keyup
 	    
 
 	//    $("#btn-changePwd1").hide();
@@ -397,26 +501,23 @@
    }); // end of $(document).ready()---------------------------    
 
    function createTeam(){ // 팀생성 유효성검사
-   	
-   	var frm = document.teamFrm;
-       var team_name = $("#new_team_name").val(); 
-       
- 	    var regexp_team_name = new RegExp(/^[A-Za-z0-9]{1,20}$/g); 
- 	    
- 	    var bool = regexp_team_name.test(team_name);
-       
-   	if(bool== false || team_name.trim() == ""){
-   		alert("Team name must includes A-Z or 0-9 and be 1 to 20 letters");
-   		$("#team_name").val(""); 
-   		return;
-   	} 
-   	
-   	frm.method="POST";
-   	frm.action="<%= request.getContextPath()%>/createTeam.action";
-   	frm.submit();
-   	
-   }
-   
+	   	
+	   	var frm = document.teamFrm;
+	       var team_name = $("#new_team_name").val(); 
+	       
+	 	    var regexp_team_name = new RegExp(/^[A-Za-z0-9]{1,20}$/g); 
+	 	    
+	 	    var bool = regexp_team_name.test(team_name);
+	       
+	   	if(bool== false || team_name.trim() == ""){
+	   		alert("Team name must includes A-Z or 0-9 and be 1 to 20 letters");
+	   		$("#team_name").val(""); 
+	   		return;
+	   	} 
+	   	frm.method="POST";
+	   	frm.action="<%= request.getContextPath()%>/createTeam.action";
+	   	frm.submit();
+	   }
    
     function goLogin(event){  
       if(${sessionScope.loginuser != null}){ //이미 로그인 된 상태라면
@@ -466,37 +567,22 @@
 </script>
 
 <style type="text/css">
-/* .myModal{
-  width: 200px;
-   position: absolute;
-   margin: 0 auto;
-   right: 0;
-   left: 0;
-    bottom: 20px;
-   z-index: 9999;
+
+.div_style{
+	max-height: 328px;
+	/* border: 1px solid blue; */
 }
- .modal-content.modal-fullsize {
-  height: auto;
-  min-height: 50%;
-  border-radius: 0; 
+.inner_div {
+    border: 1px solid lightgray;
+    /* padding-left: 10%; */
+    /* margin-left: 11px; */
+    border-radius: 0.3em;
+    background-color: white;
 }
 
-.modal-dialog{
-display: inline-block;  vertical-align: middle; 
-
+.checkbox_style{
+	margin-left: 11px;
 }
-
-.modal {
-  display: none;
-  overflow: hidden;
-  overflow-y: hidden;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1040;
-} */
 
 .background-grid-trigger {
     align-items: left;
@@ -506,7 +592,6 @@ display: inline-block;  vertical-align: middle;
     display: flex;
     height: 100%;
     justify-content: left;
-    /* margin: 0; */
     margin-right: 50px;
     min-height: 0;
     padding: 0;
@@ -583,6 +668,7 @@ body{overflow: hidden;}
         <button type="button" class="btn btn-info btn-lg btn-block" onClick="location.href='<%=request.getContextPath()%>/signup.action'">Sign up</button>
       </div>
       </c:if>
+      
       <c:if test="${sessionScope.loginuser != null}">
          <div style="padding-top: 15px; padding-bottom: 10px;">
             <p>${sessionScope.loginuser.name} 님 로그인을 환영합니다!</p>
@@ -614,11 +700,9 @@ body{overflow: hidden;}
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu" style="width: 100%;">
 							<c:forEach items="${sessionScope.teamList}" var="map">
-								<%-- <li><a href="#">${map.team_name}</a></li> --%>
 								<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${map.team_idx}">${map.team_name}</a></li>
 						    </c:forEach>
 					    </ul>
-					    
 					</div>
 					<!-- 프로젝트 리스트 불러오기 -->
 					<label for="team" style="margin-top: 10px; text-align: center;">My Project List</label>
@@ -639,15 +723,10 @@ body{overflow: hidden;}
       </c:if>
     </form>
     
-     <form name="infoFrm"> 
-		<input type="hidden" name="team_idx" id="team_idx"/>
-		<input type="hidden" name="nav" id="nav"/>    
-	 </form> 
-	  
     <div class="text-right">
       <div style="text-align: center; color: gray; margin-top: 10px;">
        <c:if test="${sessionScope.loginuser != null}">
-         <a data-toggle="modal" href="#myModal" style="font-size: 14pt; color: white; font-weight: bold;">Create Project...</a>
+         <a data-toggle="modal" href="#myModal" style="font-size: 14pt; color: white; font-weight: bold;">Create Project</a>
          <br/>
          <a data-toggle="modal" href="#myModal2" style="font-size: 14pt; color: white; font-weight: bold;">Create Team</a>
          </c:if>
@@ -696,13 +775,15 @@ body{overflow: hidden;}
 			</select>
 			<span id="error_teamlist" class="text-danger"></span>
 		  </div>
+		  <!-- 팀 노출도가 private인 경우 팀멤버 리스트 보여주기 -->
           <!-- 팀노출도 선택 -->
-          <div class="form-group" >
+          <div class="form-group" id="div_pjst">
 		  	<label for="pjst" style="margin-top: 10px;">Project Visible</label>
 			<select name="pjst" id="pjst" class="form-control">
 				<option value="">::: 선택하세요 :::</option>
 			</select>				
 		  </div> 
+		  
 		  <!-- 프로젝트 배경이미지 선택 -->
 		  <div class="form-group" >
 		  	<label for="background-grid" style="margin-top: 10px;">select Background</label>
@@ -744,7 +825,7 @@ body{overflow: hidden;}
     </div>
   </div>
   
-  <!-- 팀 생성 모달 -->
+   <!-- 팀 생성 모달 -->
    <div class="modal fade" id="myModal2" role="dialog" >
     <div class="modal-dialog">
     
@@ -771,6 +852,7 @@ body{overflow: hidden;}
       </div> 
     </div>
   </div>
+  
   <!-- 아이디찾기 modal -->
   <div class="modal fade" id="findID-modal" role="dialog" >
     <div class="modal-dialog" style="width:400px;">

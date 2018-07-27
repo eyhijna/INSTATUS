@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.spring.finalins.model.CardVO;
 import com.spring.finalins.model.ListVO;
 import com.spring.finalins.model.MemberVO;
+import com.spring.finalins.model.TeamMemberVO;
 import com.spring.finalins.service.InterProjectService;
 
 @Controller
@@ -186,8 +188,6 @@ public class ProjectController {
 		String team_idx = request.getParameter("team");
 		String image_idx = request.getParameter("image_idx");
 		
-	//	System.out.println("image_idx확인용: " + image_idx);
-
 		HashMap<String, String> project_info = new HashMap<String, String>();
 		project_info.put("userid", userid);
 		project_info.put("project_name", project_name);
@@ -195,7 +195,26 @@ public class ProjectController {
 		project_info.put("team_idx", team_idx);
 		project_info.put("image_idx", image_idx);
 		
-		int result = service.insertProject(project_info);
+		int result = 0;
+		
+		//선택된 팀 멤버를 프로젝트 멤버에 함께 insert하기 위해 받아온 팀멤버 아이디
+		String checkedID = request.getParameter("checkedID"); 
+		
+		if(checkedID.length() > 0 || checkedID != "") {
+			System.out.println("substring확인용: " + checkedID.substring(0, checkedID.length()-1));
+		//	checkedID.substring(0, checkedID.length()-1);
+			String[] memberIdArr = checkedID.substring(0, checkedID.length()-1).split(",");
+			
+			for(int i=0; i<memberIdArr.length; i++) {
+				System.out.println("memberID 스플리트확인: " + memberIdArr[i]);
+			}
+			System.out.println("================================멤버아이디 있는 경우");
+			result = service.insertProject(project_info, memberIdArr);
+		}
+		else {
+			System.out.println("================================멤버아이디 없는 경우");
+			result = service.insertProject(project_info);
+		}
 		
 		request.setAttribute("project_info", project_info);
 		request.setAttribute("result", result);
@@ -409,7 +428,7 @@ public class ProjectController {
 		JSONObject jsonObj = new JSONObject();
 		jsonObj.put("result", result);
 		
-		if(result == 1) {
+		if(result == 2) {
 			ListVO listvo = service.getListOne(map);
 			
 			jsonObj.put("list_idx", listvo.getList_idx());
@@ -421,7 +440,7 @@ public class ProjectController {
 		
 		String str_jsonObj = jsonObj.toString();
 		request.setAttribute("str_jsonObj", str_jsonObj);
-		System.out.println("json데이터 확인: " + str_jsonObj);
+	//	System.out.println("json데이터 확인: " + str_jsonObj);
 		return "project/addListJSON";
 	} // end of addList(HttpServletRequest request) 
 	
@@ -432,9 +451,9 @@ public class ProjectController {
 		String userid = request.getParameter("userid");
 		String list_idx = request.getParameter("list_idx");
 		String card_title = request.getParameter("card_title");
-		System.out.println("카트인서트 아이디체크: " + userid);
+	/*	System.out.println("카트인서트 아이디체크: " + userid);
 		System.out.println("카트인서트 리스트idx체크: " + list_idx);
-		System.out.println("카트인서트 카드제목체크: " + card_title);
+		System.out.println("카트인서트 카드제목체크: " + card_title);*/
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("userid", userid);
 		map.put("list_idx", list_idx);
@@ -505,4 +524,33 @@ public class ProjectController {
 		request.setAttribute("str_jsonObj", str_jsonObj);
 		return "project/titleUpdateJSON";
 	} // end of updateListTitle(HttpServletRequest request)
+	
+	
+	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
+	@RequestMapping(value="getTeamMemberInfo.action", method= {RequestMethod.POST})
+	public String getTeamMemberInfo(HttpServletRequest request) {
+		String team_idx = request.getParameter("teamIDX");
+		String userid = request.getParameter("userid");
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("team_idx", team_idx);
+		map.put("userid", userid);
+		
+		List<TeamMemberVO> voList = service.getTeamMemberInfo(map); 
+		
+		JSONArray jsonArr = new JSONArray();
+		for(int i=0; i<voList.size(); i++) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("fk_team_idx", voList.get(i).getFk_team_idx());
+			jsonObj.put("team_userid", voList.get(i).getTeam_userid());
+			jsonObj.put("team_member_admin_status", voList.get(i).getTeam_member_admin_status());
+			
+			jsonArr.put(jsonObj);
+		}
+		String str_jsonArr = jsonArr.toString();
+		System.out.println("jsonArr확인용: " + str_jsonArr);
+		
+		request.setAttribute("str_jsonArr", str_jsonArr);
+		return "main/getTeamMemberInfoJSON";
+	} // end of getTeamMemberInfo(HttpServletRequest request)
 }

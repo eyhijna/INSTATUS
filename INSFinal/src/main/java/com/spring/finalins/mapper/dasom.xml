@@ -82,6 +82,12 @@
 	</insert>
 	
 	
+	<!-- 생성된 프로젝트의 멤버테이블에 팀멤버정보  insert -->
+	<insert id="insertProjectMembers" parameterType="HashMap">
+		insert into ins_project_member(project_member_idx, fk_project_idx, project_member_userid, project_member_status, project_member_admin_status, project_favorite_status)
+		values(seq_project_member.nextval, #{projectIDX}, #{memberID}, default, 0, default)
+	</insert>
+	
 	<!-- 로그인 한 유저의 프로젝트 이름, 프로젝트idx, 팀idx select -->
 	<resultMap type="HashMap" id="getProjectInfo">
 		<result property="project_idx"   column="project_idx"  javaType="String" />
@@ -108,24 +114,29 @@
 		<result property="member_id"   		  column="member_id"  		  javaType="String" />
 		<result property="project_admin"   	  column="project_admin"  	  javaType="String" />
 		<result property="project_image_name" column="project_image_name" javaType="String" />
+		<result property="team_idx" 		  column="team_idx" 		  javaType="String" />
+		<result property="team_name" 		  column="team_name" 		  javaType="String" />
 	</resultMap>
 	<select id="getProjectInfo" parameterType="HashMap" resultMap="projectInfo">
-		select project_idx, 
-			   project_name, 
-			   project_visibility_st as project_visibility, 
-			   project_favorite_status as project_favorite, 
-			   project_member_idx, 
-       		   project_member_userid as member_id, 
-       		   project_member_admin_status as project_admin,
-       		   project_image_name
+		select project_idx, project_name, project_visibility_st as
+			   project_visibility,
+			   project_favorite_status as project_favorite,
+			   project_member_idx,
+			   project_member_userid as member_id,
+			   project_member_admin_status as project_admin,
+			   project_image_name,
+			   team_idx,
+			   team_name
 		  from ins_project A,
-		  	   ins_project_member B,
-		  	   ins_project_image C
-		 where project_idx = #{project_idx} 
-		   and project_member_status = 0 
+		       ins_project_member B,
+			   ins_project_image C,
+			   ins_team D
+		 where project_idx = #{project_idx}
+		   and project_member_status = 0
 		   and project_member_userid = #{userid}
 		   and A.project_idx = B.fk_project_idx
 		   and A.fk_project_image_idx = C.project_image_idx
+		   and A.fk_team_idx = D.team_idx
 	</select>
 	
 	<!-- 유저가 접속한 프로젝트의 배경이미지명을 select -->
@@ -253,6 +264,30 @@
 		   and project_member_status = 0
 		   and A.userid = B.project_member_userid
 		 order by 6 desc, 1 asc
+	</select>
+	
+	
+	<!-- insert된 리스트의 idx를 select -->
+	<select id="getListIDX" parameterType="HashMap" resultType="String">
+		select max(list_idx) as list_idx
+		  from ins_list 
+		 where fk_project_idx = #{project_idx}
+	</select>
+	
+	
+	<!-- 리스트가 생성될 때 기록테이블에 insert -->
+	<insert id="addListRecord" parameterType="HashMap">
+		insert into ins_project_record(project_record_idx , fk_project_idx, record_userid,project_record_time,fk_list_idx,record_dml_status)
+		values(seq_project_record.nextval, #{project_idx},#{userid}, sysdate, #{list_idx}, #{recordstatus})
+	</insert>
+	
+	
+	<!-- 팀 idx를 받아와서 팀멤버voList select -->
+	<select id="getTeamMemberInfo" parameterType="String" resultType="com.spring.finalins.model.TeamMemberVO">
+		select fk_team_idx, team_userid, team_member_admin_status 
+		  from ins_team_member 
+		 where fk_team_idx = #{team_idx}
+		   and team_userid != #{userid}
 	</select>
 	
 </mapper>

@@ -77,4 +77,16 @@ public interface InterProjectDAO {
 	//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
 	List<HashMap<String, String>> getProjectMemberInfo(String project_idx);
 
+	//insert된 리스트의 idx를 가져오는 메소드
+	String getListIDX(HashMap<String, String> map);
+
+	//리스트가 생성될 때 기록테이블에 insert해주는 메소드
+	int addListRecord(HashMap<String, String> map);
+
+	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
+	List<TeamMemberVO> getTeamMemberInfo(HashMap<String, String> map);
+
+	//팀멤버를 프로젝트 멤버에 insert
+	int insertProjectMembers(HashMap<String, String> map);
+
 }

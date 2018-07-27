@@ -127,8 +127,8 @@
 	</style>
 </head>
 
-<body>
-	<div id="mycontainer">
+<body >
+	<div id="mycontainer" >
 		<div id="myheader">
 			<tiles:insertAttribute name="header" />
 		</div>

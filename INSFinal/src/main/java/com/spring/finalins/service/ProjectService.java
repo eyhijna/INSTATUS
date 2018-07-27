@@ -13,6 +13,7 @@ import com.spring.finalins.model.CardVO;
 import com.spring.finalins.model.InterProjectDAO;
 import com.spring.finalins.model.ListVO;
 import com.spring.finalins.model.MemberVO;
+import com.spring.finalins.model.TeamMemberVO;
 
 @Service
 public class ProjectService implements InterProjectService{
@@ -73,20 +74,48 @@ public class ProjectService implements InterProjectService{
 		if(n==1) {
 			String projectIDX = dao.getProjectIDX(project_info);
 			project_info.put("projectIDX", projectIDX);
-			
-/*			System.out.println("projectIDX값 확인용: " + project_info.get("projectIDX"));
-			System.out.println("userid값 확인용: " + project_info.get("userid"));
-			System.out.println("project_name값 확인용: " + project_info.get("project_name"));
-			System.out.println("pjst값 확인용: " + project_info.get("pjst"));
-			System.out.println("team_idx값 확인용: " + project_info.get("team_idx"));
-			*/
+
 			m = dao.insertProjectMember(project_info);
 		//	System.out.println("================== m값 확인용:" + m);
 		}
-		result = n + m;
+		if((n + m) > 1) {
+			result = 1;
+		}
 		return result;
 	} // end of insertProject(HashMap<String, String> project_info)
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED, isolation=Isolation.READ_COMMITTED,rollbackFor= {Throwable.class})
+	public int insertProject(HashMap<String, String> project_info, String[] memberIdArr) {
+		int result = 0;
+		int n = 0, m = 0, insertmember = 0;
+		 
+		n = dao.insertProject(project_info);
+		
+		if(n==1) {
+			String projectIDX = dao.getProjectIDX(project_info);
+			project_info.put("projectIDX", projectIDX);
 
+			m = dao.insertProjectMember(project_info); 
+			
+			if(m != 0) {
+				for(int i=0; i<memberIdArr.length; i++) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("projectIDX", projectIDX);
+					map.put("memberID", memberIdArr[i]);
+					
+					//프로젝트 생성 + 프로젝트admin 정보 insert 완료 후 팀멤버를 프로젝트멤버에 insert
+					insertmember += dao.insertProjectMembers(map);
+				}
+			}
+			if(insertmember > 0) {
+				result = 1;
+			}
+		}
+		return result;
+	} // end of insertProject(HashMap<String, String> project_info)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//로그인 한 유저의 프로젝트리스트를 가져오는 메소드
 	@Override
@@ -162,12 +191,30 @@ public class ProjectService implements InterProjectService{
 
 
 	//새로운 리스트를 생성하는 메소드
-	@Override
+	/*@Override
 	public int addList(HashMap<String, String> map) {
 		int result = dao.addList(map);
 		return result;
 	} // end of addList(HashMap<String, String> map)
-
+*/
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED, isolation=Isolation.READ_COMMITTED,rollbackFor= {Throwable.class})
+	public int addList(HashMap<String, String> map) {
+		int n = 0, m = 0, result = 0;
+		n = dao.addList(map);
+		
+		if(n==1) {
+			String list_idx = dao.getListIDX(map); //insert된 리스트의 idx를 가져오는 메소드
+			map.put("list_idx", list_idx);
+			
+			String recordstatus = "List를 생성했습니다.";
+			map.put("recordstatus", recordstatus);
+			
+			m = dao.addListRecord(map); //리스트가 생성될 때 기록테이블에 insert해주는 메소드
+		}
+		result = n + m;
+		return result;
+	} // end of addList(HashMap<String, String> map)
 
 	//프로젝트에 포함된 리스트의 카드목록을 가져오는 메소드
 	@Override
@@ -225,5 +272,13 @@ public class ProjectService implements InterProjectService{
 		List<HashMap<String, String>> memberInfo = dao.getProjectMemberInfo(project_idx);
 		return memberInfo;
 	} // end of getProjectMemberInfo(String project_idx)
+
+
+	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
+	@Override
+	public List<TeamMemberVO> getTeamMemberInfo(HashMap<String, String> map) {
+		List<TeamMemberVO> voList = dao.getTeamMemberInfo(map);
+		return voList;
+	} // end of getTeamMemberInfo(String team_idx)
 
 }

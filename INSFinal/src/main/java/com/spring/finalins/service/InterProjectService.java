@@ -6,6 +6,7 @@ import java.util.List;
 import com.spring.finalins.model.CardVO;
 import com.spring.finalins.model.ListVO;
 import com.spring.finalins.model.MemberVO;
+import com.spring.finalins.model.TeamMemberVO;
 
 
 public interface InterProjectService {
@@ -27,7 +28,9 @@ public interface InterProjectService {
 
 	//프로젝트를 생성하는 메소드
 	int insertProject(HashMap<String, String> project_info);
-
+	//프로젝트를 생성하면서 팀 멤버를 인서트하는 경우
+	int insertProject(HashMap<String, String> project_info, String[] memberIdArr);
+	
 	//로그인 한 유저의 프로젝트리스트를 가져오는 메소드
 	List<HashMap<String, String>> getProjectList(String userid);
 
@@ -75,6 +78,9 @@ public interface InterProjectService {
 
 	//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
 	List<HashMap<String, String>> getProjectMemberInfo(String project_idx);
+
+	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
+	List<TeamMemberVO> getTeamMemberInfo(HashMap<String, String> map);
 
 
 }

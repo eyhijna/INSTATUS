@@ -203,5 +203,37 @@ public class ProjectDAO implements InterProjectDAO{
 	} // end of getProjectMemberInfo(String project_idx)
 
 
+	//insert된 리스트의 idx를 가져오는 메소드
+	@Override
+	public String getListIDX(HashMap<String, String> map) {
+		String list_idx = sqlsession.selectOne("dasom.getListIDX", map);
+		return list_idx;
+	} // end of getListIDX(HashMap<String, String> map)
+
+
+	//리스트가 생성될 때 기록테이블에 insert해주는 메소드
+	@Override
+	public int addListRecord(HashMap<String, String> map) {
+		int result = sqlsession.insert("dasom.addListRecord", map);
+		return result;
+	} // end of addListRecord(HashMap<String, String> map)
+
+
+	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
+	@Override
+	public List<TeamMemberVO> getTeamMemberInfo(HashMap<String, String> map) {
+		List<TeamMemberVO> voList = sqlsession.selectList("dasom.getTeamMemberInfo", map);
+		return voList;
+	} // end of getTeamMemberInfo(String team_idx)
+
+
+	//팀멤버를 프로젝트 멤버에 insert
+	@Override
+	public int insertProjectMembers(HashMap<String, String> map) {
+		int n = sqlsession.insert("dasom.insertProjectMembers", map);
+		return n;
+	} // end of insertProjectMembers(HashMap<String, String> map)
+
+
 	
 }

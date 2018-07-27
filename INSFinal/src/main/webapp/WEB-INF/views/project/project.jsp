@@ -184,7 +184,7 @@
 				data: form_data,
 				dataType: "JSON",
 				success: function(data){
-					if(data.result == 1){
+					if(data.result == 2){
 					var html = "<div class='well well2' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>"
 							 + "	<input type='text' class='project_listname newval' value='" + data.list_name + "' style='cursor:pointer;  background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;' maxlength='25'/>"
 							 + "	&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>"
@@ -304,6 +304,17 @@
 		}
 	} // end of insertList
 	
+	
+	
+	var win = null;
+	function NewWindow(mypage,myname,w,h,scroll){
+	LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
+	TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
+	settings =
+	'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars='+scroll+',resizable'
+	win = window.open(mypage,myname,settings)
+	} 
+	
 </script>
 
 <style type="text/css">
@@ -407,11 +418,50 @@
   }
 
   .member_avatar{
-  	height: 35px;
-  	width: 35px;
-  	border-radius: 25em;
-  	margin-left: 60%;
+    height: 40px;
+    width: 40px;
+    border-radius: 25em;
+    margin-left: 60%;
+    margin-top: 19%;
   }
+  
+  .drop_img{
+  height: 65px;
+    width: 65px;
+    border-radius: 25em;
+  }
+  
+  .dropdown-menu{
+  	background-color: black;
+  	left: 60%;
+  }
+  
+  .img_style{
+  	margin-left: 10px;
+  	font-size: 13pt;
+  	color: white;
+  	font-weight: bold;
+  }
+  
+  /* width */
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: white; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #f1f1f1; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
   
 </style>
 
@@ -433,32 +483,32 @@
 			<c:if test="${projectInfo.project_visibility == '2'}">
 				<li><a href="#">public</a></li>
 			</c:if>
+			<!-- 팀명 -->
+		<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${projectInfo.team_idx}">team:&nbsp;&nbsp;
+			<span style="font-size: 12pt; color: yellow; font-weight: bold;">${projectInfo.team_name}</span></a></li>
 		</ul>
-
-		<!-- 프로젝트 멤버 정보 들어갈 자리 -->
 		
-   			<c:if test="${memberInfo.size() > 0}">
-				<c:forEach items="${memberInfo}" var="member" >
-					<div class="project_member">
-						<img class="member_avatar" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}">
-					</div>
-				</c:forEach>
-			</c:if>
-			<!-- <img class="member_avatar dropdown-toggle" src="./resources/images/19_18304-01.jpg" data-toggle="dropdown"> -->
-<%-- <c:if test="${memberInfo.size() > 0}">
-	<c:forEach items="${memberInfo}" var="member" >
-		<ul class="nav navbar-nav">
-			<li class="dropdown">
-			<img class="member_avatar dropdown-toggle" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}" data-toggle="dropdown">
-				<ul class="dropdown-menu">
-					<li><a href="#">이름</a></li>
-					<li><a href="#">이메일</a></li>
-				</ul></li>
-		</ul>
-	</c:forEach>
-</c:if> --%>
-		<!-- ----------------------------------------------------------------- -->
-
+	
+		<!-- 프로젝트 멤버 프로필사진 -->
+		<c:if test="${memberInfo.size() > 0}">
+			<c:forEach items="${memberInfo}" var="member" >
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+					<img class="member_avatar dropdown-toggle" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}" data-toggle="dropdown">
+						<ul class="dropdown-menu">
+							<li style="min-width: 250px; min-height: 100px; padding-left: 10px; padding-top: 5px;">
+							<div style="width: inherit; height: inherit;">
+							<img class="drop_img" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}">
+							<span class="img_style">${member.nickname}</a></span><br/>
+							<span class="img_style">${member.email}</span><br/>
+							<span class="img_style">${member.userid}</span><br/>
+							</div>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</c:forEach>
+		</c:if>
 		<p align="right">
 			<button class="btn btn-default" type="button" id="menu1"
 				style="background-color: black; margin-top: 5px; margin-bottom: 5px; color: black; border-color: black;">
@@ -468,7 +518,7 @@
 	</div>
 </nav>
 
-<div class="list-wrapper">
+<div class="list-wrapper" >
 	<c:if test="${listvo == null || listvo.size() == 0}">
 		<div id="addListShow" class="well list-hover"
 			style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
@@ -532,7 +582,9 @@
 							<c:forEach items="${vo.cardlist}" var="cardvo">
 								<div class="panel panel-default">
 									<div class="panel-body"
-										onClick="window.open('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','width=800,height=710,location=no,status=no,scrollbars=yes');">${cardvo.card_title}</div>
+										><%-- onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false" --%>
+										${cardvo.card_title}
+									</div>
 								</div>
 							</c:forEach>
 						</c:if>
