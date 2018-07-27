@@ -160,11 +160,11 @@
 		    	  html += "<tr> ";
 		    	  
 		    	  if(json.file_size == 0){  
-		    	      html += "<img src='<%= request.getContextPath() %>/resources/img/"+json.org_filename+"'  data-toggle='modal' onclick='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' /></a>";
-		    	  }
+		    	      html += "<img src='<%= request.getContextPath()%>/resources/img/"+json.org_filename+"' data-toggle='modal' href='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' />";
+		    	  }   
 		   		  
 		    	  if(json.file_size != 0){
-		    		  html += "<img src='<%= request.getContextPath() %>/resources/files/"+json.server_filename+"'  data-toggle='modal' onclick='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' /></a>";
+		    		  html += "<img src='<%= request.getContextPath()%>/resources/files/"+json.server_filename+"'  data-toggle='modal' href='#myModal' class='img-circle' alt='' style='width:80px;height:80px; margin-left:220px; margin-right:0px; margin-top:25px;' />";
 		    	      
 		    	  }
 		    	    
@@ -306,7 +306,7 @@
     
       <!-- Modal content-->
       
-	      <div class="modal-content" style="display:inline-block; right: 600px; top: 100px; width: 400px; ">
+	      <div class="modal-content" style="display:inline-block; right: 170px; top: 100px; width: 400px; ">
 	        <div class="modal-header">
 	          <button type="button" class="close" data-dismiss="modal">&times;</button>
 	          <h4 class="modal-title" style="color:black; font-weight: bold;">Set Team Image</h4>

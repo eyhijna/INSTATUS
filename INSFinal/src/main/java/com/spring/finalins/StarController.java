@@ -127,6 +127,16 @@ public class StarController {
 	      req.setAttribute("team_idx", team_idx);
 	   	  req.setAttribute("teamvo", teamvo); 
 	   	  
+	   	  if("0".equals(teamvo.getTeam_delete_status())) {
+	   		  
+	   		   msg = "삭제된 팀입니다.";
+	   		   loc = "javascript:history.back();";
+	   		   
+	   		   req.setAttribute("loc", loc);
+	   		   req.setAttribute("msg", msg);
+	   		   
+	   		   return "msg.notiles";
+	   	  }
 	      List<TeamMemberVO> memberList = service.teamMemberList(team_idx); // 팀의 회원정보들을 불러오는 메소드
 	   	  req.setAttribute("memberList", memberList);
 	   	  
@@ -723,7 +733,7 @@ public class StarController {
 			   
 		   int m=0;
 		  
-		   m = service.chgToNormal(map); 
+		   m = service.chgToNormal(map1); 
 		   if(m == 0) {
 					   
 					   String msg = "업데이트 에러 발생 ! ";  
