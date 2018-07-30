@@ -21,7 +21,7 @@
 		select team_idx, admin_userid, team_name, team_delete_status, team_visibility_status, server_filename, file_size, org_filename  
 		from ins_team A join ins_team_member B
 		on A.team_idx = B.fk_team_idx
-		where B.team_userid = #{userid}
+		where B.team_userid = #{userid} and B.team_member_admin_status in (0, 1, 2)
 	</select>
 	
 	<!-- header : 해당 user의 팀에 해당하는 프로젝트 리스트를 얻음 -->
@@ -130,14 +130,16 @@
 	</select>
 	
 	<!-- header : 검색을 위해 listList 를 얻음 -->
-	<resultMap type="com.spring.finalins.model.ListVO" id="getSearch_listMap">
+	<resultMap type="HashMap" id="getSearch_listMap">
 		<result property="list_idx" column="list_idx" javaType="String"/>
 		<result property="fk_project_idx" column="fk_project_idx" javaType="String"/>
 		<result property="list_name" column="list_name" javaType="String"/>
 		<result property="list_delete_status" column="list_delete_status" javaType="String"/>
+		<result property="fk_team_idx" column="fk_team_idx" javaType="String"/>
+		<result property="project_name" column="project_name" javaType="String"/>
 	</resultMap>
 	<select id="getSearch_list" parameterType="HashMap" resultMap="getSearch_listMap" >
-		select list_idx, fk_project_idx, list_name, list_delete_status
+		select list_idx, fk_project_idx, list_name, list_delete_status, fk_team_idx, project_name
 		from ins_list C join( select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
 		                        from ins_project A join ins_project_member B
 		                        on A.project_idx = B.fk_project_idx
@@ -147,14 +149,17 @@
 	</select>
 	 
 	<!-- header : 검색을 위해 cardList 를 얻음 --> 
-	<resultMap type="com.spring.finalins.model.CardVO" id="getSearch_cardMap">
+	<resultMap type="HashMap" id="getSearch_cardMap">
 		<result property="card_idx" column="card_idx" javaType="String"/>
 		<result property="fk_list_idx" column="fk_list_idx" javaType="String"/>
 		<result property="card_userid" column="card_userid" javaType="String"/>
 		<result property="card_title" column="card_title" javaType="String"/>
+		<result property="project_idx" column="project_idx" javaType="String"/>
+		<result property="fk_team_idx" column="fk_team_idx" javaType="String"/>
+		<result property="project_name" column="project_name" javaType="String"/>
 	</resultMap>
 	<select id="getSearch_card" parameterType="HashMap" resultMap="getSearch_cardMap">
-		select card_idx, fk_list_idx, card_userid, card_title
+		select card_idx, fk_list_idx, card_userid, card_title, project_idx, fk_team_idx, project_name
 		from ins_list C join( select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
 		                        from ins_project A join ins_project_member B
 		                        on A.project_idx = B.fk_project_idx
@@ -170,17 +175,17 @@
 		<result property="userid" column="userid" javaType="String"/>
 		<result property="name" column="name" javaType="String"/>
 		<result property="nickname" column="nickname" javaType="String"/>
-		<result property="org_filename" column="profilejpg" javaType="String"/>
+		<result property="server_filename" column="server_filename" javaType="String"/>
 	</resultMap>
 	<select id="getSearch_member" parameterType="String" resultMap="getSearch_memberMap">
-		select userid, name, nickname, org_filename
+		select userid, name, nickname, server_filename
 	    from ins_member
 	    where leave_status = 0 and userid like '%' ||  #{search_input}  || '%' 
 	          or name like '%' ||  #{search_input}  || '%' 
 	          or nickname like '%' ||  #{search_input}  || '%'
 	</select>
 	
-	
+	<!-- project : project 탈퇴시 project_member의 userid 와 admin_status 를 얻어옴 -->
 	<resultMap type="com.spring.finalins.model.ProjectMemeberVO" id="projectCorrectListMap">
 		<result property="project_member_idx" column="project_member_idx" javaType="String" />
 		<result property="fk_project_idx" column="fk_project_idx" javaType="String" />
@@ -200,16 +205,19 @@
 	    where fk_project_idx = #{fk_project_idx} and project_member_status =0
 	</select>
 	
+	<!-- project: 프로젝트의 일반 유저일 경우 프로젝트 탈퇴 -->
 	<update id="generalProjectLeave" parameterType="HashMap">
 		 update ins_project_member set project_member_status = 1, project_favorite_status = 0
     	 where fk_project_idx = #{fk_project_idx} and project_member_userid = #{userid} and project_member_admin_status =0
 	</update>
 	
+	<!-- project: 프로젝트의 관리자일 경우 프로젝트 탈퇴 -->
 	<update id="adminProjectLeave" parameterType="HashMap">
 		 update ins_project_member set project_member_status = 1, project_favorite_status = 0
     	 where fk_project_idx = #{fk_project_idx} and project_member_userid = #{userid} and project_member_admin_status =1
 	</update>
 
+	<!-- project: 프로젝트의 관리자일 경우 프로젝트 탈퇴 할 때 해당하는 프로젝트의 다른사람 목록을 알아 온다. -->
 	<select id="adminProjectNextPerson1" parameterType="map" resultType="String">
 	    select min(project_member_idx)
 	    from ins_project_member
@@ -217,77 +225,85 @@
 	    order by project_member_idx	
 	</select>
 	
+	<!-- project: 프로젝트의 관리자일 경우 프로젝트를 탈퇴 할 때 다음 사람에게 권한을 위임함. -->
 	<update id="adminProjectNextPerson2" parameterType="String">
 	 	update ins_project_member set project_member_admin_status = 1
     	where project_member_idx = #{project_member_idxMin}	 	 
 	</update>
 	
-	
-	<resultMap type="HashMap" id="getAdminListMap">
-		<result property="project_member_idx" column="project_member_idx" javaType="String" />
-		<result property="fk_project_idx" column="fk_project_idx" javaType="String" />
-		<result property="project_member_userid" column="project_member_userid" javaType="String" />
-	</resultMap>
-	<select id="getAdminList" resultMap="getAdminListMap">
-		select project_member_idx, fk_project_idx, project_member_userid
+	<!-- project : 삭제하기 위해 admin인지 확인하기 위해 admin을 갖고옴 -->
+	<select id="getAdminList" parameterType="String" resultType="String">
+		select project_member_userid
 	    from ins_project_member
-	    where project_member_status = 0 and project_member_admin_status = 1
+	    where project_member_status = 0 and project_member_admin_status = 1 and fk_project_idx = #{fk_project_idx}
 	</select>
 	
+	<!-- project: ins_project 테이블에서의 project_delete_status = 0 -->
 	<update id="deleteProject" parameterType="String">
 		 update ins_project set project_delete_status = 0
    		 where project_idx = #{fk_project_idx}
 	</update>
 
+	<!-- project: ins_project_member 테이블에서의 project_member_status = 1 project_favorite_status = 0 -->
 	<update id="deleteProjectMember" parameterType="String">
 		 update ins_project_member set project_member_status = 1, project_favorite_status = 0
    		 where fk_project_idx = #{fk_project_idx}	
 	</update> 
 	
-	<resultMap type="HashMap" id="projectRecordViewMap">
-		<result property="server_filename" column="org_filename" javaType="String"/>
-		<result property="userid" column="userid" javaType="String"/>
-		<result property="project_record_idx" column="project_record_idx" javaType="String"/>
+	<!-- project: 프로젝트 기록의 리스트를 얻어옴 -->
+	<resultMap type="HashMap" id="projectRecordView_createMap">
 		<result property="fk_project_idx" column="fk_project_idx" javaType="String"/>
+		<result property="project_name" column="project_name" javaType="String"/>
+		<result property="record_userid" column="record_userid" javaType="String"/>
+		<result property="fk_list_idx" column="fk_list_idx" javaType="String"/>
+		<result property="list_name" column="list_name" javaType="String"/>
+		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
+		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
+		<result property="server_filename" column="server_filename" javaType="String"/>
+	</resultMap>
+	<select id="projectRecordView_create" parameterType="HashMap" resultMap="projectRecordView_createMap">
+	   		 select A.fk_project_idx, B.project_name, A.record_userid
+	            , to_char(A.project_record_time,'yyyy-mm-dd am hh12:mi:ss') as project_record_time
+	            , A.fk_list_idx, C.list_name
+	            , A.record_dml_status
+	            , D.server_filename
+		     from ins_project_record A, ins_project B, ins_list C, ins_member D
+		     where A.record_dml_status like '%' || #{sel1Val} || '%'
+		        and A.fk_project_idx = #{fk_project_idx}
+		        and A.fk_project_idx = B.project_idx
+		        and A.fk_list_idx = C.list_idx
+		        and A.record_userid = D.userid
+	</select>   
+	
+	<resultMap type="HashMap" id="projectRecordView_elseMap">
+		<result property="fk_project_idx" column="fk_project_idx" javaType="String"/>
+		<result property="project_name" column="project_name" javaType="String"/>
+		<result property="record_userid" column="record_userid" javaType="String"/>
 		<result property="project_record_time" column="project_record_time" javaType="String"/>
 		<result property="fk_list_idx" column="fk_list_idx" javaType="String"/>
 		<result property="list_name" column="list_name" javaType="String"/>
+		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
 		<result property="fk_card_idx" column="fk_card_idx" javaType="String"/>
 		<result property="card_title" column="card_title" javaType="String"/>
-		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
-	</resultMap>
-	<select id="projectRecordView" parameterType="map" resultMap="projectRecordViewMap">
-	   select server_filename, userid,
-	            project_record_idx, fk_project_idx, project_record_time, fk_list_idx, list_name, fk_card_idx, card_title, record_dml_status
-	   from 
-	   (select A.server_filename, A.userid,
-	            project_record_idx, fk_project_idx, to_char(project_record_time,'yyyy-mm-dd am hh12:mi:ss') as project_record_time, fk_list_idx, fk_card_idx, record_dml_status
-	   from ins_member A join ins_project_record B
-	   on B.record_userid = A.userid) V 
-	   join 
-	   (select C.list_idx, C.list_name,  D.card_idx, D.card_title
-	   from ins_list C join ins_card D
-	   on C.list_idx = D.fk_list_idx) T
-	   on V.fk_list_idx = T.list_idx AND V.fk_card_idx = T.card_idx
-	   where fk_project_idx = #{fk_project_idx} and record_dml_status like '%' || #{sel1Val} || '%' 
+		<result property="server_filename" column="server_filename" javaType="String"/>
+	</resultMap>   
+	<select id="projectRecordView_else" parameterType="HashMap" resultMap="projectRecordView_elseMap">
+	   		select A.fk_project_idx, B.project_name, A.record_userid
+	            , to_char(A.project_record_time,'yyyy-mm-dd am hh12:mi:ss') as project_record_time
+	            , A.fk_list_idx, C.list_name
+	            , A.record_dml_status
+	            , A.fk_card_idx, D.card_title
+	            , E.server_filename
+	     from ins_project_record A, ins_project B, ins_list C, ins_card D, ins_member E 
+	     where A.record_dml_status like '%' || #{sel1Val} || '%'
+	        and A.fk_project_idx = #{fk_project_idx}
+	        and A.fk_project_idx = B.project_idx
+	        and A.fk_list_idx = C.list_idx
+	        and A.fk_card_idx = D.card_idx
+	        and A.record_userid = E.userid
 	</select>
 	
-	<resultMap type="HashMap" id="getSearchlistINprojectMap">
-		<result property="list_idx" column="list_idx" javaType="String" />
-		<result property="list_name" column="list_name" javaType="String" />
-		<result property="list_userid" column="list_userid" javaType="String" />
-	</resultMap>
-	<select id="getSearchlistINproject" parameterType="HashMap" resultMap="getSearchlistINprojectMap">
-		select list_idx, list_name, list_userid
-    	from ins_list C join ( select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, project_favorite_status, project_profilejpg, fk_project_image_idx
-                               from ins_project A join ins_project_member B
-                               on A.project_idx = B.fk_project_idx
-                               where B.project_member_userid = #{userid} and project_visibility_st in (0, 1) and project_delete_status=1 ) D
-    	on C.fk_project_idx = D.project_idx
-   	 	where fk_project_idx = #{fk_project_idx} and list_name like '%' || #{listsearchINproject} || '%'
-	</select>
-	
-	
+	<!-- header : user가 읽지 않은 메시지의 갯수를 얻어옴 -->
 	<select id="getNewMessageCount" parameterType="String" resultType="int">
 		 select count(*) as cnt
 		 from ins_project_record A 
@@ -303,7 +319,7 @@
 		    and A.fk_list_idx = D.list_idx
 	</select>
 	
-	
+	<!-- header : user가 읽지 않은 메세지의 리스트를 얻어옴 -->
 	<resultMap type="HashMap" id="getNewMessageListMap">
 		<result property="project_record_idx" column="project_record_idx" javaType="String" />
 		<result property="record_userid" column="record_userid" javaType="String" />
@@ -335,10 +351,87 @@
 		order by  project_record_time desc	
 	</select>
 	
+	<!-- header : personl_alarm 테이블의 personal_alarm_read_status 변경 -->
 	<update id="setPersonal_alarm_read_status" parameterType="String">
 		update ins_personal_alarm set personal_alarm_read_status = 1
   		where fk_project_record_idx = #{checkboxVal}
 	</update>
 	
+	<!-- project: projectList의 favorite_status를 변경 -->
+	<update id="projectList_updateFavoriteStatus" parameterType="HashMap">
+		update ins_project_member set project_favorite_status = 0
+      	where fk_project_idx = #{project_idx} and project_member_userid = #{userid}
+	</update>
+	
+	
+	<!-- project: 프로젝트 내에서 list 검색 -->
+	<resultMap type="HashMap" id="getSearchlistINprojectMap">
+		<result property="list_idx" column="list_idx" javaType="String" />
+		<result property="list_name" column="list_name" javaType="String" />
+		<result property="list_userid" column="list_userid" javaType="String" />
+		<result property="list_delete_status" column="list_delete_status" javaType="String" />
+	</resultMap>
+	<select id="getSearchlistINproject" parameterType="HashMap" resultMap="getSearchlistINprojectMap">
+		select list_idx, list_name, list_userid, list_delete_status
+    	from ins_list C join ( select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, project_favorite_status, project_profilejpg, fk_project_image_idx
+                               from ins_project A join ins_project_member B
+                               on A.project_idx = B.fk_project_idx
+                               where B.project_member_userid = #{userid} and project_visibility_st in (0, 1) and project_delete_status=1 ) D
+    	on C.fk_project_idx = D.project_idx
+   	 	where fk_project_idx = #{fk_project_idx} and list_name like '%' || #{listsearchINproject} || '%'
+	</select>
+	
+	<!-- project: 프로젝트 내에서 card 검색 -->
+	<resultMap type="HashMap" id="getSearchcardINprojectMap">
+		<result property="fk_project_idx" column="fk_project_idx" javaType="String" />
+		<result property="fk_list_idx" column="fk_list_idx" javaType="String" />
+		<result property="card_idx" column="card_idx" javaType="String" />
+		<result property="card_title" column="card_title" javaType="String" />
+	</resultMap>
+	<select id="getSearchcardINproject" parameterType="HashMap" resultMap="getSearchcardINprojectMap">
+		   select B.fk_project_idx, A.fk_list_idx, A.card_idx, A.card_title 
+		   from ins_card A, ins_list B
+		   where fk_project_idx = #{fk_project_idx} and fk_list_idx = #{fk_list_idx}
+		      and list_delete_status = 1
+		      and card_delete_status = 1
+		      and A.fk_list_idx = B.list_idx
+	</select>
+	 
+	<!-- project : 프로젝트 내 카드 검색 list 알아옴 --> 
+	<resultMap type="HashMap" id="getcardsearchINproject_listMap">
+		<result property="fk_list_idx" column="fk_list_idx" javaType="String" />
+		<result property="list_name" column="list_name" javaType="String" />
+		<result property="list_userid" column="list_userid" javaType="String" />
+		<result property="list_delete_status" column="list_delete_status" javaType="String" />
+	</resultMap> 
+	<select id="getcardsearchINproject_list" parameterType="HashMap" resultMap="getcardsearchINproject_listMap">
+		    select fk_list_idx, list_name, list_userid, list_delete_status
+			from ins_card A, ins_list B
+			where A.fk_list_idx = B.list_idx 
+			  and card_title like '%' || #{cardsearchINproject} || '%'
+			  and fk_project_idx = #{fk_project_idx}
+			  and card_delete_status = 1
+			  and list_delete_status = 1
+			group by fk_list_idx, list_name, list_userid, list_delete_status
+	</select>
+	
+	<!-- project: 프로젝트 내에서 card 검색  card 얻어옴 -->
+	<resultMap type="HashMap" id="getcardsearchINproject_cardMap">
+		<result property="fk_project_idx" column="fk_project_idx" javaType="String" />
+		<result property="fk_list_idx" column="fk_list_idx" javaType="String" />
+		<result property="card_idx" column="card_idx" javaType="String" />
+		<result property="card_title" column="card_title" javaType="String" />
+	</resultMap>
+	<select id="getcardsearchINproject_card" parameterType="HashMap" resultMap="getcardsearchINproject_cardMap">
+		   select fk_project_idx, fk_list_idx, card_idx, card_title   
+		   from ins_card A, ins_list B
+		   where A.fk_list_idx = B.list_idx 
+		      and card_title like '%' || #{cardsearchINproject} || '%'
+		      and fk_project_idx = #{fk_project_idx} 
+		      and fk_list_idx = #{fk_list_idx}
+		      and card_delete_status = 1
+		      and list_delete_status = 1
+	</select> 
+			
 </mapper>
  
