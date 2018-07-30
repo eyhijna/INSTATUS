@@ -52,6 +52,7 @@ public class MinjaeService implements InterMinjaeServie {
 		return teamList;
 	}
 
+	// header : 검색을 위해 projectList 를 얻음
 	@Override
 	public List<ProjectVO> getSearch_project(HashMap<String, String> map) {
 		
@@ -60,22 +61,25 @@ public class MinjaeService implements InterMinjaeServie {
 		return projectList;
 	}
 	
+	// header : 검색을 위해 listList 를 얻음
 	@Override
-	public List<ListVO> getSearch_list(HashMap<String, String> map) {
+	public List<HashMap<String, String>> getSearch_list(HashMap<String, String> map) {
 		
-		List<ListVO> listList = dao.getSearch_list(map);
+		List<HashMap<String, String>> listList = dao.getSearch_list(map);
 		
 		return listList;
 	}
 
+	// header : 검색을 위해 cardList 를 얻음
 	@Override
-	public List<CardVO> getSearch_card(HashMap<String, String> map) {
+	public List<HashMap<String, String>> getSearch_card(HashMap<String, String> map) {
 		
-		List<CardVO> cardList = dao.getSearch_card(map);
+		List<HashMap<String, String>> cardList = dao.getSearch_card(map);
 		
 		return cardList;
 	}
 
+	// header : 검색을 위해 memberList 를 얻음
 	@Override
 	public List<HashMap<String, String>> getSearch_member(String search_input) {
 
@@ -93,7 +97,7 @@ public class MinjaeService implements InterMinjaeServie {
 		return projectmemberList;
 	}
 
-	// 프로젝트의 일반 유저일 경우 프로젝트 탈퇴
+	// project : 프로젝트의 일반 유저일 경우 프로젝트 탈퇴
 	@Override
 	public int generalProjectLeave(HashMap<String, String> map) {
 		
@@ -102,7 +106,7 @@ public class MinjaeService implements InterMinjaeServie {
 		return n;
 	}
 
-	
+	// project : 프로젝트의 관리자일 경우 프로젝트 탈퇴
 	@Override
 	@Transactional(propagation=Propagation.REQUIRED, isolation=Isolation.READ_COMMITTED, rollbackFor= {Throwable.class})
 	public int adminProjectLeave(HashMap<String, String> map) throws Throwable {
@@ -121,15 +125,16 @@ public class MinjaeService implements InterMinjaeServie {
 		return m;
 	}
 
-	// 삭제하기 위해 adminList를 갖고옴
+	// project : 삭제하기 위해 adminList를 갖고옴
 	@Override
-	public List<HashMap<String, String>> getAdminList() {
+	public String getAdmin(String fk_project_idx) {
 		
-		List<HashMap<String, String>> adminList = dao.getAdminList();
+		String admin= dao.getAdmin(fk_project_idx);
 		
-		return adminList;
+		return admin;
 	}
 
+	// project : 프로젝트 삭제
 	@Override
 	public int deleteProject(String fk_project_idx) {
 		
@@ -148,23 +153,26 @@ public class MinjaeService implements InterMinjaeServie {
 		
 	}
 
+	// project : 프로젝트 기록을 얻어옴 
 	@Override
 	public List<HashMap<String, String>> projectRecordView(HashMap<String, String> map) {
 		
-		List<HashMap<String, String>> projectRecordList = dao.projectRecordView(map);
+		List<HashMap<String, String>> projectRecordList = null;
+		
+		if((map.get("sel1Val")).equals("생성")) {
+			
+			projectRecordList = dao.projectRecordView_create(map);
+			
+		}
+		else {
+			projectRecordList = dao.projectRecordView_else(map);
+		}
 		
 		return projectRecordList;
 	}
 
-	@Override
-	public List<HashMap<String, String>> getSearchlistINproject(HashMap<String, String> map) {
-		
-		List<HashMap<String, String>> searchINprojectList = dao.getSearchlistINproject(map);
-		
-		return searchINprojectList;
-	}
 
-    // user가 읽지 않은 메시지의 갯수를 얻어옴
+    // header : user가 읽지 않은 메시지의 갯수를 얻어옴
 	@Override
 	public int getNewMessageCount(String userid) {
 		
@@ -175,7 +183,7 @@ public class MinjaeService implements InterMinjaeServie {
 		return newmsg;
 	}
 
-	// user가 읽지 않은 메세지의 리스트를 얻어옴
+	// header : user가 읽지 않은 메세지의 리스트를 얻어옴
 	@Override
 	public List<HashMap<String, String>> getNewMessageList(String userid) {
 		
@@ -184,7 +192,7 @@ public class MinjaeService implements InterMinjaeServie {
 		return nesMsgList;
 	}
 
-	// personl_alarm 테이블의 personal_alarm_read_status 변경
+	// header : personl_alarm 테이블의 personal_alarm_read_status 변경
 	@Override
 	public int setPersonal_alarm_read_status(String checkboxVal) {
 		
@@ -192,6 +200,67 @@ public class MinjaeService implements InterMinjaeServie {
 		
 		return n;
 	}
+
+	// header : projectList의 favorite_status를 변경
+	@Override
+	public int projectList_updateFavoriteStatus(HashMap<String, String> map) {
+		
+		int n = dao.projectList_updateFavoriteStatus(map);
+		
+		return n;
+	}
+
+	// project : 프로젝트 내에 리스트 검색
+	@Override
+	public List<HashMap<String, String>> getSearchlistINproject(HashMap<String, String> map) {
+		
+		List<HashMap<String, String>> searchINprojectList = dao.getSearchlistINproject(map);
+		
+		return searchINprojectList;
+	}
+	
+	// project : 프로젝트 내에 리스트 검색 중 카드 리스트 얻어옴
+	@Override
+	public List<HashMap<String, String>> getSearchcardINproject(HashMap<String, String> map) {
+		
+		List<HashMap<String, String>> cardsearchINprojectList = dao.getSearchcardINproject(map);
+		
+		return cardsearchINprojectList;
+	}
+
+	// project : 프로젝트 내에 카드 검색 중 리스트의 리스트 얻어옴
+	@Override
+	public List<HashMap<String, String>> getcardsearchINproject_list(HashMap<String, String> map) {
+		
+		List<HashMap<String, String>> cardsearchINprojectList_list = dao.getcardsearchINproject_list(map);
+		
+		return cardsearchINprojectList_list;
+	}
+
+	// project : 프로젝트 내에 카드 검색 중 카드의 리스트 얻어옴
+	@Override
+	public List<HashMap<String, String>> getcardsearchINproject_card(HashMap<String, String> map) {
+	
+		List<HashMap<String, String>> cardsearchINprojectList_card = dao.getcardsearchINproject_card(map);
+		
+		return cardsearchINprojectList_card;
+	}
+
+	 // project :  프로젝트의 관리자일 경우 프로젝트 탈퇴
+	@Override
+	public List<ListVO> getListInfo(String project_idx) {
+		List<ListVO> listvo = dao.getListInfo(project_idx);
+		return listvo;
+	} // end of getListInfo(String project_idx)
+
+
+	 // project : 삭제하기 위해 adminList를 갖고옴
+	@Override
+	public List<CardVO> getCardInfo(String list_idx) {
+		List<CardVO> cardlist = dao.getCardInfo(list_idx);
+		return cardlist;
+	} // end of getCardInfo(String list_idx)
+
 
 	
 	

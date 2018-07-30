@@ -179,6 +179,43 @@
 				}); //end of $.ajax  */
 			}
 		}); // end of $(".btn-addcard").click
+		
+//////////////////////////////////////////////////민재 ///////////////////////////////////////////////////////////////////////////////		
+		$("#listsearchINproject").keyup(function(){
+			
+			 // alert("실행성공이다222222222222");
+			 
+			  if(${sessionScope.loginuser == null}){
+					alert("로그인이 필요합니다.");
+					location.href = "<%=request.getContextPath()%>/index.action";
+					return;
+			  }
+			
+			  if($("#listsearchINproject").val().trim() != ""){
+				  
+				  if($("#sel3").val() == 'list'){
+					
+					  searchListINproject();
+					  
+				  }
+				  else if($("#sel3").val() == 'card'){
+					  
+					  searchCardINproject();
+					  
+				  }
+				   
+			  }
+			  
+			  if($("#listsearchINproject").val().trim() == ""){
+				 
+				 	projectINlistRe();
+				 	
+			  } 
+			  
+		   }); // $("#search_input").keyup()-------------------------------------------------------------------
+		
+		
+		
 	}); // end of $(document).ready
 	
 	function changeListName(obj, blur) {
@@ -413,6 +450,637 @@
 	win = window.open(mypage,myname,settings)
 	} 
 	
+///////////////////////////////////////////////////////// 민재 //////////////////////////////////////////////////////////////////////////////
+	function openNav() {
+	
+	    document.getElementById("mySidenav").style.width = "400px";
+	    
+	   	// Activity();  
+	    selVal(); 
+	   
+	}
+	
+	function openNav2() {
+	    document.getElementById("mySidesearch").style.width = "400px";
+	   /*  document.getElementById("mySidenav").style.width = "0"; */
+	}
+	
+	
+	function openNav3(){
+		document.getElementById("mySideactivity").style.width = "400px";
+		
+		selVal();
+		
+	}
+	
+	function closeNav() {
+	    document.getElementById("mySidenav").style.width = "0";
+	    document.getElementById("mySidesearch").style.width = "0";
+	}
+	
+	function closeNav2() {
+	    document.getElementById("mySidesearch").style.width = "0";
+	    document.getElementById("mySidenav").style.width = "400px";
+	}
+	
+	function closeNav3() {
+	    document.getElementById("mySideactivity").style.width = "0";
+	}
+	
+	
+	
+	function leaveProject(){
+		
+	//	var fk_project_idx = "${projectInfo.project_idx}";
+		
+		var frm = document.leaveProjectFrm;
+				
+		frm.method = "GET";
+		frm.action = "<%= request.getContextPath() %>/leaveProject.action";
+		frm.submit();
+		
+	}
+	
+	
+	function deleteProject(){
+		
+		/* var fk_project_idx = "${projectInfo.project_idx}"; */
+		
+		var frm = document.leaveProjectFrm;
+				
+		frm.method = "GET";
+		frm.action = "<%= request.getContextPath() %>/deleteProject.action";
+		frm.submit();
+		
+	}
+	
+	function Activity(val){
+				
+		var form_data1 = {fk_project_idx: "${projectInfo.project_idx}", 
+				          sel1Val: val}
+		
+		$.ajax({
+			
+			url: "<%= request.getContextPath()%>/projectRecordView.action",
+			type: "get",
+			data: form_data1,
+			dataType: "json",
+			success: function(json){
+				
+				$("#activitylist").empty();
+				
+				$("#projectRecordListMoreTB").empty();
+						
+				var html = "";
+				
+				if(json.length > 0){
+					
+					$.each(json, function(entryIndex, entry){
+						
+						if(entryIndex < 10){ 
+							 
+							html += "<tr>";
+							html += "<td rowspan='3' class='imgtd' style='size: 10px;'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></td>";
+							html += "<td style='font-weight: bold;'>"+entry.userid+"&nbsp;&nbsp;"+entry.record_dml_status+"</td>";
+							html += "</tr>";
+							html += "<tr>";
+							html += "<td  style='font-size: 8pt;'>&nbsp;"+entry.project_record_time+"</td>";
+							html += "</tr>";
+							html += "<tr>";
+							html += "<td style='font-size: 8pt; color: #b3b3b3;'>"+entry.card_title+" in "+entry.list_name+"</td>"; 
+							html += "</tr>";
+							html += "<tr>";
+							html += "<td colspan='2' style='border: 1px solid #fed189;'></td>";
+							html += "</tr>";
+							
+						 }
+						
+					});
+					
+					$("#projectRecordListTB").html(html);
+					
+					 if(json.length > 10 ){  
+						
+						html += "<tr style='height: 50px; text-align:center; border: 1px solid red;' >";
+						html += "<td colspan='2' style='padding-top: 15px;'>";
+						html += "<a style='cursor: pointer; color: #00a0df;' id='viewallactivity'>view all activity</a></td>"; 
+						html += "</tr>";
+						
+				 	 } 
+					
+					$("#projectRecordListTB").html(html);
+					
+					$("#activitylist").html(html);
+					
+				}
+				else{
+										
+					html = "<h2>프로젝트 내 활동이 없습니다.</h2>";
+					
+				}
+				
+				$("#activitylist").html(html);
+				
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		});
+		
+	}
+	
+	
+	$(document).on("click", "#viewallactivity", function(event){
+		
+		// alert("실행 성공");
+		
+		var val = $("#sel1").val();
+		
+		var form_data1 = {fk_project_idx: "${projectInfo.project_idx}", 
+		          		  sel1Val: val}   
+		
+		$.ajax({
+			url: "<%= request.getContextPath()%>/projectRecordView.action",
+			type: "get",
+			data: form_data1,
+			dataType: "json",
+			success: function(json){
+								
+				var html = "";
+								
+				openNav3();
+				
+				if(json.length > 0){
+					
+					$.each(json, function(entryIndex, entry){
+						
+						html += "<tr>";
+						html += "<td rowspan='3' class='imgtd' style='size: 10px;'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></td>";
+						html += "<td style='font-weight: bold;'>"+entry.userid+"&nbsp;&nbsp;"+entry.record_dml_status+"</td>";
+						html += "</tr>";
+						html += "<tr>";
+						html += "<td  style='font-size: 8pt;'>&nbsp;"+entry.project_record_time+"</td>";
+						html += "</tr>";
+						html += "<tr>";
+						html += "<td style='font-size: 8pt; color: #b3b3b3;'>"+entry.card_title+" in "+entry.list_name+"</td>"; 
+						html += "</tr>";
+						html += "<tr>";
+						html += "<td colspan='2' style='border: 1px solid #fed189;'></td>";
+						html += "</tr>";
+					
+						$("#projectRecordListMoreTB").html(html);
+					
+					}); // end of $.each(json)------------------------------------------------------------ 
+				 						
+				}
+					
+					$("#activitylistMore").html(html); 
+				
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+		});
+		
+			
+	});
+			
+	/* 프로젝트 내 리스트를 검색하는 함수 */
+	function searchListINproject(){
+		   
+		var listsearchINproject = $("#listsearchINproject").val();
+		var sel = $("#sel3").val();
+		
+		/* 리스트 form */
+		var form_data2 = {fk_project_idx: "${projectInfo.project_idx}",
+				          sel3Val : $("#sel3").val(),
+				          listsearchINproject: listsearchINproject}
+			
+		$.ajax({
+			
+			url: "<%= request.getContextPath() %>/listsearchINproject.action",
+			type: "get",
+			data: form_data2,
+			dataType: "json",
+			success: function(json){
+				
+				var html = "";
+				
+				if($("#sel3").val() == 'list'){
+							
+					 $(".list-wrapper").empty();
+					 var html = "";
+					
+					$.each(json, function(entryIndex, entry){
+				
+						/* 카드 form */
+						var project_idx = "${projectInfo.project_idx}"; 
+												
+	
+					  	if(entry.list_delete_status != 0){ 
+					  		
+								html += "<input type='text' class='project_listname newval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+								html += "<div id='list"+entryIndex+"' class='well list-hover' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>";
+								html += "<input type='text' class='project_listname newval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+								html += "&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>";
+								html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+								html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+								html += "<div class='card-wrapper' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>";
+								
+								var listidx = entry.list_idx
+								// alert("listidx"+ listidx);
+					 	        cardinfo(project_idx, sel,listsearchINproject,listidx);
+					 
+								
+								html += "</div>";
+								html += "<div class='div-addcard'>";
+	/* 							html += "<textarea rows='2' cols='33' placeholder=;'Enter card title...'></textarea><br/>"; 
+								html += "<button class='btn btn-default btn-addcard' style='margin-top: 10px;' >add Card</button>";  */
+								html += "<input type='hidden' value='"+entry.list_idx+"'>";
+								html += "</div>";
+								/* html += "<span style='font-size: 12pt; color: gray;' id='addCardstyle"+entryIndex+"' class='addCardstyle'><i class='fa fa-plus'></i>&nbsp;add another card...</span>"; */
+								html += "</div>";
+								html += "</div>";
+								
+						}
+					  	
+							
+						
+						
+				
+				});
+			
+					$(".list-wrapper").html(html);
+			
+			    }
+		
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		});
+		
+		
+	}
+	   
+	/* 프로젝트 내에서 리스트를 검색할 시 카드 리스트를 불러오는 함수 */   
+		function cardinfo(fk_project_idx,sel3Val,listsearchINproject,fk_list_idx){
+		// alert("시작");
+		
+		var form_data = {fk_project_idx: fk_project_idx,
+				          sel3Val : sel3Val,
+				          listsearchINproject: listsearchINproject,
+				          fk_list_idx : fk_list_idx}
+		
+		$.ajax({
+			
+			url: "<%= request.getContextPath() %>/listsearchINproject_card.action",
+			type: "get",
+			data: form_data,
+			dataType: "json",
+			success: function(json){
+				
+				var html = "";
+				
+				if(json.length > 0){
+					
+					$.each(json, function(entryIndex, entry){
+						
+						html += "<div class='panel panel-default'>";
+						html += "<div class='panel-body' onClick='window.open('carddetail.action?projectIDX="+entry.fk_project_idx+"&listIDX="+entry.fk_list_idx+"&cardIDX="+entry.card_idx+"','window_name','width=800,height=710,location=no,status=no,scrollbars=yes');'>"+entry.card_title+"</div>";
+						html += "</div>";
+					});
+					
+					
+						
+				}
+				
+				$(".card-wrapper").html(html);
+				
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		}); // $.ajax({searchCardINproject.action});
+	}
+		
+	// 프로젝트 내에서 카드를 검색하는 함수 
+	  function searchCardINproject(){
+					
+		    var fk_project_idx = "${projectInfo.project_idx}";
+			var cardsearchINproject = $("#listsearchINproject").val();
+			var sel = $("#sel3").val();
+			/* 리스트 form */
+			
+			var form_data = {fk_project_idx: fk_project_idx,
+					          sel3Val : sel,
+					          cardsearchINproject: cardsearchINproject}
+			
+			$(".list-wrapper").empty();
+			
+			// alert("cardsearchINproject"+cardsearchINproject);
+			
+			// 프로젝트 내에서 검색한 카드의 list_idx 를 갖고 온다. 
+			$.ajax({
+				
+				url: "<%= request.getContextPath() %>/cardsearchINproject_list.action",
+				type: "get",
+				data: form_data,
+				dataType: "json",
+				success: function(json){
+					
+					var html = "";
+					
+					if($("#sel3").val() == 'card'){
+						
+						if(json.length > 0){
+							
+							$.each(json, function(entryIndex, entry){
+								
+								/* var project_idx = ${projectInfo.project_idx};  */
+								
+								if(entry.list_delete_status != 0){  
+							  		
+									html += "<input type='text' class='project_listname newval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+									html += "<div id='list"+entryIndex+"' class='well list-hover' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>";
+									html += "<input type='text' class='project_listname newval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+									html += "&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>";
+									html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+									html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+									html += "<div class='card-wrapper' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>";
+									
+																	 
+									cardinfo2(fk_project_idx, sel, cardsearchINproject, entry.fk_list_idx);
+						  
+									html += "</div>";
+									html += "<div class='div-addcard'>";
+		/* 							html += "<textarea rows='2' cols='33' placeholder=;'Enter card title...'></textarea><br/>"; 
+									html += "<button class='btn btn-default btn-addcard' style='margin-top: 10px;' >add Card</button>";  */
+									html += "<input type='hidden' value='"+entry.list_idx+"'>";
+									html += "</div>";
+									/* html += "<span style='font-size: 12pt; color: gray;' id='addCardstyle"+entryIndex+"' class='addCardstyle'><i class='fa fa-plus'></i>&nbsp;add another card...</span>"; */
+									html += "</div>";
+									html += "</div>";
+									
+								}
+								
+							});
+						}
+						
+						 
+						
+					}
+					
+					$(".list-wrapper").html(html);
+					
+					//searchCardINproject();
+	
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		});
+			
+			
+	}   
+	
+	function cardinfo2(fk_project_idx, sel, cardsearchINproject, fk_list_idx){
+		// alert("시작2222222");
+		
+		var form_data = {fk_project_idx: fk_project_idx,
+				         sel3Val : sel,
+				         cardsearchINproject: cardsearchINproject,
+				         fk_list_idx : fk_list_idx}
+		
+		
+		$.ajax({
+			
+			url: "<%= request.getContextPath() %>/cardsearchINproject_card.action",
+			type: "get",
+			data: form_data,
+			dataType: "json",
+			success: function(json){
+				
+				var html = "";
+				
+				if(json.length > 0){
+					
+					$.each(json, function(entryIndex, entry){
+						
+						html += "<div class='panel panel-default'>";
+						html += "<div class='panel-body' onClick='window.open('carddetail.action?projectIDX="+entry.fk_project_idx+"&listIDX="+entry.fk_list_idx+"&cardIDX="+entry.card_idx+"','window_name','width=800,height=710,location=no,status=no,scrollbars=yes');'>"+entry.card_title+"</div>";
+						html += "</div>";
+					});
+											
+				}
+				
+				$(".card-wrapper").html(html);
+				
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		}); // $.ajax({searchCardINproject.action});
+	} 
+	   
+	
+	var se1Val = "";
+	
+	function selVal(){
+		
+		if($("#sel1").val() == null){
+			
+			sel1Val = $("#sel1").val("수정");
+			
+		} 
+				
+		sel1Val = $("#sel1").val($("#sel").val());	
+		
+		sel1Val = $("#sel1").val();
+		
+		// console.log("버튼확인::::::"+se1Val);
+		
+		Activity(sel1Val); 
+				
+	}
+	
+	/* 	function sel2Val(){
+			
+			console.log("버튼확인22222::::::"+se1Val);
+		
+		if($("#sel1").val() == null){
+			
+			sel1Val = $("#sel1").val("수정");
+			
+		} 
+		
+		sel1Val = $("#sel1").val($("#sel2").val());	
+		
+		
+		sel1Val = $("#sel1").val();
+		
+		console.log("버튼확인::::::"+se1Val);
+		
+		Activity(sel1Val);
+		 
+	}  */
+	
+	
+	
+		$(document).mouseup(function (e){
+		
+		if(!$(".sidenav").is(e.target) && $(".sidenav").has(e.target).length == 0 ){
+			
+			closeNav(); 
+			
+		}
+				
+	});
+	
+	
+	
+	function projectINlistRe(){
+		
+		// alert("값 : ${projectInfo.project_idx}" );
+		
+		var form_data = {project_idx : "${projectInfo.project_idx}"}
+				
+		$(".list-wrapper").empty();
+		
+		$.ajax({
+			
+			url: "<%= request.getContextPath()%>/projectRe_list.action",
+			type: "get",
+			dataType: "json",
+			data: form_data,
+			success: function(json){
+				
+				var html = "";
+										
+				if(json.length == 0){
+					html += "<div id='addList' class='well list-hover' style='width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;'>";
+					html += "<label for='addListstyle'>";
+					html += "<span style='font-size: 14pt; color: gray; font-weight: bold;' id='addListstyle'><i class='fa fa-plus'></i>&nbsp;add another list...</span>";
+					html += "</label>";
+					html += "<div class='div-listname'>";
+					html += "<input type='text' class='list-title' id='listname' placeholder='Enter list title...' maxlength='30'>";
+					html += "<button class='btn btn-default' style='margin-top: 10px;' onClick='insertList();'>add List</button>";
+					html += "</div>";
+					html += "</div>";
+				}
+				else if(json.length > 0){
+					
+					$.each(json, function(entryIndex, entry){
+					
+						if(entry.list_delete_status != 0){
+							html += "<div id='list"+entryIndex+"' class='well list-hover' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>";
+							html += "<input type='text' class='project_listname newval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+							html += "&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>";
+							html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
+							html += "<div class='card-wrapper' id='card-wrapper"+entryIndex+"' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>";
+													
+							var list_idx = entry.list_idx;
+							var fk_project_idx = entry.fk_project_idx;
+							
+							cardlistRe(fk_project_idx, list_idx, entryIndex);
+														
+							html += "</div>";
+							html += "<div style='margin-top: 5%;'>";
+							html += "<div class='div-addcard'>";
+						//	html += "<textarea rows='2' cols='33' placeholder='Enter card title...'></textarea><br/>";
+						//	html += "<button class='btn btn-default btn-addcard' style='margin-top: 10px;' >add Card</button>";
+							html += "<input type='hidden' value='"+entry.list_idx+"'>";
+							html += "</div>";
+							html += "<span style='font-size: 12pt; color: gray;' id='addCardstyle"+entryIndex+"' class='addCardstyle'><i class='fa fa-plus'></i>&nbsp;add another card...</span>";
+							html += "</div>"; 
+							html += "</div>";
+							
+						}
+						
+					});
+					
+					
+					html += "<div id='addList' class='well list-hover' style='width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;'>";
+					html += "<label for='addListstyle'>";
+					html += "<span style='font-size: 14pt; color: gray; font-weight: bold; padding-bottom: 10%;' id='addListstyle'><i class='fa fa-plus'></i>&nbsp;add another list...</span>";
+					html += "</label>";
+					html += "<div class='div-listname'>";
+					html += "<input type='text' class='list-title' id='listname' placeholder='Enter list title...' maxlength='30'>";
+					html += "<button class='btn btn-default' style='margin-top: 10px;' onClick='insertList();'>add List</button>";
+					html += "</div>";
+					html += "</div>";
+					              
+				}
+				
+				$(".list-wrapper").html(html);
+				
+								
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+			
+		});
+	}
+	
+	function cardlistRe(fk_project_idx, list_idx, Index){
+		
+		//alert("list_idx : " + list_idx);
+		var form_data = {projectIDX : fk_project_idx}
+	
+		$.ajax({
+			
+			url: "<%= request.getContextPath()%>/projectRe_card.action",
+			type: "get",
+			dataType: "json",
+			data: form_data,
+			//async: false,
+			success: function(json){
+				
+				var html = "";
+				
+				if(json.length > 0 ){
+					
+					$.each(json, function(entryIndex, entry){
+					
+				
+						//alert("카드 형성 확인용: >>>>>>>>>>>" + entryIndex);
+						// console.log("entry.fk_list_idx : " + entry.fk_list_idx);
+						if(list_idx == entry.fk_list_idx){
+						
+							html += "<div class='panel panel-default'>";
+							html += "<div class='panel-body' onClick=\"window.open('carddetail.action?projectIDX="+entry.fk_project_idx+"&listIDX="+entry.card_idx+"&cardIDX="+entry.card_idx+"','window_name','width=800,height=710,location=no,status=no,scrollbars=yes');\">"+entry.card_title+"</div>";
+							html += "</div>";
+						
+						} 
+						
+						
+						
+							
+					});
+						
+					$("#card-wrapper"+Index).html(html);
+					
+				}
+				
+				
+				
+			},
+			error: function(request, status, error){
+				alert("code : " + request.status+"\n"+"message : "+request.responseText+"\n"+"error : "+ error); // 어디가 오류인지 알려줌
+		    }
+				
+		});
+		
+	} 
+	
+	
+	
 </script>
 
 <style type="text/css">
@@ -560,6 +1228,66 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555; 
 }
+
+/* ----------------------------------------------- 민재 -------------------------------------------- */
+	.sidenav {
+	    height: 100%;
+	    width: 0;
+	    position: fixed; 
+	    z-index: 2; 
+	    top: 0;
+	    right: 0;
+	    background-color: #111;
+	    overflow-x: hidden;
+	    transition: 0.5s;
+	    padding-top: 100px;
+	}
+	
+	.sidenav span {
+	    padding: 8px 8px 8px 32px;
+	    text-decoration: none;
+	    font-size: 25px;
+	    color: #818181;
+	    display: block;
+	    transition: 0.3s;
+	    /* cursor: pointer; */
+	}
+	
+	.sidenav span:hover {
+	    color: #f1f1f1;
+	}
+	
+	.sidenav .closebtn {
+	    position: absolute;
+	    top: 0;
+	    right: 25px;
+	    font-size: 36px;
+	    margin-left: 50px;
+	}
+	
+	
+	@media screen and (max-height: 450px) {
+	  .sidenav {padding-top: 15px;}
+	  .sidenav a {font-size: 15px;} 
+	}
+	
+	.imgtd {
+		width: 100px;
+		/* border: 1px solid green; */
+		
+	}
+	
+	#sel1 {
+		width: 150px;	}
+	
+	.btnActivity{
+		width:24%;
+		height:30px;
+		background-color: #00a0df; 
+		color: white;
+		font-size: 5pt;
+		margin-bottom: 20px;
+	}
   
 </style>
 
@@ -607,7 +1335,7 @@
 				</ul>
 			</c:forEach>
 		</c:if>
-		<ul class="nav navbar-nav navbar-right showMenu">
+		<!-- <ul class="nav navbar-nav navbar-right showMenu">
 			<li class="dropdown">
 			<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">...Show Menu</button>
 				<ul class="dropdown-menu">
@@ -616,14 +1344,14 @@
 					</li>
 				</ul>
 			</li>
-		</ul>
-		<!-- <p align="right">
+		</ul> -->
+		<p align="right">
 			
 			<button class="btn btn-default" type="button" id="menu1"
 				style="background-color: black; margin-top: 5px; margin-bottom: 5px; color: black; border-color: black;">
-				<span style="font-size: 13pt; color: yellow;">...Show Menu</span>
+				<span style="font-size: 13pt; color: yellow;"  onclick='openNav();'>...Show Menu</span>
 			</button>
-		</p> -->
+		</p>
 	</div>
 </nav>
 
@@ -717,3 +1445,103 @@
 	<input type="hidden" name="project_idx"
 		value="${projectInfo.project_idx}">
 </form>
+<!-- ----------------------------------------------------------  민재 ------------------------------------------------------------------------------- -->	
+	<div id="mySidenav" class="sidenav">
+	 	  <span style="font-size: 40pt; font-weight: bold;" onclick="Activity();">&#9776; menu</span>
+	 	  <a href="javascript:void(0)"onclick="closeNav();"><span style="padding-left: 80%; ">&times;</span></a>
+	 	  <span style="cursor:pointer" onclick="openNav2();">Search in PROJECT</span> 
+		  <span style="cursor: pointer;" onclick="leaveProject();">Leave PROJECT</span> 
+		  
+		  
+		  <span style="cursor: pointer;" onclick="deleteProject();" >Delete PROJECT</span>
+		 
+		  <hr style="border: solid 1px gray; background-color: gray;"> 
+		  <!-- <span>Activity</span> -->
+		    <div class="form-group" style="padding-left:18pt; padding-top: 10pt; width: 150px; border: 0px solid yellow;">
+		      <span style="padding-left: 10px;">Activity</span>
+		      <select class="form-control" id="sel" name="sel" onchange="selVal();">     <!-- onclick="Activity();" -->
+		        <option selected value="수정">CARD EDIT</option>
+		        <option value="삭제">CARD DELETE</option>
+		        <option value="추가">CARD ADD</option>
+		        <option value="생성">LIST CREATE</option>
+		      </select>
+		    </div>           
+		  
+		  	<div class="container" style="background-color: #f2f2f2; border: 0px solid red; width:400px;" id="activitylist">
+			  <!-- <h2>Activity</h2>  -->          
+			  <table class="table" id="projectRecordListTB"> 			    	
+			  </table>
+		  	</div>
+		  
+		  
+		 
+		    
+	  </div>
+	  
+	   <div id="mySideactivity" class="sidenav" style="border: 0px solid yellow;">
+   		       
+	  	  <span style="font-size: 40pt; font-weight: bold; cursor: pointer; float: left;" onclick="closeNav2();">Activity</span>
+		  	  <ul class="w3-ul">
+			    <span style="font-size: 30pt; margin-top: 20px; float: left;"><i class="fa fa-arrow-left" onclick="closeNav3();"></i></span>
+		  	  </ul>
+	  	  
+	  	    
+	  	  <div style="border: 0px solid yellow; margin-top: 100px;">
+		  
+	  	  </div>
+
+		    
+		    
+		  
+		  
+		  <div class="container" style="background-color: #f2f2f2; border: 0px solid red; width:400px;" id="activitylistMore">
+			  <!-- <h2>Activity</h2>  -->          
+			  <table class="table" id="projectRecordListMoreTB">
+			    			    	
+			  </table>
+		  </div>
+	  </div>
+	  
+	  
+	  <div id="mySidesearch" class="sidenav" style="border: 0px solid yellow;">     
+	  	  <span style="font-size: 40pt; font-weight: bold; cursor: pointer; " onclick="closeNav2();">&#9776; menu</span>
+		  <a href="javascript:void(0)" onclick="closeNav();"><span style="padding-left: 80%; font-size: 20pt;">&times;</span></a>
+		  <span>&nbsp;&nbsp;&nbsp;Search in PROJECT</span>             
+		  <div class="container" style="border: 0px solid yellow;" >
+			  <form>
+			    <div class="form-group" style="padding-left:18pt; padding-top: 10pt; width: 120px; border: 0px solid yellow;">
+			      <select class="form-control" id="sel3">    
+			        <option selected value="list">LIST</option>
+			        <option value="card">CARD</option>
+			      </select>
+			    </div>             
+			  </form>
+			  
+			  <!--  search form start -->
+		      <div class="nav search-row" id="top_menu" style="float: left; width: 300px; border: 0px solid orange;">
+		      <form class="navbar-form" style="border: 0px solid yellow;">
+		         <input class="form-control" placeholder="Search" type="text" id="listsearchINproject" style="float:left; hight: 500px; width: 300px; border: 0px solid yellow;"> 
+		      </form>                        
+		        <!--  search form start -->
+		        <!-- <ul class="nav top-menu"> 
+		          <li>
+		            
+		          </li>
+		        </ul>  -->
+		        <!--  search form end -->
+		      </div>
+		  </div>
+	  </div>
+	
+	 <%--  <form name="project_idxFrm">
+	  	<input type="hidden" name="fk_project_idx" value="${projectInfo.project_idx}"/>value="${project_membervo.fk_project_idx}"
+	  	<input type="hidden" name="sel1Val" />
+	  </form> --%>
+	  
+	  <form name="leaveProjectFrm">
+	  	<input type="hidden" name="fk_project_idx" value="${projectInfo.project_idx}"/><%-- value="${project_membervo.fk_project_idx}" --%>
+	  </form>
+
+	  <div style="float: right;">
+	  		<input type="hidden" id="sel1" name="sel1" value=""/>	
+	  </div>
