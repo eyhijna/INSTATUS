@@ -331,13 +331,13 @@ table tr th { color: #688a7e;}
 
 .login-form input[type="text"], .login-form input[type="password"] {
 
-    border: none;
+   /*  border: none; */
 
     box-shadow: none;
 
     font-size: 16px;
 
-    border-radius: 0;
+  /*   border-radius: 0; */
 
 }
 
@@ -4249,7 +4249,7 @@ div[data-role="editor-toolbar"] {
 
 .panel-footer.revenue-foot ul li a:hover i, .panel-footer.revenue-foot ul li.active a i {
 
-    color: #688a7e;
+  /*   color: #688a7e; */
 
     display: block;
 

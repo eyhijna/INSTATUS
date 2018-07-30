@@ -632,7 +632,41 @@
 body{overflow: auto;}
 
 
+.body_img{
+  background: url("./resources/images/background1.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
 
+.icon_lock_alt{color: hotpink;}
+
+.login-wrap{background-color: white;}
+
+.login_style{border: 1px solid lightgray;
+    border-radius: 0.5em;
+    }
+
+.btn_login{
+	/* color:#ff89dd; */
+	background-color: #ff89dd;
+	border-color: #ff89dd;
+/* 	border-radius: 1em; */
+}
+.btn_login:hover{
+	background-color: white;
+	border-color: #ff89dd;
+  	border-radius: 1em;  
+	color:#ff89dd;
+}
+
+.login-form a {
+    color: black !important;
+}
+.login-form .btn {
+    border-radius: 0.5em;
+}
 </style>
 
 <head>
@@ -649,36 +683,38 @@ body{overflow: auto;}
 </head>  
 
        
-<body class="login-img3-body">
-
+<!-- <body class="login-img3-body"> -->
+<body class="body_img">
 <!--   <div class="container"> -->
    
       
     <form class="login-form" name="loginFrm">
       <c:if test="${sessionScope.loginuser == null}">
-      <div style="padding: auto; margin: auto;" class="login-wrap">
+      <div style="padding: auto; margin: auto;" class="login-wrap" >
         <p class="login-img"><i class="icon_lock_alt"></i></p>
         <div class="input-group">
           <span class="input-group-addon"><i class="icon_profile"></i></span>
-          <input type="text" name="userid" id="userid" class="form-control" placeholder="Username" autofocus>
+          <input type="text" name="userid" id="userid" class="form-control " placeholder="Username" autofocus style="border: 1px solid lightgray;
+    border-radius: 0.5em;">
         </div>
         <div class="input-group">
           <span class="input-group-addon"><i class="icon_key_alt"></i></span>
-          <input type="password" name="pwd" id="pwd" class="form-control" placeholder="Password">
+          <input type="password" name="pwd" id="pwd" class="form-control " placeholder="Password" style="border: 1px solid lightgray;
+    border-radius: 0.5em;">
         </div>
-        <label class="checkbox">
-                <input type="checkbox" value="remember-me"> Remember me
+      <!--   <label class="checkbox"> -->
+               <!--  <input type="checkbox" value="remember-me"> Remember me -->
                 <span class="pull-right"><a data-toggle="modal" href="#findID-modal">Forgot ID?</a></span><br/>
                 <span class="pull-right"><a data-toggle="modal" href="#findPwd-modal">Forgot Password?</a></span>
             </label>
-        <button class="btn btn-primary btn-lg btn-block" type="button" id="btnLogin">Login</button> 
+        <button class="btn btn-primary btn-lg btn-block btn_login" type="button" id="btnLogin">Login</button> 
         <button type="button" class="btn btn-info btn-lg btn-block" onClick="location.href='<%=request.getContextPath()%>/signup.action'">Sign up</button>
       </div>
       </c:if>
       
       <c:if test="${sessionScope.loginuser != null}">
-         <div style="padding-top: 15px; padding-bottom: 10px;">
-            <p>${sessionScope.loginuser.name} 님 로그인을 환영합니다!</p>
+         <div style="padding-top: 15px; padding-bottom: 10px;" class="login-wrap">
+            <p><span style="color: #ff89dd; font-size: 12pt;">${sessionScope.loginuser.name}</span> 님 로그인을 환영합니다!</p>
             <br/>
 	
 			<!-- 팀리스트, 프로젝트 리스트가 존재하지 않는 경우 -->
@@ -703,7 +739,7 @@ body{overflow: auto;}
 			
 					<!-- 팀 리스트 불러오기 -->
 					<div class="dropdown">
-						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
+						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%; background-color: white; border: 1px solid lightgray;">Select
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu scrollable-menu" style="width: 100%;">
 							<c:forEach items="${teamList}" var="map">
@@ -714,7 +750,7 @@ body{overflow: auto;}
 					<!-- 프로젝트 리스트 불러오기 -->
 					<label for="team" style="margin-top: 10px; text-align: center;">My Project List</label>
 					<div class="dropdown">
-						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
+						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%; background-color: white; border: 1px solid lightgray;">Select
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu scrollable-menu" style="width: 100%;">
 							<c:forEach items="${projectList}" var="map">
@@ -727,12 +763,15 @@ body{overflow: auto;}
 					   
 				  </div>
             </c:if>
+            <button class="btn btn-info btn-lg btn-block btn_login" type="button" onClick="location.href='<%=request.getContextPath()%>/logout.action'">Logout</button>
          </div>
-         <button class="btn btn-info btn-lg btn-block" type="button" onClick="location.href='<%=request.getContextPath()%>/logout.action'">Logout</button>
+         <br/>
+         <br/>
+       <%--   <button class="btn btn-info btn-lg btn-block btn_login" type="button" onClick="location.href='<%=request.getContextPath()%>/logout.action'">Logout</button> --%>
       </c:if>
     </form>
     
-    <div class="text-right">
+    <div class="text-left">
       <div style="text-align: center; color: gray; margin-top: 10px;">
        <c:if test="${sessionScope.loginuser != null}">
          <a data-toggle="modal" href="#myModal" style="font-size: 14pt; color: white; font-weight: bold;">Create Project</a>
@@ -740,10 +779,10 @@ body{overflow: auto;}
          <a data-toggle="modal" href="#myModal2" style="font-size: 14pt; color: white; font-weight: bold;">Create Team</a>
          </c:if>
       </div>
-      <div class="credits">
+     <!--  <div class="credits">
           Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
-      <!--  class="closebtn"  -->
+       class="closebtn" 
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)"onclick="closeNav();"><span style="color: white;">&times;</span></a>
         <a href="#">About</a>
@@ -752,7 +791,7 @@ body{overflow: auto;}
         <a href="#">Contact</a>
      </div>
      <span style="font-size:30px;cursor:pointer" onclick="openNav();">&#9776; open</span> 
-    </div>
+    </div> -->
 
 
 <!-- 프로젝트 생성 Modal --> 
@@ -836,12 +875,13 @@ body{overflow: auto;}
   
    <!-- 팀 생성 모달 -->
    <div class="modal fade" id="myModal2" role="dialog" >
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width:380px;">
     
-      <div class="modal-content" style="display:inline-block; left:90px; top: 100px; width: 400px; " >
+      <!-- <div class="modal-content" style="display:inline-block; left:90px; top: 100px; width: 400px; " > -->
+      <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title" style="color:black; font-weight: bold;">Create a team</h4>
+          <h4 class="modal-title" style="color: red; font-weight: bold;">Create New Team!!</h4>
         </div>
         
         <div class="modal-body">
@@ -854,8 +894,8 @@ body{overflow: auto;}
         </div>
        
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="createTeam();" id="submitBtn"  style="color:black; font-weight:bold;">Submit</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal"  style="color:black; font-weight:bold;">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="createTeam();" id="submitBtn"  style="color:black;">create</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"  style="color:black;">cancel</button>
         </div>
         
       </div> 

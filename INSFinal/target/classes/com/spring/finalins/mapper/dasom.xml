@@ -292,6 +292,7 @@
 		  from ins_team_member 
 		 where fk_team_idx = #{team_idx}
 		   and team_userid != #{userid}
+		   and team_member_admin_status in (0,1,2)
 	</select>
 	
 	<!-- 리스트 삭제 -->
