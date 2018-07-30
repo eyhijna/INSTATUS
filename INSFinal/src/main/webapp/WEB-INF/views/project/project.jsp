@@ -831,10 +831,10 @@
 									html += "&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>";
 									html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
 									html += "<input type='hidden' class='project_listname oldval' value='"+entry.list_name+"' style='background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;'/>";
-									html += "<div class='card-wrapper' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>";
+									html += "<div class='card-wrapper' id='card-wrapper"+entryIndex+"' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>";
 									
 																	 
-									cardinfo2(fk_project_idx, sel, cardsearchINproject, entry.fk_list_idx);
+									cardinfo2(fk_project_idx, sel, cardsearchINproject, entry.fk_list_idx, entryIndex);
 						  
 									html += "</div>";
 									html += "<div class='div-addcard'>";
@@ -869,7 +869,7 @@
 			
 	}   
 	
-	function cardinfo2(fk_project_idx, sel, cardsearchINproject, fk_list_idx){
+	function cardinfo2(fk_project_idx, sel, cardsearchINproject, fk_list_idx, Index){
 		// alert("시작2222222");
 		
 		var form_data = {fk_project_idx: fk_project_idx,
@@ -899,7 +899,7 @@
 											
 				}
 				
-				$(".card-wrapper").html(html);
+				$("#card-wrapper"+Index).html(html);
 				
 			},
 			error: function(request, status, error){
