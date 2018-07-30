@@ -251,7 +251,7 @@
 					  
 					  var form_data = { "team_idx" : team_idxval }
 					  
-					  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+					  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 						  alert("you must login. go to login page..");
 						  location.href="<%= request.getContextPath()%>/index.action";   
 					  }
@@ -315,7 +315,7 @@
 					  
 					  var form_data = { team_idx : team_idxval }
 					
-					  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+					  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 						  alert("you must login. go to login page..");
 						  location.href="<%= request.getContextPath()%>/index.action";   
 					  }
@@ -424,7 +424,7 @@
 		               , "team_idx" : ${teamvo.team_idx} };  
    
 			
-	  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+	  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 		  alert("you must login. go to login page..");
 		  location.href="<%= request.getContextPath()%>/index.action";   
 	  } 
@@ -487,7 +487,7 @@
 		  var form_data = { searchWord : $("#searchWord2").val()
 		                   ,team_idx : ${teamvo.team_idx} };   
 			
-		  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+		  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 			  alert("you must login. go to login page..");
 			  location.href="<%= request.getContextPath()%>/index.action";   
 		  } 
@@ -552,7 +552,7 @@
 			           ,"start" : start
 			           ,"len" : length};
 	   
-	   if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+	   if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 			  alert("you must login. go to login page..");
 			  location.href="<%= request.getContextPath()%>/index.action";   
 	   } 
@@ -612,10 +612,10 @@
 				  	       	   
 				  	       	    
 				  	       	    if( "${teamvo.admin_userid}" == "${sessionScope.loginuser.userid}"){
-				  	       	      html += "        <button type='button' onclick='leave(\""+entry.userid+"\");'  class='btn btnLeave' value='${entryUserid}' style='width:130px;'><span style='color:black; font-weight:bold;'>Leave&nbsp;&nbsp;</span><span class='glyphicon glyphicon-remove'><span></button><input type='hidden' value='"+entry.userid+"'/>"; 
+				  	       	      html += "        <button type='button' onclick='leave(\""+entry.userid+"\");'  class='btn btnLeave' value='${entryUserid}' style='width:130px; margin-left:15px;'><span style='color:black; font-weight:bold;'>Leave&nbsp;&nbsp;</span><span class='glyphicon glyphicon-remove'><span></button><input type='hidden' value='"+entry.userid+"'/>"; 
 				  	       	    }
 				  	       	    else if("${teamvo.admin_userid}" != "${sessionScope.loginuser.userid}" && entry.userid == "${sessionScope.loginuser.userid}"){
-				  	       	      html += "        <button type='button' onclick='leave(\""+entry.userid+"\");'  class='btn btnLeave' value='${entryUserid}' style='width:130px;'><span style='color:black; font-weight:bold;'>Leave&nbsp;&nbsp;</span><span class='glyphicon glyphicon-remove'><span></button><input type='hidden' value='"+entry.userid+"'/>"; 
+				  	       	      html += "        <button type='button' onclick='leave(\""+entry.userid+"\");'  class='btn btnLeave' value='${entryUserid}' style='width:130px; margin-left:15px;'><span style='color:black; font-weight:bold;'>Leave&nbsp;&nbsp;</span><span class='glyphicon glyphicon-remove'><span></button><input type='hidden' value='"+entry.userid+"'/>"; 
 				  	       	    } 
 				  	       	    
 				  	       	    html += "    </td>"; 
@@ -723,7 +723,7 @@
 		var form_data = { searchMyTmember : $("#searchMyTmember").val() 
 				         , team_idx : team_idxval };  
 		 
-		if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+		if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 			  alert("you must login. go to login page..");
 			  location.href="<%= request.getContextPath()%>/index.action";   
 		} 

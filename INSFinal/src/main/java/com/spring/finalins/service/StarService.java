@@ -438,24 +438,26 @@ public class StarService implements InterStarService {
 	@Override
 	public String getProjectList(HashMap<String, String> map2) {
 		
-		List<ProjectVO> projectList = dao.getProjectList(map2);
-		// 제품별로 ProductVO를 가져온다 
-		 
+		List<HashMap<String, String>> projectList = dao.getProjectList(map2);
+		  
 		JSONArray jsonArray = new JSONArray();
 		
 		if(jsonArray != null && projectList.size() > 0) {
-			
-			for(ProjectVO pvo : projectList) {
-				
+			 
+			for(HashMap<String, String> map : projectList) {
+				   
 			     JSONObject jsonObj = new JSONObject();     
 			     
-				 jsonObj.put("fk_team_idx", pvo.getFk_team_idx());
-				 jsonObj.put("project_idx", pvo.getProject_idx());
-				 jsonObj.put("project_name", pvo.getProject_name());
-				 jsonObj.put("project_visibility_st", pvo.getProject_visibility_st());
-				 jsonObj.put("project_delete_status", pvo.getProject_delete_status());
-				 jsonObj.put("fk_project_image_idx", pvo.getFk_project_image_idx());
+				 jsonObj.put("fk_team_idx", map.get("fk_team_idx"));
+				 jsonObj.put("project_idx", map.get("project_idx"));
+				 jsonObj.put("project_name", map.get("project_name"));
+				 jsonObj.put("project_visibility_st", map.get("project_visibility_st"));
+				 jsonObj.put("project_delete_status", map.get("project_delete_status"));
+				 jsonObj.put("fk_project_image_idx", map.get("fk_project_image_idx"));
+				 jsonObj.put("project_member_admin_status", map.get("project_member_admin_status"));
+				 jsonObj.put("project_image_name", map.get("project_image_name"));
 				 jsonObj.put("totalCount", map2.get("totalCount"));
+				 
 				 
 				 jsonArray.put(jsonObj);
 			} 
@@ -484,6 +486,44 @@ public class StarService implements InterStarService {
 	public int wantJoinTeam(HashMap<String, String> map) {
 		int n = dao.wantJoinTeam(map);
 		return n;
+	}
+	
+	// public인 프로젝트 갯수알아오기 
+	@Override
+	public int publicProjectCnt(String team_idx) {
+		int totalCount = dao.publicProjectCnt(team_idx);
+		return totalCount; 
+	}
+
+	// public인 프로젝트를 가져온다.
+	@Override
+	public String getPublicProjectList(HashMap<String, String> map2) {
+		
+		List<ProjectVO> projectList = dao.getPublicProjectList(map2);
+		// 제품별로 ProductVO를 가져온다 
+		 
+		JSONArray jsonArray = new JSONArray();
+		
+		if(jsonArray != null && projectList.size() > 0) {
+			
+			for(ProjectVO pvo : projectList) {
+				
+			     JSONObject jsonObj = new JSONObject();     
+			     
+				 jsonObj.put("fk_team_idx", pvo.getFk_team_idx());
+				 jsonObj.put("project_idx", pvo.getProject_idx());
+				 jsonObj.put("project_name", pvo.getProject_name());
+				 jsonObj.put("project_visibility_st", pvo.getProject_visibility_st());
+				 jsonObj.put("project_delete_status", pvo.getProject_delete_status());
+				 jsonObj.put("fk_project_image_idx", pvo.getFk_project_image_idx());
+				 jsonObj.put("totalCount", map2.get("totalCount"));
+				 
+				 jsonArray.put(jsonObj);
+			} 
+		}//end of if 
+		
+		String str_jsonArray = jsonArray.toString();
+		return str_jsonArray; 
 	}
    
   

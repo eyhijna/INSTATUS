@@ -140,7 +140,7 @@
 	  var team_idxval = ${teamvo.team_idx}; 
 	  var data_form = {team_idx : team_idxval}
 	  
-	  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+	  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 		  alert("you must login. go to login page..");
 		  location.href="<%= request.getContextPath()%>/index.action";   
 	  } 
@@ -190,7 +190,7 @@
 
 	  var data_form = {team_idx : team_idx_val};
 	  
-	  if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+	  if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 		  alert("you must login. go to login page..");
 		  location.href="<%= request.getContextPath()%>/index.action";   
 	  } 

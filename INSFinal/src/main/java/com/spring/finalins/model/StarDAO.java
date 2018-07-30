@@ -231,9 +231,9 @@ public class StarDAO implements InterStarDAO {
 		return totalCount;
 	}
 
-	@Override
-	public List<ProjectVO> getProjectList(HashMap<String, String> map2) {
-		List<ProjectVO> projectList = sqlsession.selectList("star.getProjectList", map2);
+	@Override 
+	public List<HashMap<String, String>> getProjectList(HashMap<String, String> map2) {
+		 List<HashMap<String, String>> projectList = sqlsession.selectList("star.getProjectList", map2);
 		return projectList;
 	}
 	
@@ -249,6 +249,19 @@ public class StarDAO implements InterStarDAO {
 	public int wantJoinTeam(HashMap<String, String> map) {
 		int n = sqlsession.update("star.wantJoinTeam", map);
 		return n;
+	}
+
+	// public인 프로젝트 갯수알아오기 
+	@Override
+	public int publicProjectCnt(String team_idx) {
+		int totalCount = sqlsession.selectOne("star.publicProjectCnt", team_idx);
+		return totalCount;
+	}
+
+	@Override
+	public List<ProjectVO> getPublicProjectList(HashMap<String, String> map2) {
+		List<ProjectVO> projectList = sqlsession.selectList("star.getPublicProjectList", map2);
+		return projectList;
 	}
  
 }

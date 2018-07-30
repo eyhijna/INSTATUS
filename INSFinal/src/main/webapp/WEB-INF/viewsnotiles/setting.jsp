@@ -65,7 +65,7 @@
 			            ,"start" : start
 			            ,"len" : length};
 	   
-	   if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+	   if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 			  alert("you must login. go to login page..");
 			  location.href="<%= request.getContextPath()%>/index.action";   
 	    } 

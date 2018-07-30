@@ -82,6 +82,10 @@ public interface InterStarService {
 	List<TeamMemberVO> teamMemberList(String team_idx); // 팀의 회원정보들을 불러오는 메소드
 
 	int wantJoinTeam(HashMap<String, String> map); // 회원이 팀가입을 요청할때
+
+	int publicProjectCnt(String team_idx); // public인 프로젝트 갯수알아오기 
+
+	String getPublicProjectList(HashMap<String, String> map2); // public인 프로젝트를 가져온다.
  
 
 	

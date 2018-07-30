@@ -307,20 +307,33 @@
       select count(*)
 	  from ins_project A join ins_project_member B
 	  on A.project_idx = B.fk_project_idx
-	  where B.project_member_userid = #{login_userid} and A.fk_team_idx = #{team_idx}
+	  where (B.project_member_userid = #{login_userid} or A.project_visibility_st = 2 ) and A.fk_team_idx = #{team_idx} and B.project_member_status != 1
     </select>
     
-    <select id="getProjectList" parameterType="HashMap" resultType="com.spring.finalins.model.ProjectVO">
-      select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+    
+    <resultMap type="HashMap"  id="ProjectListMap"> 
+ 		<result property="project_idx" 			       column="project_idx" 		        javaType="String" />
+ 		<result property="fk_team_idx" 			       column="fk_team_idx" 		        javaType="String" />  
+ 		<result property="project_name" 	           column="project_name" 	            javaType="String" /> 
+ 		<result property="project_visibility_st" 	   column="project_visibility_st" 	    javaType="String" /> 
+ 		<result property="project_delete_status" 	   column="project_delete_status" 		javaType="String" />  
+ 		<result property="fk_project_image_idx" 	   column="fk_project_image_idx" 	    javaType="String" /> 
+ 		<result property="project_member_admin_status" column="project_member_admin_status" javaType="String" /> 
+        <result property="project_image_name"          column="project_image_name"          javaType="String"/>
+    </resultMap> 
+    <select id="getProjectList" parameterType="HashMap" resultMap="ProjectListMap">
+      select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx, project_member_admin_status, project_image_name
 	  from 
 		   (
-		    select rownum as RNO ,project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+		    select rownum as RNO ,project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx, project_member_admin_status, project_image_name
 		    from
 		       (
-		        select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+		        select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx, project_member_admin_status, project_image_name
 		        from ins_project A join ins_project_member B
 		        on A.project_idx = B.fk_project_idx
-		        where B.project_member_userid = #{login_userid} and A.project_delete_status != 0 and B.project_member_status != 1 and A.fk_team_idx = ${team_idx}
+		        join ins_project_image C
+                on A.fk_project_image_idx = C.project_image_idx
+		        where (B.project_member_userid = #{login_userid} or A.project_visibility_st = 2) and A.project_delete_status != 0 and B.project_member_status != 1 and A.fk_team_idx = ${team_idx}
 		        order by project_idx desc
 		     )V
 		   )T
@@ -337,6 +350,28 @@
         insert into ins_team_member(fk_team_idx, team_userid, team_member_admin_status)
         values(#{team_idx}, #{login_userid},  4 )  
     </update>
+    
+    <select id="publicProjectCnt" parameterType="String" resultType="Integer">
+       select count(*)
+	   from ins_project  
+	   where fk_team_idx = #{team_idx} and project_visibility_st = 2 and project_delete_status != 0
+    </select>
+    
+    <select id="getPublicProjectList" parameterType="HashMap" resultType="com.spring.finalins.model.ProjectVO">
+        select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+	    from 
+		   (
+		    select rownum as RNO ,project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+		    from
+		       (
+		        select project_idx, fk_team_idx, project_name, project_visibility_st, project_delete_status, fk_project_image_idx
+		        from ins_project   
+		        where project_delete_status != 0 and fk_team_idx = #{team_idx} and project_visibility_st = 2
+		        order by project_idx desc 
+		     )V
+		   )T
+		where T.RNO between #{startRno} and #{endRno}
+    </select>
 </mapper>
  
  

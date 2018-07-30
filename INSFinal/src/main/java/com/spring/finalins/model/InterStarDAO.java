@@ -70,11 +70,15 @@ public interface InterStarDAO {
 
 	int projectCnt(HashMap<String, String> map1); // 내가 포함된 팀 프로젝트 총 갯수 가져오기 
 
-	List<ProjectVO> getProjectList(HashMap<String, String> map2); // 내가 포함된 프로젝트를 불러오는 메소드
+	List<HashMap<String, String>> getProjectList(HashMap<String, String> map2); // 내가 포함된 프로젝트를 불러오는 메소드
 
 	List<TeamMemberVO> teamMemberList(String team_idx); // 팀의 회원정보들을 불러오는 메소드
 
 	int wantJoinTeam(HashMap<String, String> map); // 회원이 팀가입을 요청할때
+
+	int publicProjectCnt(String team_idx); // public인 프로젝트 갯수알아오기 
+
+	List<ProjectVO> getPublicProjectList(HashMap<String, String> map2); // public인 프로젝트를 가져온다.
  
 	
 

@@ -7,8 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <style>
-.button {
-    background-color: #e6e6e6;
+.button { 
     border: 0px solid gray; 
     color: black;
     height : 60px;
@@ -91,9 +90,19 @@
 <script type="text/javascript">
   $(document).ready(function(){
 	   
-	  displayProject("1");
+	  if(${mystatus != 0 && mystatus != 1 && mystatus != 2}){
+		   
+		  displayPublicProject("1");
+		  $("#display1").hide();
+		  $("#display2").show();
+	  }  
+	  else{ 
+		  
+		  displayProject("1");
+		  $("#display2").hide();
+		  $("#display1").show();
+	  }
 	  
-	  // NEW상품 더보기  버튼 클릭시 이벤트 등록 
 	  $("#btnMore").bind("click", function(){
 		  
 		   if($(this).text() == "Back"){   
@@ -104,6 +113,19 @@
 		   }
 		   else{
 			   displayProject($(this).val());// 버튼의 value값을 넣는다 
+		   }
+	  });
+	  
+	  $("#btnMore1").bind("click", function(){
+		  
+		   if($(this).text() == "Back"){   
+			   
+		      $("#displayResult").empty();
+		      displayPublicProject("1");
+		      $(this).text("More");
+		   }
+		   else{
+			   displayPublicProject($(this).val());// 버튼의 value값을 넣는다 
 		   }
 	  });
 	  
@@ -268,7 +290,7 @@
  			          ,"team_idx" : team_idx };
  	 // 시작값이 1이고 1부터 HIT상품을 3개만 보여주라는 뜻 
  	 
- 	if(${sessionScope.loginuser  == "" || sessionScope.loginuser  == null }){
+ 	if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
 		  alert("you must login. go to login page..");
 		  location.href="<%= request.getContextPath()%>/index.action";   
     } 
@@ -301,8 +323,11 @@
    		  					 + team_idx;
 	    		  			
 	    		  			 html += "<div align='left' style='display: inline-block; margin-left:30px;'>"; 
-	    		  			 html += "<br/><button type='button' class='button' onClick='location.href= \" " + url + " \" '>";
-	    		  			 html += entry.project_name+"</button>";    					   
+	    		  			 html += "<br/><button type='button' class='button' onClick='location.href= \" " + url + " \"' style='background-image: url(\"http://localhost:9090/finalins/resources/images/"+entry.project_image_name+"\"); color:white;'>";
+	    		  			 if(entry.project_member_admin_status == 1){ 
+		    		    		 html += "<span class='glyphicon glyphicon-user' style='color: gray;'>&nbsp;</span>";
+		    		    	 }
+	    		  			 html += ""+entry.project_name+"</button>";     					   
 	    		  			 html += "<input type='hidden' name='project_idx' value='"+entry.project_idx+"'>";
 	    		  			 html += "<br/><br/></div>";  
 	    		  			 
@@ -336,9 +361,75 @@
  		       
  		   
  	   });
-	} 
- 	 
-  }// end of displayNEWAppend -------------------------------
+	}  
+  }// displayProject(start) -------------------------------
+  
+  function displayPublicProject(start){
+	 	 
+		 var team_idx = ${team_idx};
+	 	 var form_data = {"start" : start 
+	 			          ,"len" : length
+	 			          ,"team_idx" : team_idx }; 
+	 	 
+	 	if(${sessionScope.loginuser.userid  == "" || sessionScope.loginuser.userid  == null }){
+			  alert("you must login. go to login page..");
+			  location.href="<%= request.getContextPath()%>/index.action";   
+	    } 
+		else{  
+	 	   $.ajax({
+	 		       url: "projectPublicJSON.action",
+	 		       type: "GET",
+	 		       data: form_data,
+	 		       dataType: "JSON",
+	 		       success : function(json){
+	 		    	   
+	 		    	   var html = "";
+	 		    	    
+	 		    	   if(json.length > 0){ // 데이터가 있는 경우 
+	 		    		   
+	 		    		    $.each(json, function(entryindex, entry){
+	 		    		    	
+	 		    		    	 html += "<div align='left' style='display: inline-block; margin-left:30px;'>" 
+		    		  			 html += "<br/><button type='button' class='button'>"+entry.project_name+"</button>";    					   
+		    		  			 html += "<input type='hidden' name='project_idx' value='"+entry.project_idx+"'>";
+		    		  			 html += "<br/><br/></div>"; 
+		    		  				      
+		    		  		     $("#totalCount1").text(entry.totalCount);
+	 		    		    });//end of each
+	 		    	   }//end of if 
+	 		    	   else{
+	 		    		   html += "<p> There is no project. <p>";
+	 		    	   }
+	 		    	       html += "<div style='clear: both;'>&nbsp;</div>";
+	 		    	       	 
+	 		    	        $("#displayResult").append(html);
+	 		    	         
+	 		    	        $("#btnMore1").val(parseInt(start) + length );
+	 		    	        
+	 			    	     if($("#totalCount1").text() <= 3 ){
+	 			    			 $("#btnMore1").hide(); 
+	 			    		 }	   
+	 			    		 else{
+	 			    			 $("#btnMore1").show();
+	 			    			 $("#btnMore1").text("More");
+	 			    		 }
+	 			    	      
+	 		    	       	$("#count1").text(parseInt($("#count1").text()) + json.length ); 
+	 		    	      	if($("#count1").text() == $("#totalCount1").text() ){
+	 		    	       		$("#btnMore1").text("Back");
+	 		    	       		$("#count1").text("0");
+	 		    	       	} 
+	 		    	   
+	 		       },
+	 		       error: function(request, status, error){
+		  	     	      alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+		  	       }
+	 		       
+	 		   
+	 	   });
+		}  
+	 	 
+}// end of  displayProject
 
 </script>
 </head>
@@ -355,12 +446,17 @@
  	 </div> 
 	 <div id="displayResult" style="margin-left: 400px; border: 0px solid gray;"> 
  	 </div>	    		   
-	<div style="margin-top: 10px; margin-left:730px; margin-bottom:20px;">
+	<div id="display1" style="margin-top: 10px; margin-left:730px; margin-bottom:20px;">
 	  <button type="button" id="btnMore" class="btn" style="color:black; font-weight:bold;" value="">More</button>
 	  <span id="totalCount" hidden>${totalCount}</span> <!-- 총 프로젝트 갯수(totalCOUNT)보다 많아지면 더보기버튼을 안보여주기 위해 사용 -->
-	  <span id="count" hidden>0</span> <!-- 현재 내가 프로젝트를 몇개만큼 받아왔는지 알아보기 위해  count변수사용 -->
+	  <span id="count" hidden >0</span> <!-- 현재 내가 프로젝트를 몇개만큼 받아왔는지 알아보기 위해  count변수사용 -->
 	</div>
 	
+	<div id="display2" style="margin-top: 10px; margin-left:730px; margin-bottom:20px;">
+	  <button type="button" id="btnMore1" class="btn" style="color:black; font-weight:bold;" value="">More</button>
+	  <span id="totalCount1" hidden >${totalCount}</span> <!-- 총 프로젝트 갯수(totalCOUNT)보다 많아지면 더보기버튼을 안보여주기 위해 사용 -->
+	  <span id="count1" hidden >0</span> <!-- 현재 내가 프로젝트를 몇개만큼 받아왔는지 알아보기 위해  count변수사용 -->
+	</div>
  </div>
  
  <!--  30일 다솜 Add -->

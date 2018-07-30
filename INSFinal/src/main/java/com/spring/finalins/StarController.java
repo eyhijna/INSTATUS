@@ -582,7 +582,7 @@ public class StarController {
 				   return "star/myTeamInfo.tiles";    
 			}  
 		    req.setAttribute("teamvo", teamvo); 
-		    return "/index.tiles";   
+		    return "main/index.tiles";   
 	     } 
 	  
 	  // 회원 권한을 관리자로 바꾸는 메소드 
@@ -851,7 +851,7 @@ public class StarController {
 	   
 	  // 팀가입 신청을 수락하는 메소드 
 	  @RequestMapping(value="/acceptMember.action", method={RequestMethod.POST})
-	  public String requireLogin_acceptMember(HttpServletRequest req, HttpServletResponse res) {
+	  public String requireLogin__acceptMember(HttpServletRequest req, HttpServletResponse res) {
      
 		 String userid = req.getParameter("userid");  
 		 String team_idx = req.getParameter("team_idx");
@@ -1143,7 +1143,7 @@ public class StarController {
 		    	 TeamMemberVO myinfo = service.teamMemberInfo(map); //존재한다면 나의 status 를 가져온다. 	    	 
 		    	 req.setAttribute("mystatus", myinfo.getTeam_member_admin_status());
 		      }
-		      
+		     
 			  req.setAttribute("memberList", memberList);
 			  req.setAttribute("team_idx", team_idx);
 			 
@@ -1271,7 +1271,7 @@ public class StarController {
 			int m = service.checkMemberExist(map);//멤버테이블에 존재하는지 확인 
 			if(m>0) { // 팀내에 존재한다면(이미 신청했다면)
 				msg = "You already send request.";
-				loc = "javascript:history.back();";
+				loc = "javascript:history.back(-2);";
 				 
 			}
 			else {
@@ -1279,11 +1279,11 @@ public class StarController {
 				
 				if(n>0) {
 					msg = "Success!";
-					loc = "javascript:history.back();"; 
+					loc = "javascript:history.back(-2);"; 
 				}
 				else if(n==0) {
 					msg = "The request is failed. Please try again";
-					loc = "javascript:history.back();";
+					loc = "javascript:history.back(-2);";
 				} 
 			}
 
@@ -1292,5 +1292,50 @@ public class StarController {
 		    return "msg.notiles";
 		    
 	 }
-	 
+	  
+	// 팀에서 생성한 프로젝트(=public인것)를 가져오는 JSON -- 팀에 포함이안된 회원이 팀페이지에 들어왔을때 
+	 @RequestMapping(value="/projectPublicJSON.action", method={RequestMethod.GET})
+     public String projectPublicJSON(HttpServletRequest req) {
+				  
+		 String start = req.getParameter("start"); // 맨 처음에는 초계치 1이 들어온다. 
+		 String len = req.getParameter("len"); // 3
+		 String team_idx = req.getParameter("team_idx");  
+				
+		 if(start == null || start.trim().isEmpty()) { // 초기값을 준다 
+			  start ="1";
+		 }
+		 if(len == null || len.trim().isEmpty()) {
+			  len = "3";
+		 } 
+				
+		 System.out.println(" ===> 확인용 projectPublicJSON.action => start, len, team_idx =  start"+start+" len "+len+" team_idx "+team_idx);
+				  
+		 int startRno = Integer.parseInt(start);
+		 // 시작 행번호 ( 1, 4, 7, 10...)
+				
+		 int endRno = startRno + Integer.parseInt(len) - 1;
+		 // 끝 행번호 
+		 // !!!!  공식 !!!! 
+		 // 끝행번호 = 시작행번호 + 보여줄상품길이(len) - 1 
+		 // 1+3-1 = 3, 6, 9, ... 
+		 HttpSession session = req.getSession();
+		 MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+				  
+		 int totalCount = service.publicProjectCnt(team_idx); // public인 프로젝트 갯수알아오기 
+		 String str_totalCount = String.valueOf(totalCount);
+		 String str_startRno = String.valueOf(startRno);
+		 String str_endRno = String.valueOf(endRno);
+				
+		 HashMap<String, String> map2 = new HashMap<String, String>();
+		 map2.put("team_idx", team_idx); 
+		 map2.put("totalCount", str_totalCount);
+		 map2.put("startRno", str_startRno);
+		 map2.put("endRno", str_endRno);
+				
+		 String str_jsonArray = service.getPublicProjectList(map2); // public인 프로젝트를 가져온다.
+		 System.out.println("public project List 확인용 jsonArray"+str_jsonArray);
+		 req.setAttribute("str_jsonArray", str_jsonArray);	 
+		        
+		 return "projectPublicJSON.notiles";
+	 }
 }//end of class
