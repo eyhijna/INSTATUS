@@ -667,6 +667,11 @@ body{overflow: auto;}
 .login-form .btn {
     border-radius: 0.5em;
 }
+
+a:hover{
+background-color: red; background: transparent
+}
+
 </style>
 
 <head>
