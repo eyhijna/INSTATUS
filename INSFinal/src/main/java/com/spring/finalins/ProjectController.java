@@ -240,6 +240,9 @@ public class ProjectController {
 			map.put("project_idx", project_idx);
 			map.put("project_name", project_name);
 			
+			System.out.println("userid확인: " + userid);
+			System.out.println("project_idx확인: " + project_idx);
+			System.out.println("project_name확인: " + project_name);
 			//project_idx로 배경이미지 테이블에서 프로젝트의 배경이미지명을 가져오는 메소드
 			String project_image_name = service.getBackgroundIMG(project_idx);
 			
@@ -537,6 +540,8 @@ public class ProjectController {
 		String team_idx = request.getParameter("teamIDX");
 		String userid = request.getParameter("userid");
 		
+		System.out.println("팀 idx: " + team_idx);
+		System.out.println("userid: " + userid);
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("team_idx", team_idx);
 		map.put("userid", userid);

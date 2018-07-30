@@ -85,7 +85,7 @@
 	    			
 	    			$("#pjst").bind("change", function(){ //프로젝트 생성에서 노출도 값이 변할 때 
 	    				$(".div_pjst_private").remove();
-	    			
+	    				
 	    		    	 if( $("#pjst").val() == "1"){ //프로젝트 노출도가 private인 경우 멤버 select창 추가
 	    		    		var html = "<div class='form-group div_style div_pjst_private'>"
 	    		    				 + "	<label for='inner_div' style='margin-top: 10px;'>Select Team mate</label><br/>"
@@ -568,6 +568,12 @@
 
 <style type="text/css">
 
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
 .div_style{
 	max-height: 328px;
 	/* border: 1px solid blue; */
@@ -699,7 +705,7 @@ body{overflow: auto;}
 					<div class="dropdown">
 						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
 					    <span class="caret"></span></button>
-					    <ul class="dropdown-menu" style="width: 100%;">
+					    <ul class="dropdown-menu scrollable-menu" style="width: 100%;">
 							<c:forEach items="${teamList}" var="map">
 								<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${map.team_idx}">${map.team_name}</a></li>
 						    </c:forEach>
@@ -710,7 +716,7 @@ body{overflow: auto;}
 					<div class="dropdown">
 						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
 					    <span class="caret"></span></button>
-					    <ul class="dropdown-menu" style="width: 100%;">
+					    <ul class="dropdown-menu scrollable-menu" style="width: 100%;">
 							<c:forEach items="${projectList}" var="map">
 								<c:if test="${map.team_delete_status == '1'}">
 								<li><a href="<%=request.getContextPath()%>/project.action?project_name=${map.project_name}&projectIDX=${map.project_idx}&team_IDX=${map.team_idx}">${map.project_name}</a></li>

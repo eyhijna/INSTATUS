@@ -529,7 +529,7 @@
     border-radius: 25em;
   }
   
-  .dropdown-menu{
+  .dropdown_member{
   	background-color: black;
   	left: 60%;
   }
@@ -593,7 +593,7 @@
 				<ul class="nav navbar-nav">
 					<li class="dropdown">
 					<img class="member_avatar dropdown-toggle" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}" data-toggle="dropdown">
-						<ul class="dropdown-menu">
+						<ul class="dropdown-menu dropdown_member">
 							<li style="min-width: 250px; min-height: 100px; padding-left: 10px; padding-top: 5px;">
 							<div style="width: inherit; height: inherit;">
 							<img class="drop_img" src="<%=request.getContextPath()%>/resources/files/${member.server_filename}">
