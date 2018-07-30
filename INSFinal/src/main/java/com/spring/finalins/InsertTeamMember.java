@@ -94,6 +94,9 @@ public class InsertTeamMember {
 			     m = service.checkMemberExist(map); // 팀안에 중복되어있는지 검사 
 			    if(m == 0) {
 			        n = service.insertTeamMember(map); // 중복되어있지 않다면 insert해준다.  
+			        
+			        String nav = "1";  
+					request.setAttribute("nav", nav);
 			        if(n==0) {
 			    		 try { //dispatcher 예외처리를 위한 try-catch
 				    		    String msg = "팀테이블 생성 실패";
