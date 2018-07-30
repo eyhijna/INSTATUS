@@ -1157,73 +1157,82 @@
 			dataType: "JSON",
 			success: function(json){          
 				
-				var html = "";
+				if(${sessionScope.loginuser.ins_personal_alarm == 0}){
+					var html = "";
+					
+					html += "<div class='notify-arrow notify-arrow-blue'></div>";
+					
+					if(json.length > 0){
+							
+						
+						html += "<li style='width: 300px;'>";
+						html += "<p class='blue'>You have "+json[0].newmsg+" new messages </p>";
+						html += "</li>"; 
+						
+						html += "<div class='wrap' style='border: 0px solid yellow; width: 300px;'>";
+						
+						
+						 $.each(json, function(entryIndex, entry){
+							 
+							 	
 								
-				html += "<div class='notify-arrow notify-arrow-blue'></div>";
+								/* html += "<span style='color: gray; font-weight: bold; font-size: 15pt;'><p>"*/
+								/* html += entry.record_userid + "</p></span>" ; */ 
+								html += "<li id='checkbox"+entry.project_record_idx+"' >";
+								/* html += "<input type='checkbox' id='select"+entryIndex+ "' name='current_proudct' class='custom_checkbox' value='"+entry.project_record_idx+"' onclick='goHide();'/>";
+								html += "<label for='select'"+entryIndex+">"; */
+								html += "<input type='checkbox' name='current_proudct' class='custom_checkbox' value='"+entry.project_record_idx+"' onclick='goHide();'/>";
+								html += "<label for='select'"+entryIndex+">";
+								html += "</label><br/>";
+								
+								/* html += "<input type='checkbox' id='select'"+entryIndex+ "class='custom_checkbox'>";
+								html += "<label for='select'"+entryIndex+">"; */
+								html += "<span class='profile-ava'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></span>&nbsp;&nbsp;"
+								html += "<span style='color: gray; font-weight: bold; font-size: 12pt; color: rgba(255, 82, 82, 0.7);'>"+ entry.record_userid + "</span><br/>" ;
+								html += "<span style='color: gray; font-weight: lighter;'>" + entry.record_dml_status + "</span><br/>";
+								html += "<span style='color: gray; font-weight: lighter; font-size: 7pt;'>on CARD "+entry.card_title+" on LIST "+entry.list_name;
+								html += "on PROJECT "+entry.project_name+"&nbsp;&nbsp;</span><br/>";
 				
-				if(json.length > 0){
+								html += "<span style='color: gray; font-weight: lighter; font-size: 7pt; float: right; padding-top: 5%; padding-right: 5%;'><br/>"+entry.project_record_time+"</span>";
+								
+								html += "<li class='divider'></li>";
+								html += "</li>";
+								
+								
+							});
+							
+							
+							
+							
 						
+					}
+					else{
+						
+											
+						html += "<li style='width: 300px;'>";
+						html += "<p class='blue'>You have 0 new messages </p>";
+						html += "</li>"; 
+						
+						html += "<div class='wrap2' style='border: 0px solid yellow; width: 300px;'>";
+																
+						html += "<br/><br/><li style='text-align: center;'><span style='color: gray; font-weight: bold;'>최근 활동한 기록이 없습니다.</span></li><br/><br/>";
+
+									
+									            
+					}         
+				
+					html += "</div>";
 					
-					html += "<li style='width: 300px;'>";
-					html += "<p class='blue'>You have "+json[0].newmsg+" new messages </p>";
-					html += "</li>"; 
 					
-					html += "<div class='wrap' style='border: 0px solid yellow; width: 300px;'>";
-					
-					
-					 $.each(json, function(entryIndex, entry){
-						 
-						 	
-							
-							/* html += "<span style='color: gray; font-weight: bold; font-size: 15pt;'><p>"*/
-							/* html += entry.record_userid + "</p></span>" ; */ 
-							html += "<li id='checkbox"+entry.project_record_idx+"' >";
-							/* html += "<input type='checkbox' id='select"+entryIndex+ "' name='current_proudct' class='custom_checkbox' value='"+entry.project_record_idx+"' onclick='goHide();'/>";
-							html += "<label for='select'"+entryIndex+">"; */
-							html += "<input type='checkbox' name='current_proudct' class='custom_checkbox' value='"+entry.project_record_idx+"' onclick='goHide();'/>";
-							html += "<label for='select'"+entryIndex+">";
-							html += "</label><br/>";
-							
-							/* html += "<input type='checkbox' id='select'"+entryIndex+ "class='custom_checkbox'>";
-							html += "<label for='select'"+entryIndex+">"; */
-							html += "<span class='profile-ava'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></span>&nbsp;&nbsp;"
-							html += "<span style='color: gray; font-weight: bold; font-size: 12pt; color: rgba(255, 82, 82, 0.7);'>"+ entry.record_userid + "</span><br/>" ;
-							html += "<span style='color: gray; font-weight: lighter;'>" + entry.record_dml_status + "</span><br/>";
-							html += "<span style='color: gray; font-weight: lighter; font-size: 7pt;'>on CARD "+entry.card_title+" on LIST "+entry.list_name;
-							html += "on PROJECT "+entry.project_name+"&nbsp;&nbsp;</span><br/>";
-			
-							html += "<span style='color: gray; font-weight: lighter; font-size: 7pt; float: right; padding-top: 5%; padding-right: 5%;'><br/>"+entry.project_record_time+"</span>";
-							
-							html += "<li class='divider'></li>";
-							html += "</li>";
-							
-							
-						});
-						
-						
-						
-						
+					$("#newMsgList").html(html); 
 					
 				}
 				else{
 					
-										
-					html += "<li style='width: 300px;'>";
-					html += "<p class='blue'>You have 0 new messages </p>";
-					html += "</li>"; 
+					alert("개인 알람을 활성화 해주세요");
 					
-					html += "<div class='wrap2' style='border: 0px solid yellow; width: 300px;'>";
-															
-					html += "<br/><br/><li style='text-align: center;'><span style='color: gray; font-weight: bold;'>최근 활동한 기록이 없습니다.</span></li><br/><br/>";
-
-								
-								            
-				}         
-			
-				html += "</div>";
+				}
 				
-				
-				$("#newMsgList").html(html); 
 				
 				
 			},
