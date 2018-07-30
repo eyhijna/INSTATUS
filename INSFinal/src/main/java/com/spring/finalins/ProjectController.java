@@ -240,9 +240,9 @@ public class ProjectController {
 			map.put("project_idx", project_idx);
 			map.put("project_name", project_name);
 			
-			System.out.println("userid확인: " + userid);
+			/*System.out.println("userid확인: " + userid);
 			System.out.println("project_idx확인: " + project_idx);
-			System.out.println("project_name확인: " + project_name);
+			System.out.println("project_name확인: " + project_name);*/
 			//project_idx로 배경이미지 테이블에서 프로젝트의 배경이미지명을 가져오는 메소드
 			String project_image_name = service.getBackgroundIMG(project_idx);
 			
@@ -267,8 +267,6 @@ public class ProjectController {
 					listvo.get(i).setCardlist(cardlist);
 				}
 				// listvo for문 돌면서 cardVo 담기 
-			//	System.out.println("확인용 " + i + "번째 리스트 제목: " + listvo.get(i).getList_name());
-			//	System.out.println("카드vo확인용: " + listvo.get(i).getCardvo().getCard_title());
 			}
 			
 			//프로젝트에 소속되어 있는 프로젝트 멤버의 정보를 가져오는 메소드
@@ -583,8 +581,10 @@ public class ProjectController {
 		
 		String str_jsonObj = jsonObj.toString();
 		request.setAttribute("str_jsonObj", str_jsonObj);
+		
 		return "project/addListJSON";
 	} // end of updateListTitle(HttpServletRequest request)
+	
 	
 	@RequestMapping(value="getArchive.action", method= {RequestMethod.POST})
 	public String getArchive(HttpServletRequest request) {

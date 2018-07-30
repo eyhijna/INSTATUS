@@ -78,7 +78,8 @@
 	    		var $listDiv = $(this).closest(".listDiv");
 	    		var list_idx = $listDiv.find(".update_idx").val();
 	    		var form_data = {"project_idx" : project_idx, "list_idx" : list_idx, "delete_type" : "D"};
-	    		
+	    		var list_name = $(this).next().val();
+	    	
 				$.ajax({
 					url: "updateListDeleteStatus.action",
 					type: "POST",
@@ -87,6 +88,11 @@
 					success: function(data){
 						if(data.result == "2") {
 							$listDiv.remove();
+							$(".showMenu").find(".dropdown-menu div").empty();
+							
+							var	html = "<span data-list-idx="+ list_idx+" onclick='recoverList(this)' class='archive_style' style='cursor:pointer; font-weight: bold; '>"+list_name+"</span><br/>";
+							
+							$(".showMenu").find(".dropdown-menu div").append(html);
 						}
 					},
 					error: function(request, status, error){ 
@@ -131,6 +137,7 @@
 		});
 		
 		$(document).on("click", ".btn-addcard", function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
+			alert("호출 확인용");
 			var card_title = $(this).prev().prev().val().trim(); //카드 타이틀
 			var card_title_length = $(this).prev().prev().val().length;
 			var list_idx = $(this).next().next().val();//리스트idx
@@ -159,8 +166,6 @@
 					dataType: "JSON",
 					success: function(data){
 						if(data.result == 1){
-						//	location.reload();
-							//alert("카드를 생성했습니다.");
 							var html = "<div class='panel panel-default'>"
 									 + "	<div class='panel-body' onclick='NewWindow(\"carddetail.action?projectIDX=${projectInfo.project_idx}&listIDX="+list_idx+"&cardIDX="+data.card_idx+"\",\"window_name\",\"800\",\"710\",\"yes\");return false' style='word-break:break-all;white-space:normal;'>"
 									 + card_title
@@ -182,8 +187,6 @@
 		
 //////////////////////////////////////////////////민재 ///////////////////////////////////////////////////////////////////////////////		
 		$("#listsearchINproject").keyup(function(){
-			
-			 // alert("실행성공이다222222222222");
 			 
 			  if(${sessionScope.loginuser == null}){
 					alert("로그인이 필요합니다.");
@@ -203,20 +206,16 @@
 					  searchCardINproject();
 					  
 				  }
-				   
 			  }
 			  
 			  if($("#listsearchINproject").val().trim() == ""){
-				 
 				 	projectINlistRe();
-				 	
 			  } 
-			  
 		   }); // $("#search_input").keyup()-------------------------------------------------------------------
 		
 		
-		
 	}); // end of $(document).ready
+	
 	
 	function changeListName(obj, blur) {
     	var contentid = $(obj).parent("id"); //클릭한 리스트 아이디
@@ -265,7 +264,7 @@
 				var html = "";
 				$(".showMenu").find(".dropdown-menu div").empty();
 				$.each(data, function(i, v) {
-					html = "<span data-list-idx="+v.list_idx+" onclick='recoverList(this)'>"+v.list_name+"</span><br/>";
+					html = "<span data-list-idx="+v.list_idx+" onclick='recoverList(this)' class='archive_style' style='cursor:pointer;'>"+v.list_name+"</span><br/>";
 					$(".showMenu").find(".dropdown-menu div").append(html);
 				});
 			},
@@ -280,17 +279,16 @@
 			var project_idx = "${projectInfo.project_idx}";
 			var list_idx = $(obj).data("listIdx");
 			var form_data = {"project_idx" : project_idx, "list_idx" : list_idx, "delete_type" : "R"};
-			
+		
 			$.ajax({
 				url: "updateListDeleteStatus.action",
 				type: "POST",
 				data: form_data,    
 				dataType: "JSON",
 				success: function(data){ 
-					if(data.result == "2") {
+				/* 	if(data.result == "2") {} */
 						getArchive();
-						//리스트 복구 후 empty 후 리스트 갱신
-					}
+						location.reload();
 				},
 				error: function(request, status, error){ 
 					alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
@@ -347,56 +345,14 @@
 			   				 $(".addCardstyle").click(function(){
 			   						$(this).hide();
 			   						$(this).prev().show();
-			   					});
+			   				 });
 			   				 
 			   				$(".btn_cardCancel").click(function(){ //cancel버튼 클릭시 카드생성 div 숨기는 이벤트
 			   						$(this).prev().prev().prev().val("");
 			   						$(this).parent().hide();
 			   						$(this).parent().next().show();
-			   					});
-			   				 
-			   				/* $(".btn-addcard").click(function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
-			   					var card_title = $(this).prev().prev().val().trim(); //카드 타이틀
-			   					var card_title_length = $(this).prev().prev().val().length;
-			   					var list_idx = $(this).next().next().val();//리스트idx
-			   					var userid = "${sessionScope.loginuser.userid}";//유저 아이디
-			   				
-			   					console.log("카드타이틀 확인: " + card_title + "  리스트idx확인: " + list_idx + "   유저아이디 확인: " + userid);
-			   					if(card_title_length == 0){
-			   						alert("카드 타이틀은 공백으로 할 수 없습니다.");
-			   						$(this).prev().prev().val("");
-			   						$(this).prev().prev().focus();
-			   						return;
-			   					}
-			   					else if(card_title_length > 200){
-			   						alert("카드 타이틀은 한글200자, 영문400자 이내로 입력해주세요.");
-			   						$(this).prev().prev().val("");
-			   						$(this).prev().prev().focus();
-			   						return;
-			   					}
-			   					
-			   				 	if(card_title != "" && userid != null && list_idx != "" && card_title_length <= 200){
-			   						var addCard_data = {"userid" : userid, "list_idx" : list_idx, "card_title" : card_title};
-			   						 $.ajax({
-			   							url: "addCard.action",
-			   							type: "POST",
-			   							data: addCard_data,
-			   							dataType: "JSON",
-			   							success: function(data){
-			   								if(data.result == 1){
-			   									location.reload();
-			   								}
-			   								else{
-			   									alert("카드 생성에 실패했습니다.");
-			   								}
-			   							},
-			   							error: function(request, status, error){ 
-			   						         alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
-			   						    }
-			   						}); //end of $.ajax  
-			   					}
-			   				}); // end of $(".btn-addcard").click */
-			   				
+			   				});
+	
 			   				//리스트제목 클릭시 인풋창 스타일 변경, 제목 변경
 			   			    $(".well2").click(function(){
 			   			    	var list_idx = $(this).children('.update_idx').val();
@@ -489,30 +445,39 @@
 	
 	
 	
-	function leaveProject(){
-		
-	//	var fk_project_idx = "${projectInfo.project_idx}";
-		
-		var frm = document.leaveProjectFrm;
-				
-		frm.method = "GET";
-		frm.action = "<%= request.getContextPath() %>/leaveProject.action";
-		frm.submit();
-		
-	}
-	
-	
-	function deleteProject(){
-		
-		/* var fk_project_idx = "${projectInfo.project_idx}"; */
-		
-		var frm = document.leaveProjectFrm;
-				
-		frm.method = "GET";
-		frm.action = "<%= request.getContextPath() %>/deleteProject.action";
-		frm.submit();
-		
-	}
+	   function leaveProject(){
+		      
+		      if(confirm("정말로 프로젝트에서 탈퇴하시겠습니까?")){
+
+		         var frm = document.leaveProjectFrm;
+		               
+		         frm.method = "GET";
+		         frm.action = "<%= request.getContextPath() %>/leaveProject.action";
+		         frm.submit();
+		      }   
+		      else{
+		         alert("프로젝트 탈퇴가 취소되었습니다.");
+		      }
+		         
+		   }
+		   
+		   
+		   function deleteProject(){
+		      
+		      /* var fk_project_idx = "${projectInfo.project_idx}"; */
+		      
+		      if(confirm("정말로 프로젝트를 삭제하시겠습니까?")){
+		         var frm = document.leaveProjectFrm;
+		         
+		         frm.method = "GET";
+		         frm.action = "<%= request.getContextPath() %>/deleteProject.action";
+		         frm.submit();
+		      }
+		      else{
+		         alert("프로젝트 삭제가 취소 되었습니다.");
+		      }
+		   
+		   }
 	
 	function Activity(val){
 				
@@ -1108,6 +1073,8 @@
 
  #mycontainer	{height:inherit;}
  
+ .archive_style{text-align: center;}
+ 
  .fa-star{font-size:20px; color:yellow;}
  .fa-star-o{font-size:20px; color: yellow;}
  .panel-body{overflow-y: auto;}
@@ -1204,13 +1171,13 @@
     position: inherit;
   }
 
-  .member_avatar{
+  .member_avatar {
     height: 40px;
     width: 40px;
     border-radius: 25em;
     margin-left: 60%;
-    margin-top: 19%;
-  }
+    margin-top: 14%;
+}
   
   .drop_img{
   height: 65px;
@@ -1249,7 +1216,9 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555; 
 }
-
+a:hover{
+background-color: red; background: transparent
+}
 /* ----------------------------------------------- 민재 -------------------------------------------- */
 	.sidenav {
 	    height: 100%;
@@ -1310,10 +1279,19 @@
 		margin-bottom: 20px;
 	}
   
+  
+  .trash_style{
+      margin-top: 12px;
+    background-color: black;
+    width: 200px;
+    font-weight: bold;
+    font-size: 12pt;
+    /* opacity: 1.0; */
+    margin-left: 45px;}
 </style>
 
 <nav class="navbar navbar-inverse"
-	style="width: 100%; margin-top: 20px; height: 30px; position: fixed; opacity: 0.7;">
+	style="width: 100%; margin-top: 34px; height: 30px; position: fixed; opacity: 0.7;">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<a class="navbar-brand" href="#" onClick="window.location.reload();return false;"><span style="color: yellow;">${projectInfo.project_name}</span></a>
@@ -1334,8 +1312,6 @@
 		<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${projectInfo.team_idx}">team:&nbsp;&nbsp;
 			<span style="font-size: 12pt; color: yellow; font-weight: bold;">${projectInfo.team_name}</span></a></li>
 		</ul>
-		
-	
 		<!-- 프로젝트 멤버 프로필사진 -->
 		<c:if test="${memberInfo.size() > 0}">
 			<c:forEach items="${memberInfo}" var="member" >
@@ -1356,20 +1332,20 @@
 				</ul>
 			</c:forEach>
 		</c:if>
-		<!-- <ul class="nav navbar-nav navbar-right showMenu">
+		
+ <ul class="nav navbar-nav showMenu">
 			<li class="dropdown">
-			<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">...Show Menu</button>
-				<ul class="dropdown-menu">
-					<li style="min-width: 250px; min-height: 100px; padding-left: 10px; padding-top: 5px;">
-					<div style="width: inherit; height: inherit;"></div>
+			<i class="fa fa-trash-o  dropdown-toggle"  data-toggle="dropdown" style="font-size: 24px; padding-left:60px; padding-top: 12px; vertical-align:top;cursor:pointer; color: white;"></i>
+				<ul class="dropdown-menu trash_style">
+					<li style="min-width: 250px; min-height: 100px; margin-left: 40px;  padding-top: 15px;">
+				 	<div style="width: inherit; height: inherit;"></div> 
 					</li>
 				</ul>
 			</li>
-		</ul> -->
+		</ul>
 		<p align="right">
-			
 			<button class="btn btn-default" type="button" id="menu1"
-				style="background-color: black; margin-top: 5px; margin-bottom: 5px; color: black; border-color: black;">
+				style="background-color: black; margin-top: 5px; margin-bottom: 5px; color: black; border-color: black; float: right;">
 				<span style="font-size: 13pt; color: yellow;"  onclick='openNav();'>...Show Menu</span>
 			</button>
 		</p>
@@ -1473,7 +1449,6 @@
 	 	  <span style="cursor:pointer" onclick="openNav2();">Search in PROJECT</span> 
 		  <span style="cursor: pointer;" onclick="leaveProject();">Leave PROJECT</span> 
 		  
-		  
 		  <span style="cursor: pointer;" onclick="deleteProject();" >Delete PROJECT</span>
 		 
 		  <hr style="border: solid 1px gray; background-color: gray;"> 
@@ -1493,9 +1468,6 @@
 			  <table class="table" id="projectRecordListTB"> 			    	
 			  </table>
 		  	</div>
-		  
-		  
-		 
 		    
 	  </div>
 	  

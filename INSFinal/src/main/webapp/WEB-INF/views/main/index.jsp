@@ -914,7 +914,7 @@ background-color: red; background: transparent
         
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><span style="font-size: 13pt; font-weight: bold;">Find Your ID!!</span></h4>
+          <h4 class="modal-title"><span style="font-size: 13pt; font-weight: bold; color: red;">Find Your ID!!</span></h4>
         </div>
         
         <div class="modal-body" >
@@ -942,7 +942,7 @@ background-color: red; background: transparent
       <div class="modal-content" style="border: 0px solid yellow;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><span style="font-size: 13pt; font-weight: bold;">Change your password!!</span></h4>
+          <h4 class="modal-title"><span style="font-size: 13pt; font-weight: bold; color:red;">Change your password!!</span></h4>
         </div>
         
         
