@@ -538,20 +538,41 @@
 					$.each(json, function(entryIndex, entry){
 						
 						if(entryIndex < 10){ 
-							 
-							html += "<tr>";
-							html += "<td rowspan='3' class='imgtd' style='size: 10px;'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></td>";
-							html += "<td style='font-weight: bold;'>"+entry.userid+"&nbsp;&nbsp;"+entry.record_dml_status+"</td>";
-							html += "</tr>";
-							html += "<tr>";
-							html += "<td  style='font-size: 8pt;'>&nbsp;"+entry.project_record_time+"</td>";
-							html += "</tr>";
-							html += "<tr>";
-							html += "<td style='font-size: 8pt; color: #b3b3b3;'>"+entry.card_title+" in "+entry.list_name+"</td>"; 
-							html += "</tr>";
-							html += "<tr>";
-							html += "<td colspan='2' style='border: 1px solid #fed189;'></td>";
-							html += "</tr>";
+							
+							if(val == '생성'){
+								html += "<tr>";
+								html += "<td rowspan='3' class='imgtd' style='size: 10px;'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></td>";
+								html += "<td style='font-weight: bold;'>"+entry.record_userid+"&nbsp;&nbsp;"+entry.record_dml_status+"</td>";
+								html += "</tr>";
+								html += "<tr>";
+								html += "<td  style='font-size: 8pt;'>&nbsp;"+entry.project_record_time+"</td>";
+								html += "</tr>";
+								/* html += "<tr>";
+								html += "<td style='font-size: 8pt; color: #b3b3b3;'>"+entry.card_title+"</td>"; 
+								html += "</tr>";
+ */								html += "<tr>";
+								html += "<td colspan='2' style='border: 1px solid #fed189;'></td>";
+								html += "</tr>";
+							}
+							
+							else{
+								
+								html += "<tr>";
+								html += "<td rowspan='3' class='imgtd' style='size: 10px;'><img class='drop_img' src='<%=request.getContextPath()%>/resources/files/"+entry.server_filename+"'></td>";
+								html += "<td style='font-weight: bold;'>"+entry.record_userid+"&nbsp;&nbsp;"+entry.record_dml_status+"</td>";
+								html += "</tr>";
+								html += "<tr>";
+								html += "<td  style='font-size: 8pt;'>&nbsp;"+entry.project_record_time+"</td>";
+								html += "</tr>";
+								html += "<tr>";
+								html += "<td style='font-size: 8pt; color: #b3b3b3;'>"+entry.card_title+" in "+entry.list_name+"</td>"; 
+								html += "</tr>";
+								html += "<tr>";
+								html += "<td colspan='2' style='border: 1px solid #fed189;'></td>";
+								html += "</tr>";
+								
+							}
+							
 							
 						 }
 						

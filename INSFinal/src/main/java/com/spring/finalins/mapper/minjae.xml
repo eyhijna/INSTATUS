@@ -257,7 +257,7 @@
 		<result property="record_userid" column="record_userid" javaType="String"/>
 		<result property="fk_list_idx" column="fk_list_idx" javaType="String"/>
 		<result property="list_name" column="list_name" javaType="String"/>
-		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
+		<result property="project_record_time" column="project_record_time" javaType="String"/>
 		<result property="record_dml_status" column="record_dml_status" javaType="String"/>
 		<result property="server_filename" column="server_filename" javaType="String"/>
 	</resultMap>
