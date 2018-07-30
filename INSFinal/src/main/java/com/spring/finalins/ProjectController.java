@@ -32,8 +32,6 @@ public class ProjectController {
 	@Autowired
 	private InterProjectService service;
 
-	
-
 	//로그인 처리를 하는 메소드
 	@RequestMapping(value="loginEnd.action", method= {RequestMethod.POST})
 	public String loginEnd(HttpServletRequest request) {
@@ -247,6 +245,12 @@ public class ProjectController {
 			
 			//유저가 접속한 프로젝트의 정보를 가져오는 메소드
 			HashMap<String, String> projectInfo = service.getProjectInfo(map);
+			
+			if(projectInfo == null) {
+				String msg = "접근권한이 없습니다.";
+				request.setAttribute("msg", msg);
+				return "main/error";
+			}
 			
 			//프로젝트의 리스트 목록을 가져오는 메소드
 			List<ListVO> listvo = null;
@@ -463,6 +467,7 @@ public class ProjectController {
 		
 		JSONObject jsonObj = new JSONObject();
 		jsonObj.put("result", result);
+		jsonObj.put("card_idx", map.get("card_idx"));
 		
 		String str_jsonObj = jsonObj.toString();
 		request.setAttribute("str_jsonObj", str_jsonObj);
@@ -553,4 +558,46 @@ public class ProjectController {
 		request.setAttribute("str_jsonArr", str_jsonArr);
 		return "main/getTeamMemberInfoJSON";
 	} // end of getTeamMemberInfo(HttpServletRequest request)
+	
+	
+	@RequestMapping(value="updateListDeleteStatus.action", method= {RequestMethod.POST})
+	public String updateListDeleteStatus(HttpServletRequest request) {
+		String project_idx = request.getParameter("project_idx");
+		String list_idx = request.getParameter("list_idx");
+		String delete_type = request.getParameter("delete_type");
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("project_idx", project_idx);
+		map.put("list_idx", list_idx);
+		map.put("delete_type", delete_type);
+		
+		int result = service.updateListDeleteStatus(map);
+		
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("result", result);
+		
+		String str_jsonObj = jsonObj.toString();
+		request.setAttribute("str_jsonObj", str_jsonObj);
+		return "project/addListJSON";
+	} // end of updateListTitle(HttpServletRequest request)
+	
+	@RequestMapping(value="getArchive.action", method= {RequestMethod.POST})
+	public String getArchive(HttpServletRequest request) {
+		String project_idx = request.getParameter("project_idx");
+
+		List<HashMap<String, String>> voList = service.getArchive(project_idx); 
+		
+		JSONArray jsonArr = new JSONArray();
+		for(int i=0; i<voList.size(); i++) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("ARCHIVE_IDX", voList.get(i).get("ARCHIVE_IDX"));
+			jsonObj.put("ARCHIVE_INSERT_TIME", voList.get(i).get("ARCHIVE_INSERT_TIME"));
+			jsonObj.put("list_idx", voList.get(i).get("list_idx"));
+			jsonObj.put("list_name", voList.get(i).get("list_name"));
+			jsonArr.put(jsonObj);
+		}
+		String str_jsonArr = jsonArr.toString();
+		request.setAttribute("str_jsonObj", str_jsonArr);
+		return "project/addListJSON";
+	} // end of updateListTitle(HttpServletRequest request)
 }

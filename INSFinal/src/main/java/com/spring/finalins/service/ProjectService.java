@@ -281,4 +281,25 @@ public class ProjectService implements InterProjectService{
 		return voList;
 	} // end of getTeamMemberInfo(String team_idx)
 
+
+	@Override
+	public int updateListDeleteStatus(HashMap<String, String> map) {
+		int n = 0, m = 0, result = 0;
+		String delete_type = map.get("delete_type");
+		n = dao.updateListDeleteStatus(map);
+		if("D".equals(delete_type)) {
+			m = dao.addArchive(map);
+		} else if("R".equals(delete_type)) {
+			m = dao.deleteArchive(map);
+		}
+		result = n+m;
+		return result;
+	}
+
+
+	@Override
+	public List<HashMap<String, String>> getArchive(String project_idx) {
+		return dao.getArchive(project_idx);
+	}
+
 }

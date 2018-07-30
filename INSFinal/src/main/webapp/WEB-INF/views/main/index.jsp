@@ -622,7 +622,8 @@
     margin-left: 8px;
 }
 
-body{overflow: hidden;}
+/* body{overflow: hidden;} */
+body{overflow: auto;}
 
 
 
@@ -675,7 +676,7 @@ body{overflow: hidden;}
             <br/>
 	
 			<!-- 팀리스트, 프로젝트 리스트가 존재하지 않는 경우 -->
-            <c:if test="${sessionScope.teamList == null || sessionScope.teamList.size() == 0}">
+            <c:if test="${teamList == null || teamList.size() == 0}">
 			<div class="form-group" >
 			<label for="team" style="margin-top: 10px; text-align: center;">My Team List</label>
 				<div class="dropdown">
@@ -690,7 +691,7 @@ body{overflow: hidden;}
             </c:if>
             
             <!-- 팀리스트, 프로젝트 리스트가 존재하는 경우 -->
-            <c:if test="${sessionScope.teamList != null && sessionScope.teamList.size() != 0}">
+            <c:if test="${teamList != null && teamList.size() != 0}">
             	 <div class="form-group" >
 				  	<label for="team" style="margin-top: 10px; text-align: center;">My Team List</label>
 			
@@ -699,7 +700,7 @@ body{overflow: hidden;}
 						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu" style="width: 100%;">
-							<c:forEach items="${sessionScope.teamList}" var="map">
+							<c:forEach items="${teamList}" var="map">
 								<li><a href="<%=request.getContextPath()%>/showTeam.action?team_idx=${map.team_idx}">${map.team_name}</a></li>
 						    </c:forEach>
 					    </ul>
@@ -710,7 +711,7 @@ body{overflow: hidden;}
 						<button class="btn  dropdown-toggle" type="button" data-toggle="dropdown" style="width: 100%;">Select
 					    <span class="caret"></span></button>
 					    <ul class="dropdown-menu" style="width: 100%;">
-							<c:forEach items="${sessionScope.projectList}" var="map">
+							<c:forEach items="${projectList}" var="map">
 								<c:if test="${map.team_delete_status == '1'}">
 								<li><a href="<%=request.getContextPath()%>/project.action?project_name=${map.project_name}&projectIDX=${map.project_idx}&team_IDX=${map.team_idx}">${map.project_name}</a></li>
 								</c:if>
@@ -754,11 +755,11 @@ body{overflow: hidden;}
       <div class="modal-content" id="testcontent">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title" style="font-weight: bold;">Create New Project!!</h4>
+          <h4 class="modal-title" style="font-weight: bold; color: red;">Create New Project!!</h4>
         </div>
         
         <!-- 소속된 팀이 있는 경우 -->
-        <c:if test="${sessionScope.teamList != null && sessionScope.teamList.size() != 0}">
+        <c:if test="${teamList != null && teamList.size() != 0}">
         <div class="modal-body" id="project-modal">
           <form name = PJcreateFrm>
           <div class="form-group">
@@ -771,7 +772,7 @@ body{overflow: hidden;}
 		  	<label for="team" style="margin-top: 10px;">select Team</label>
 			<select name="team" id="team" class="form-control">
 				<option value="">::: 선택하세요 :::</option>
-				<c:forEach items="${sessionScope.teamList}" var="map">
+				<c:forEach items="${teamList}" var="map">
 					<option value="${map.team_idx}">${map.team_name}</option>
 				</c:forEach>
 			</select>
@@ -790,7 +791,7 @@ body{overflow: hidden;}
 		  <div class="form-group" >
 		  	<label for="background-grid" style="margin-top: 10px;">select Background</label>
 			<ul class="background-grid" id="background-grid">
-				<c:forEach items="${sessionScope.imageList}" var="map" varStatus="status">
+				<c:forEach items="${imageList}" var="map" varStatus="status">
 				<li class="background-grid-item">
 					<button class="background-grid-trigger" type="button" style="background-image: url('./resources/images/${map.project_image_name}');" value="${map.project_image_name}"></button>
 					<input type="hidden" name="input-image_idx" id="input-image_idx${status.count}" value="${map.project_image_idx}">
@@ -811,7 +812,7 @@ body{overflow: hidden;}
         </c:if>
         
         <!-- 소속된 팀이 없는 경우 -->
-        <c:if test="${sessionScope.teamList != null && sessionScope.teamList.size() == 0 }">
+        <c:if test="${teamList != null && teamList.size() == 0 }">
         <div class="modal-body">
         	<h4>소속된 팀이 없습니다.</h4>
         	<br/>

@@ -88,5 +88,14 @@ public interface InterProjectDAO {
 
 	//팀멤버를 프로젝트 멤버에 insert
 	int insertProjectMembers(HashMap<String, String> map);
+	
+	//리스트 삭제
+	int updateListDeleteStatus(HashMap<String, String> map);
+	
+	int addArchive(HashMap<String, String> map);
+	
+	int deleteArchive(HashMap<String, String> map);
+	
+	List<HashMap<String, String>> getArchive(String project_idx);
 
 }

@@ -81,6 +81,9 @@ public interface InterProjectService {
 
 	//팀 idx를 받아와서 팀멤버vo 정보를 불러오는 메소드 
 	List<TeamMemberVO> getTeamMemberInfo(HashMap<String, String> map);
+	
+	//리스트 삭제
+	int updateListDeleteStatus(HashMap<String, String> map);
 
-
+	public List<HashMap<String, String>> getArchive(String project_idx);
 }

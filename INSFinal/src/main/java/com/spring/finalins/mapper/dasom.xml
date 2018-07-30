@@ -223,10 +223,12 @@
 	
 	<!-- 카드 테이블에 insert -->
 	<insert id="addCard" parameterType="HashMap">
+		<selectKey keyProperty="card_idx" resultType="int" order="BEFORE">
+		    select seq_card.nextval FROM DUAL
+		</selectKey>
 		insert into ins_card(card_idx, fk_list_idx, card_userid, card_title, card_commentcount, card_date, card_delete_status)
-		values(seq_card.nextval, #{list_idx}, #{userid}, #{card_title}, default, default, default)
+		values(#{card_idx}, #{list_idx}, #{userid}, #{card_title}, default, default, default)
 	</insert>
-	
 	
 	<!-- 메인페이지에서 비밀번호 update -->
 	<update id="changePassword" parameterType="HashMap">
@@ -290,6 +292,46 @@
 		  from ins_team_member 
 		 where fk_team_idx = #{team_idx}
 		   and team_userid != #{userid}
+	</select>
+	
+	<!-- 리스트 삭제 -->
+	<update id="updateListDeleteStatus" parameterType="HashMap">
+		<if test='delete_type eq "D"'>
+			update ins_list set list_delete_status = 0 
+		</if>
+		<if test='delete_type eq "R"'>
+			update ins_list set list_delete_status = 1 
+		</if>
+		 	where fk_project_idx = #{project_idx} and list_idx = #{list_idx}
+	</update>
+	
+	<!-- 리스트가 삭제될 때 휴지통에 insert -->
+	<insert id="addArchive" parameterType="HashMap">
+		insert into INS_ARCHIVE(ARCHIVE_IDX , FK_LIST_IDX, ARCHIVE_INSERT_TIME)
+		values(SEQ_ARCHIVE.nextval, #{list_idx}, sysdate)
+	</insert>
+	
+	<!-- 리스트가 복구될 때 휴지통 delete -->
+	<insert id="deleteArchive" parameterType="HashMap">
+		delete INS_ARCHIVE
+		 where FK_LIST_IDX = #{list_idx}
+	</insert>
+	
+	<!-- 휴지통 -->
+	<resultMap type="HashMap" id="archiveMap">
+		<result property="ARCHIVE_IDX"  		column="ARCHIVE_IDX"  	  	  javaType="String" />
+		<result property="ARCHIVE_INSERT_TIME"  column="ARCHIVE_INSERT_TIME"  javaType="String" />
+		<result property="list_idx"         	column="list_idx"  		  	  javaType="String" />
+		<result property="list_name"            column="list_name"           javaType="String" />
+	</resultMap>
+	<select id="getArchive" parameterType="String" resultMap="archiveMap">
+		select ARCHIVE_IDX, TO_CHAR(ARCHIVE_INSERT_TIME,'YYYY-MM-DD HH:mm:ss') AS ARCHIVE_INSERT_TIME, list_idx, list_name
+		  from INS_ARCHIVE A
+		  	  ,ins_list L
+		 where L.fk_project_idx = #{project_idx}
+		   and L.list_delete_status = 0
+		   and A.FK_LIST_IDX = L.list_idx
+		   and ARCHIVE_DELETE_STATUS = 0
 	</select>
 	
 </mapper>

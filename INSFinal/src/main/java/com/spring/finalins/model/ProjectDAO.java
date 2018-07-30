@@ -235,5 +235,30 @@ public class ProjectDAO implements InterProjectDAO{
 	} // end of insertProjectMembers(HashMap<String, String> map)
 
 
-	
+	@Override
+	public int updateListDeleteStatus(HashMap<String, String> map) {
+		int n = sqlsession.update("dasom.updateListDeleteStatus", map);
+		return n;
+	}
+
+
+	@Override
+	public int addArchive(HashMap<String, String> map) {
+		int n = sqlsession.insert("dasom.addArchive", map);
+		return n;
+	}
+
+
+	@Override
+	public int deleteArchive(HashMap<String, String> map) {
+		int n = sqlsession.delete("dasom.deleteArchive", map);
+		return n;
+	}
+
+
+	@Override
+	public List<HashMap<String, String>> getArchive(String project_idx) {
+		List<HashMap<String, String>> voList = sqlsession.selectList("dasom.getArchive", project_idx);
+		return voList;
+	}
 }

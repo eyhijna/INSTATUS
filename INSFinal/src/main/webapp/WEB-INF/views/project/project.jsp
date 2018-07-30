@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>    
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" >
 
 
 <script type="text/javascript">
@@ -21,7 +21,9 @@
 	    }
 	    else {
 	    	$(".clickA").html(star);
-	    } 
+	    }
+	    
+	    getArchive();
 	   
 	    $("#addList").addClass("hidden");
 		$(".div-addcard").hide();
@@ -52,40 +54,47 @@
 	    	$("#addListShow").removeClass("hidden");
 	   
 	    });
-
 	    
      	//리스트제목 클릭시 인풋창 스타일 변경, 제목 변경
-	    $(".well2").click(function(){
-	    	var contentid = $(this).attr("id"); //클릭한 리스트 아이디
-	    	var list_idx = $(this).children('.update_idx').val();
-	    	var oldval = $(this).children('.oldval').val();
-	    	
-	    	$(this).children('.newval').keyup(function(){
-	    		var newval = $(this).val();
-	    		if(event.keyCode == 13){
-					
-	    			var form_data = {"newtitle" : newval, "oldtitle" : oldval, "list_idx" : list_idx};
-	    			 $.ajax({ 
-	    				url: "updateListTitle.action",
-	    				type: "POST",
-	    				data: form_data,
-	    				dataType: "JSON",
-	    				success: function(data){
-	    					if(data.resultTitle == newval){
-	    						$(this).val(data.resultTitle);
-	    					}
-	    					else{
-	    						alert("리스트 제목 변경에 실패했습니다.");
-	    					}
-	    				},
-	    				error: function(request, status, error){ 
-	    					alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
-	    				}
-	    			}); 
-	    		}
-	    	});
-	    }); // end of $(".well").click
+	    $(document).on("click", '.listname', function(event){
+	    	$(this).hide();
+	    	$(this).parent().find(".newval").show();
+    	});
 	    
+	    $(document).on("keypress", '.newval', function(event){
+    		if(event.keyCode == 13){
+    			changeListName(this, true);
+    		}
+    	});
+	    
+	    $(document).on("blur", '.newval', function(event){
+    		changeListName(this, false);
+    	});
+	    
+	    // 리스트 삭제 버튼 클릭 시
+	    $(document).on("click", '.removeList', function(event){
+	    	if(confirm("리스트를 삭제하시겠습니까?")) {
+	    		var project_idx = "${projectInfo.project_idx}";
+	    		var $listDiv = $(this).closest(".listDiv");
+	    		var list_idx = $listDiv.find(".update_idx").val();
+	    		var form_data = {"project_idx" : project_idx, "list_idx" : list_idx, "delete_type" : "D"};
+	    		
+				$.ajax({
+					url: "updateListDeleteStatus.action",
+					type: "POST",
+					data: form_data,    
+					dataType: "JSON",
+					success: function(data){
+						if(data.result == "2") {
+							$listDiv.remove();
+						}
+					},
+					error: function(request, status, error){ 
+						alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+					}
+				}); // end of $.ajax  
+	    	}
+    	});
 	    
 		$("#mycontent").addClass("example1"); //프로젝트 배경이미지 노출
 		
@@ -121,13 +130,12 @@
 			$(this).parent().next().show();
 		});
 		
-		$(".btn-addcard").click(function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
-			
+		$(document).on("click", ".btn-addcard", function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
 			var card_title = $(this).prev().prev().val().trim(); //카드 타이틀
 			var card_title_length = $(this).prev().prev().val().length;
 			var list_idx = $(this).next().next().val();//리스트idx
 			var userid = "${sessionScope.loginuser.userid}";//유저 아이디
-			
+			var $listDiv = $(this).closest(".listDiv");
 			
 			if(card_title_length == 0){
 				alert("카드 타이틀은 공백으로 할 수 없습니다.");
@@ -152,14 +160,14 @@
 					success: function(data){
 						if(data.result == 1){
 						//	location.reload();
-							alert("카드를 생성했습니다.");
-							
+							//alert("카드를 생성했습니다.");
 							var html = "<div class='panel panel-default'>"
-									 + "	<div class='panel-body'>"
-									 + "	테스트합니다"
+									 + "	<div class='panel-body' onclick='NewWindow(\"carddetail.action?projectIDX=${projectInfo.project_idx}&listIDX="+list_idx+"&cardIDX="+data.card_idx+"\",\"window_name\",\"800\",\"710\",\"yes\");return false' style='word-break:break-all;white-space:normal;'>"
+									 + card_title
 									 + "	</div>"
 									 + "</div>";
-							$(this).parents(".card-wrapper").append(html);
+							$listDiv.find(".card-wrapper").append(html);
+							$listDiv.find(".btn_cardCancel").click();
 						}
 						else{
 							alert("카드 생성에 실패했습니다.");
@@ -173,6 +181,86 @@
 		}); // end of $(".btn-addcard").click
 	}); // end of $(document).ready
 	
+	function changeListName(obj, blur) {
+    	var contentid = $(obj).parent("id"); //클릭한 리스트 아이디
+    	var list_idx = $(obj).parent().children('.update_idx').val();
+    	var oldval = $(obj).parent().children('.oldval').val();
+		var newval = $(obj).val().trim();
+		if(newval == "") {
+			$(obj).val(oldval);
+			newval = oldval;
+		}
+    	var form_data = {"newtitle" : newval, "oldtitle" : oldval, "list_idx" : list_idx};
+		 $.ajax({ 
+			url: "updateListTitle.action",
+			type: "POST",
+			data: form_data,
+			dataType: "JSON",
+			success: function(data){
+				if(data.resultTitle == newval){
+					$(obj).val(data.resultTitle);
+					if(blur) $(obj).blur();
+					$(obj).parent().find('.oldval').val(data.resultTitle);
+					$(obj).parent().find(".listname").text(data.resultTitle);
+					$(obj).parent().find(".listname").show();
+					$(obj).hide();
+				}
+				else{
+					$(obj).val(oldval);
+				}
+			},
+			error: function(request, status, error){ 
+				//alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+				$(obj).val(oldval);
+			}
+		}); 
+    }
+	
+	function getArchive() {
+    	var project_idx = "${projectInfo.project_idx}";
+    	var form_data = {"project_idx" : project_idx};
+    	$.ajax({
+			url: "getArchive.action",
+			type: "POST",
+			data: form_data,    
+			dataType: "JSON",
+			success: function(data){
+				var html = "";
+				$(".showMenu").find(".dropdown-menu div").empty();
+				$.each(data, function(i, v) {
+					html = "<span data-list-idx="+v.list_idx+" onclick='recoverList(this)'>"+v.list_name+"</span><br/>";
+					$(".showMenu").find(".dropdown-menu div").append(html);
+				});
+			},
+			error: function(request, status, error){ 
+				alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+			}
+		}); // end of $.ajax  
+    }
+	
+	function recoverList(obj) { //리스트 복구하는 함수
+		if(confirm("리스트를 복구하시겠습니까?")) {
+			var project_idx = "${projectInfo.project_idx}";
+			var list_idx = $(obj).data("listIdx");
+			var form_data = {"project_idx" : project_idx, "list_idx" : list_idx, "delete_type" : "R"};
+			
+			$.ajax({
+				url: "updateListDeleteStatus.action",
+				type: "POST",
+				data: form_data,    
+				dataType: "JSON",
+				success: function(data){ 
+					if(data.result == "2") {
+						getArchive();
+						//리스트 복구 후 empty 후 리스트 갱신
+					}
+				},
+				error: function(request, status, error){ 
+					alert(" code: " + request.status + "\n message: " + request.responseText + "\n error: " + error);
+				}
+			}); // end of $.ajax 
+		}
+	}
 	
 	function insertList(){ //리스트를 추가하는 함수
 		var list_name = $("#listname").val().trim();
@@ -194,9 +282,10 @@
 				dataType: "JSON",
 				success: function(data){
 					if(data.result == 2){
-					var html = "<div class='well well2' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>"
-							 + "	<input type='text' class='project_listname newval' value='" + data.list_name + "' style='cursor:pointer;  background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold;' maxlength='25'/>"
-							 + "	&nbsp;&nbsp;&nbsp;<i class='fa fa-align-justify' style='font-size:24px'></i>"
+					var html = "<div class='well well2 listDiv' style='width:300px;display:inline-block; vertical-align: top; border-radius: 1em;'>"
+							 + "<p class='listname' style='width:85%; cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold; word-break:break-all; white-space:normal; display:inline-block;'>"+data.list_name+"</p>"
+							 + "	<input type='text' class='project_listname newval' value='" + data.list_name + "' style='cursor:pointer;  background-color:transparent; border:none; font-size: 14pt; color: gray; font-weight: bold; display:none;' maxlength='25'/>"
+							 + "	&nbsp;&nbsp;&nbsp;<i class='fa fa-trash removeList' style='font-size: 24px;vertical-align:top;cursor:pointer;'></i>"
 							 + "	<input type='hidden' class='project_listname oldval' value='" + data.list_name + "'/>"
 		 					 + "	<input type='hidden' class='update_idx' value='" + data.list_idx + "' maxlength='4'/>"
 		 					 + "	<div class='card-wrapper' style='max-height:500px;overflow-y:auto; margin-top: 5%;'>"
@@ -211,7 +300,7 @@
 							 + "    <span style='font-size: 12pt; color: gray; cursor: pointer;'  class='addCardstyle'><i class='fa fa-plus'></i>&nbsp;add another card...</span>"
 			   				 + "</div>";
 			   				 
-			   				 $(".list-wrapper").append(html);
+			   				 $(".listDiv:last").after(html);
 			   				 $(".div-addcard").hide();
 			   				 
 			   				 $("#listname").val("");
@@ -229,7 +318,7 @@
 			   						$(this).parent().next().show();
 			   					});
 			   				 
-			   				$(".btn-addcard").click(function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
+			   				/* $(".btn-addcard").click(function(){ //addcard버튼 클릭시 카드 생성하는 이벤트
 			   					var card_title = $(this).prev().prev().val().trim(); //카드 타이틀
 			   					var card_title_length = $(this).prev().prev().val().length;
 			   					var list_idx = $(this).next().next().val();//리스트idx
@@ -269,7 +358,7 @@
 			   						    }
 			   						}); //end of $.ajax  
 			   					}
-			   				}); // end of $(".btn-addcard").click
+			   				}); // end of $(".btn-addcard").click */
 			   				
 			   				//리스트제목 클릭시 인풋창 스타일 변경, 제목 변경
 			   			    $(".well2").click(function(){
@@ -518,12 +607,23 @@
 				</ul>
 			</c:forEach>
 		</c:if>
-		<p align="right">
+		<ul class="nav navbar-nav navbar-right showMenu">
+			<li class="dropdown">
+			<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">...Show Menu</button>
+				<ul class="dropdown-menu">
+					<li style="min-width: 250px; min-height: 100px; padding-left: 10px; padding-top: 5px;">
+					<div style="width: inherit; height: inherit;"></div>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<!-- <p align="right">
+			
 			<button class="btn btn-default" type="button" id="menu1"
 				style="background-color: black; margin-top: 5px; margin-bottom: 5px; color: black; border-color: black;">
 				<span style="font-size: 13pt; color: yellow;">...Show Menu</span>
 			</button>
-		</p>
+		</p> -->
 	</div>
 </nav>
 
@@ -552,41 +652,21 @@
 	</c:if>
 
 	<c:if test="${listvo.size() != 0}">
-
-		<div id="addListShow" class="well list-hover"
-			style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
-			<div class="addListstyle" id="addListstyle">
-				<label for="addListstyle"> <span
-					style="font-size: 14pt; color: gray; font-weight: bold; padding-bottom: 10%; cursor: pointer;"><i
-						class="fa fa-plus"></i>&nbsp;add another list...</span>
-				</label>
-			</div>
-		</div>
-		<div id="addList" class="well list-hover"
-			style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
-			<div class="div-listname" id="div-listname">
-				<input type='text' class='list-title' id="listname"
-					placeholder="Enter list title..." maxlength="25">
-				<button class="btn btn-default" style="margin-top: 10px;"
-					onClick="insertList();">add List</button>
-				<button class="btn btn-default"
-					style="margin-top: 10px; padding-left: 10px;" id="btn_listCancel">cancel</button>
-			</div>
-		</div>
 		<c:forEach items="${listvo}" var="vo" varStatus="status">
 			<c:if test="${vo.list_delete_status != 0 }">
 				<!--  list_delete_status != 0 인 경우에만 리스트 노출 -->
-				<div id="list${status.count}" class="well well2"
+				<div id="list${status.count}" class="well well2 listDiv"
 					style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
-					<input type="text" class="project_listname newval" value="${vo.list_name}" style="cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold;" maxlength="25" /> 
-					&nbsp;&nbsp;&nbsp;<i class="fa fa-align-justify" style="font-size: 24px"></i> 
+					<p class="listname" style="width:85%; cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold; word-break:break-all; white-space:normal; display:inline-block;">${vo.list_name}</p>
+					<input type="text" class="project_listname newval" value="${vo.list_name}" style="cursor: pointer; background-color: transparent; border: none; font-size: 14pt; color: gray; font-weight: bold; display:none;" maxlength="25" /> 
+					&nbsp;&nbsp;&nbsp;<i class="fa fa-trash removeList" style="font-size: 24px;vertical-align:top;cursor:pointer;"></i>
 					<input type="hidden" class="project_listname oldval" value="${vo.list_name}" /> 
 					<input type="hidden" class="update_idx" value="${vo.list_idx}" maxlength="4" />
 					<div class="card-wrapper" style="max-height: 595px; overflow-y: auto; margin-top: 5%;">
 						<c:if test="${vo.cardlist != null}">
 							<c:forEach items="${vo.cardlist}" var="cardvo">
 								<div class="panel panel-default">
-									<div class="panel-body" onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false"> 
+									<div class="panel-body" onClick="NewWindow('carddetail.action?projectIDX=${vo.fk_project_idx}&listIDX=${cardvo.fk_list_idx}&cardIDX=${cardvo.card_idx}','window_name','800','710','yes');return false" style="word-break:break-all;white-space:normal;"> 
 										${cardvo.card_title}
 									</div>
 								</div>
@@ -607,6 +687,26 @@
 				</div>
 			</c:if>
 		</c:forEach>
+		<div id="addListShow" class="well list-hover"
+			style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
+			<div class="addListstyle" id="addListstyle">
+				<label for="addListstyle"> <span
+					style="font-size: 14pt; color: gray; font-weight: bold; padding-bottom: 10%; cursor: pointer;"><i
+						class="fa fa-plus"></i>&nbsp;add another list...</span>
+				</label>
+			</div>
+		</div>
+		<div id="addList" class="well list-hover"
+			style="width: 300px; display: inline-block; vertical-align: top; border-radius: 1em;">
+			<div class="div-listname" id="div-listname">
+				<input type='text' class='list-title' id="listname"
+					placeholder="Enter list title..." maxlength="25">
+				<button class="btn btn-default" style="margin-top: 10px;"
+					onClick="insertList();">add List</button>
+				<button class="btn btn-default"
+					style="margin-top: 10px; padding-left: 10px;" id="btn_listCancel">cancel</button>
+			</div>
+		</div>
 	</c:if>
 </div>
 

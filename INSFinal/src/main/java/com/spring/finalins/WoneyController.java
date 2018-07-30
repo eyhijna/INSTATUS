@@ -27,6 +27,7 @@ import com.spring.finalins.common.FileManager;
 import com.spring.finalins.common.MyUtil;
 import com.spring.finalins.model.CardDetailVO;
 import com.spring.finalins.model.MemberVO;
+import com.spring.finalins.service.InterProjectService;
 import com.spring.finalins.service.InterWoneyService;
 
 
@@ -43,9 +44,26 @@ public class WoneyController {
 	@Autowired
 	private FileManager fileManager;
 	
+	//메인페이지 연결을 위한 projectService객체주입
+	@Autowired
+	private InterProjectService projectService;
+	
 	@RequestMapping(value="/index.action", method= {RequestMethod.GET})
 	public String index(HttpServletRequest request) {
-
+		HttpSession session = request.getSession();
+		MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
+		
+		if(loginuser != null) {
+			String userid = loginuser.getUserid();
+			
+			List<HashMap<String, String>> teamList = projectService.getTeamList(userid);
+			List<HashMap<String, String>> projectList = projectService.getProjectList(userid);
+			List<HashMap<String, String>> imageList = projectService.getProjectImg();
+			
+			request.setAttribute("teamList", teamList);
+			request.setAttribute("projectList", projectList);
+			request.setAttribute("imageList", imageList);
+		}
 		return "main/index.tiles";
 	}
 	
