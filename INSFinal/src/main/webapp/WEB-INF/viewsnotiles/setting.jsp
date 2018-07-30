@@ -176,7 +176,7 @@
 
 </script>
 <body>   
-	<div style="width:780px; margin-top: 30px;" class="container"> 
+	<div style="width:830px; margin-top: 30px;" class="container"> 
 	
 	 <form name="viewFrm">
 	  <table class="table">

@@ -120,7 +120,7 @@
 </script>
 
 
-    <div class="navtab" align="center">        
+    <div class="navtab"   style="margin-right:230px;">        
         <ul class="nav nav-tabs abc"> 
 		       <li><a data-toggle="tab1" onClick="board();"><span style="font-weight: bold; color: black;">Board</span></a></li>
 		       <li><a data-toggle="tab1" onClick="member();"><span style="font-weight: bold; color: black;">Member</span></a></li>

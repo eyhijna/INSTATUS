@@ -280,7 +280,7 @@
   		frm.submit(); 
   	}  
   } 
-  
+    
   function joinTeam(team_idx){ // public일때 회원이 가입신청 버튼을 누를때 
 	    
 	    var frm = document.joinFrm;
@@ -289,13 +289,13 @@
 	    frm.method="POST";
         frm.action="<%= request.getContextPath()%>/wantJoinTeam.action";
         frm.submit(); 
-  } 
+   } 
 </script>
-
+  
 <div> 
-  <div class="col-sm-3" id ="TeamImage" style="margin-top: 30pt; margin-left:280px;"> <!--grid-item  -->  
+  <div class="col-sm-2" id ="TeamImage" style="margin-top: 30pt; margin-left:560px;"> <!--grid-item  -->  
   </div>
-  <div class="col-sm-4" id="infoTeam" style="margin-top: 45pt; margin-bottom:30pt;">
+  <div class="col-sm-4" id="infoTeam" style="margin-top: 45pt; margin-bottom:30pt; margin-left:40px;">
   </div> 
 </div>
 

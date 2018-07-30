@@ -668,7 +668,7 @@
 		   html +=  "        <input type='hidden' name='searchUserid' id='searchUserid' style='width:100px;'>";
 		   html +=  "       <button type='button' id='searchmember' class='btn btn-primary' style='font-weight:bold; width:140px; margin-bottom:5px;'>Invite to Team</button>";
 		   
-		   html +=  "      <div id='display' class='dropdown'>"; 
+		   html +=  "      <div id='display' class='dropdown' >"; 
 	       html +=  "        <ul class='dropdown-menu' id='displayData'></ul>";  
 	       html +=  "	   </div>"; 
 		   
@@ -679,7 +679,7 @@
 		   
 		   html +=  "<c:if test='${(sessionScope.loginuser).userid != teamvo.admin_userid}'>   "; 
 		   html +=  "  <table>";
-		   html +=  "   <td><tr><span class='glyphicon glyphicon-exclamation-sign' style='color:black;'> </span><span>&nbsp;There is no members</span></tr></td>";
+		   html +=  "   <td><tr><span  style='color: #ff5252; font-weight:bold;'><span class='glyphicon glyphicon-exclamation-sign'></span>&nbsp;There is no members</span></tr></td>";
 		   html +=  "  </table>";
 		   html +=  "</c:if>";
 	   
@@ -802,7 +802,7 @@
 
 </head>
 <body> 
-    <div class="btn-group-vertical" style="margin-left: 100px; border: solid 0px black; margin-top: 30px;"> 
+    <div class="btn-group-vertical" style="margin-left: 230px; border: solid 0px black; margin-top: 30px;"> 
 	  <button type="button" class="btn btn1" disabled="disabled" ><span style="font-weight: bold;">Members of Team Boards</span></button>
 	  
 	  <c:if test="${memberCnt > 0}"> <!-- 팀원이 존재했을때  -->
@@ -815,22 +815,22 @@
 	</div>
 	
 	<c:if test="${memberCnt > 0 && teamvo.admin_userid != sessionScope.loginuser.userid}">
-	  <input type="text" placeholder="Search team member" name="searchMyTmember" id="searchMyTmember" style="width:230px; margin-left:800px;">
+	  <input type="text" placeholder="Search team member" name="searchMyTmember" id="searchMyTmember" style="width:230px; margin-left:850px;">
 	</c:if>
 	
 	<c:if test="${memberCnt > 0 && teamvo.admin_userid == sessionScope.loginuser.userid }"> 
 	    <form name="searchFrm2" class="form-inline"> 
-			  <input type="text" placeholder="Search Member" name="searchWord" id="searchWord2" style="width:230px; margin-left:940px;" ><button type="button" id="searchmember2" class="btn btn-primary" style="font-weight:bold; width:130px; margin-bottom:5px; margin-left:6px;">Invite to Team</button> 
+			  <input type="text" placeholder="Search Member" name="searchWord" id="searchWord2" style="width:230px; margin-left:1150px;" ><button type="button" id="searchmember2" class="btn btn-primary" style="font-weight:bold; width:130px; margin-bottom:5px; margin-left:6px;">Invite to Team</button> 
 			  <input type="hidden" name="searchUserid" id="searchUserid2">  
 			  <input type="hidden" name="status" id="status" value="" />
 			  
-			  <div id="display2" class="dropdown" style="margin-left:940px;"> 
+			  <div id="display2" class="dropdown" style="margin-left:1150px;"> 
 		        <ul class="dropdown-menu" id="displayData2"></ul>  
 		      </div>   
 		</form>
 	</c:if>
 	
-	<div style="margin-left: 330px; margin-top: -50px;">
+	<div style="margin-left: 460px; margin-top: -50px;">
 	    <h4 style=" font-weight: bold; width:100px; border: solid 0px black; display: inline; color:black;">Team Members ( ${memberCnt + 1} )</h4>
 	    <br/><h5 style="width:200px; font-weight: bold; width:100px; border: solid 0px black; display: inline;">Team members can view and join all Team Visible boards and create new boards in the team.</h5>
 		 

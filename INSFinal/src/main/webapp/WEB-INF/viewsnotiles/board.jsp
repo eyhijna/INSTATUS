@@ -281,7 +281,7 @@
   });//end of doucment.ready
   
   
-  var length = 3;
+  var length = 4;
   function displayProject(start){
  	 
 	 var team_idx = ${team_idx};
@@ -340,7 +340,7 @@
  		    	         
  		    	        $("#btnMore").val(parseInt(start) + length );
  		    	        
- 			    	     if($("#totalCount").text() <= 3 ){
+ 			    	     if($("#totalCount").text() <= 4 ){
  			    			 $("#btnMore").hide(); 
  			    		 }	   
  			    		 else{
@@ -398,7 +398,7 @@
 	 		    		    });//end of each
 	 		    	   }//end of if 
 	 		    	   else{
-	 		    		   html += "<p> There is no project. <p>";
+	 		    		   html += "<h3 style='color: #ff5252; font-weight:bold;'><span class='glyphicon glyphicon-exclamation-sign'></span>&nbsp;There is no project.<h3>";
 	 		    	   }
 	 		    	       html += "<div style='clear: both;'>&nbsp;</div>";
 	 		    	       	 
@@ -406,7 +406,7 @@
 	 		    	         
 	 		    	        $("#btnMore1").val(parseInt(start) + length );
 	 		    	        
-	 			    	     if($("#totalCount1").text() <= 3 ){
+	 			    	     if($("#totalCount1").text() <= 4 ){
 	 			    			 $("#btnMore1").hide(); 
 	 			    		 }	   
 	 			    		 else{
@@ -435,7 +435,7 @@
 </head>
 <body> 
 
-  <div style="width: 100%; margin-top: 60px; margin-bottom: 30px;">
+  <div style="width: 100%; margin-top: 60px; margin-bottom: 30px; margin-left:100px;">
 	 <div style="display: block; margin-left:430px; margin-bottom:35px;">
 	   <c:forEach items="${memberList}" var="member">
           <c:if test="${(sessionScope.loginuser).userid == member.team_userid && ( mystatus == 1 || mystatus == 2 )}">   
@@ -446,13 +446,13 @@
  	 </div> 
 	 <div id="displayResult" style="margin-left: 400px; border: 0px solid gray;"> 
  	 </div>	    		   
-	<div id="display1" style="margin-top: 10px; margin-left:730px; margin-bottom:20px;">
+	<div id="display1" style="margin-top: 10px; margin-left:850px; margin-bottom:20px;">
 	  <button type="button" id="btnMore" class="btn" style="color:black; font-weight:bold;" value="">More</button>
 	  <span id="totalCount" hidden>${totalCount}</span> <!-- 총 프로젝트 갯수(totalCOUNT)보다 많아지면 더보기버튼을 안보여주기 위해 사용 -->
 	  <span id="count" hidden >0</span> <!-- 현재 내가 프로젝트를 몇개만큼 받아왔는지 알아보기 위해  count변수사용 -->
 	</div>
 	
-	<div id="display2" style="margin-top: 10px; margin-left:730px; margin-bottom:20px;">
+	<div id="display2" style="margin-top: 10px; margin-left:850px; margin-bottom:20px;">
 	  <button type="button" id="btnMore1" class="btn" style="color:black; font-weight:bold;" value="">More</button>
 	  <span id="totalCount1" hidden >${totalCount}</span> <!-- 총 프로젝트 갯수(totalCOUNT)보다 많아지면 더보기버튼을 안보여주기 위해 사용 -->
 	  <span id="count1" hidden >0</span> <!-- 현재 내가 프로젝트를 몇개만큼 받아왔는지 알아보기 위해  count변수사용 -->
