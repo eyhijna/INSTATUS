@@ -76,13 +76,27 @@
 		           </c:if>  
 			       <c:if test="${teamList.size() > 0}">  
 			          <c:forEach var="teamvo" items="${teamList}">
-			          
+			             
 			           <c:if test="${teamvo.server_filename == '0'}">
-			           <button type="button" class="button btnTeam" id="btnTeamId" style="margin-right: 50px;margin-bottom: 30px;  background-image: url('<%= request.getContextPath() %>/resources/images/04148_wingsofangelsnorthernlightsoniceland_1920x1080.jpg');" onclick="location.href='<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}'">${teamvo.team_name}</button>
+			           <button type="button" class="button btnTeam" id="btnTeamId" style="margin-right: 50px;margin-bottom: 30px;  background-image: url('<%= request.getContextPath() %>/resources/images/04148_wingsofangelsnorthernlightsoniceland_1920x1080.jpg');" onclick="location.href='<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}'">${teamvo.team_name}</br>
+			          <c:if test="${teamvo.team_visibility_status == 0}">
+		    	    	 <span style='color: #ff5252;' class='glyphicon glyphicon-eye-close'></span><span style='font-size: 12pt;'>&nbsp;&nbsp;private</span>
+		    	      </c:if>
+		    	       <c:if test="${teamvo.team_visibility_status == 1}">
+		    	    	  <span style='color: blue;' class='glyphicon glyphicon-eye-open'></span><span style=' font-size: 12pt;'>&nbsp;&nbsp;public</span>
+		    	      </c:if>
+		    	      </button>
 				 	   </c:if>
 				 	   
-				 	    <c:if test="${teamvo.server_filename != 0}">
-				 	   <button type="button" class="button btnTeam" id="btnTeamId" style="margin-right: 50px;margin-bottom: 30px;  background-image: url('<%= request.getContextPath() %>/resources/files/${teamvo.server_filename}');" onclick="location.href='<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}'">${teamvo.team_name}</button>
+				 	    <c:if test="${teamvo.server_filename != 0 && teamvo.team_visibility_status == 1}">
+				 	   <button type="button" class="button btnTeam" id="btnTeamId" style="margin-right: 50px;margin-bottom: 30px;  background-image: url('<%= request.getContextPath() %>/resources/files/${teamvo.server_filename}');" onclick="location.href='<%= request.getContextPath()%>/showTeam.action?team_idx=${teamvo.team_idx}'">${teamvo.team_name}</br>
+				 	    <c:if test="${teamvo.team_visibility_status == 0}">
+		    	    	 <span style='color: #ff5252;' class='glyphicon glyphicon-eye-close'></span><span style=' font-size: 12pt;'>&nbsp;&nbsp;private</span>
+		    	      </c:if>
+		    	       <c:if test="${teamvo.team_visibility_status == 1}">
+		    	    	  <span style='color: blue;' class='glyphicon glyphicon-eye-open'></span><span style=' font-size: 12pt;'>&nbsp;&nbsp;public</span>
+		    	      </c:if>
+				 	   </button>
 	                   </c:if>
 	                   
 	                   </c:forEach>
